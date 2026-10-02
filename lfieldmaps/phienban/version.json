@@ -1,6 +1,6 @@
 {
   "versionCode": 3,
-  "versionName": "1.0.4",
+  "versionName": "1.0.5",
   "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=3",
   "apkSize": 0,
   "sha256": "",
@@ -8,7 +8,7 @@
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "Hộp thoại khai báo hệ toạ độ khi nhập .shp gọn và rõ ràng hơn",
+    "Thêm tính năng mở dữ liệu *Zip hoặc *rar cho dữ liệu *tab và *shp",
     "Thêm mục Cập nhật phiên bản: kiểm tra, tải và cài bản mới ngay trong app",
     "Tự động báo khi có phiên bản mới"
   ]
