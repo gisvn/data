@@ -407,6 +407,15 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
     <button class="tab" role="tab" data-tab="settings" aria-selected="false">Khoá ký &amp; cài đặt</button>
   </nav>
 
+  <div class="warnbox hidden" id="verifyBox">
+    <b>Tài khoản <span id="vbEmail"></span> chưa xác minh email</b> nên luật Firestore chưa cho đọc dữ liệu.
+    Bấm <b>Gửi email xác minh</b> › mở Gmail (xem cả mục Spam / Quảng cáo) › bấm link trong thư › quay lại bấm <b>Tôi đã xác minh</b>.
+    <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn sm primary" type="button" id="btnSendVerify">Gửi email xác minh</button>
+      <button class="btn sm" type="button" id="btnVerified">Tôi đã xác minh</button>
+    </div>
+  </div>
+
   <!-- ---------- TAB KEY ---------- -->
   <section data-panel="keys">
     <div class="warnbox hidden" id="noKeyWarn">Chưa có khoá ký. Vào tab <b>Khoá ký &amp; cài đặt</b> để tạo trước khi cấp key.</div>
@@ -845,8 +854,9 @@ function subscribe() {
   const { fs, db } = FB;
   const onErr = e => {
     const u = FB.auth.currentUser;
+    if (e.code === 'permission-denied' && u && !u.emailVerified) { $('#vbEmail').textContent = u.email || ''; $('#verifyBox').classList.remove('hidden'); }
     toast('Không đọc được dữ liệu: ' + (e.code !== 'permission-denied' ? e.message
-      : u && !u.emailVerified ? 'tài khoản Email/Mật khẩu này CHƯA xác minh email. Đặt mật khẩu bằng nút "Đặt mật khẩu đăng nhập" khi đang đăng nhập Google ở máy tính, đừng tạo tài khoản riêng.'
+      : u && !u.emailVerified ? 'tài khoản này CHƯA xác minh email. Bấm "Gửi email xác minh" ở khung vàng phía trên.'
       : 'email chưa có trong luật Firestore'), true);
   };
   const bind = (name, err = onErr) => unsub.push(fs.onSnapshot(fs.collection(db, name), snap => {
@@ -2083,6 +2093,24 @@ function wire() {
   $('#btnGoogleAlt').onclick = () => googleLogin(!IS_MOBILE);
   $('#btnCopyUrl').onclick = () => copyText(location.origin + location.pathname, 'Đã chép link, dán vào Chrome / Safari');
   $('#btnSetPw').onclick = setAdminPassword;
+  // Xác minh email cho tài khoản Email/Mật khẩu (luật isLicenseAdmin() bắt email_verified == true).
+  $('#btnSendVerify').onclick = async () => {
+    const u = FB?.auth?.currentUser; if (!u) return;
+    const b = $('#btnSendVerify'); b.disabled = true;
+    try { await FB.authMod.sendEmailVerification(u); toast('Đã gửi thư xác minh tới ' + u.email + '. Mở Gmail bấm link (xem cả Spam).'); }
+    catch (x) { toast(x.code === 'auth/too-many-requests' ? 'Gửi quá nhiều lần, chờ vài phút rồi thử lại (hoặc dùng thư đã gửi trước).' : x.message, true); }
+    finally { b.disabled = false; }
+  };
+  $('#btnVerified').onclick = async () => {
+    const u = FB?.auth?.currentUser; if (!u) return;
+    try {
+      await u.reload();
+      if (!FB.auth.currentUser.emailVerified) { toast('Chưa thấy xác minh. Bấm link trong thư Gmail trước rồi bấm lại.', true); return; }
+      await FB.auth.currentUser.getIdToken(true);
+      $('#verifyBox').classList.add('hidden'); toast('Đã xác minh email ✓ Đang tải dữ liệu...');
+      subscribe(); renderPwState();
+    } catch (x) { toast(x.message, true); }
+  };
 }
 
 function showGoogleErr(x) {
