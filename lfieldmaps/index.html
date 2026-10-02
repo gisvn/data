@@ -382,7 +382,9 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.35 11.1H12v2.98h5.35c-.23 1.4-1.64 4.1-5.35 4.1-3.22 0-5.85-2.67-5.85-5.95S8.78 6.28 12 6.28c1.83 0 3.06.78 3.76 1.45l2.56-2.47C16.7 3.73 14.56 2.8 12 2.8 6.92 2.8 2.8 6.92 2.8 12s4.12 9.2 9.2 9.2c5.31 0 8.83-3.73 8.83-8.99 0-.6-.07-1.06-.15-1.51z"/></svg>
         Đăng nhập bằng Google</button>
       <div class="err" id="googleErr"></div>
-      <details style="margin-top:6px"><summary style="cursor:pointer;color:var(--ink-2);font-size:14px">Hoặc đăng nhập bằng Email/Mật khẩu</summary>
+      <div class="warnbox hidden" id="inAppWarn">Đang mở trong trình duyệt của <b>Zalo / Facebook / Messenger</b>: Google chặn đăng nhập ở đây. Bấm <b>⋮</b> hoặc <b>…</b> › <b>Mở bằng trình duyệt</b> (Chrome / Safari), hoặc <button type="button" class="btn sm quiet" id="btnCopyUrl">chép link</button> rồi dán vào Chrome.</div>
+      <p class="mhint" id="altGoogleRow">Bấm đăng nhập xong mà trang trắng / quay lại không vào được? <button type="button" class="btn sm quiet" id="btnGoogleAlt">Thử cách đăng nhập Google khác</button> hoặc dùng <b>Email/Mật khẩu</b> bên dưới (đặt mật khẩu ở máy tính: tab Khoá ký &amp; cài đặt › Đăng nhập trên điện thoại).</p>
+      <details style="margin-top:6px" id="pwDetails"><summary style="cursor:pointer;color:var(--ink-2);font-size:14px">Hoặc đăng nhập bằng Email/Mật khẩu</summary>
       <form id="loginForm" style="margin-top:12px">
         <div class="field"><label for="lgEmail">Email</label><input type="email" id="lgEmail" autocomplete="username" required></div>
         <div class="field"><label for="lgPass">Mật khẩu</label><input type="password" id="lgPass" autocomplete="current-password" required></div>
@@ -608,6 +610,17 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
         </div>
       </div>
 
+      <div class="panel" id="phonePanel">
+        <h2>Đăng nhập trên điện thoại</h2>
+        <p>Đăng nhập Google trên điện thoại hay bị trang trắng (trình duyệt điện thoại chặn cửa sổ đăng nhập / bộ nhớ bên thứ ba). Cách chắc ăn: đặt <b>mật khẩu</b> cho chính tài khoản quản trị này, rồi trên điện thoại chọn <b>Đăng nhập bằng Email/Mật khẩu</b>. Vẫn là 1 tài khoản, email vẫn được xác minh nên luật Firestore vẫn nhận.</p>
+        <div class="keystate" id="pwState"></div>
+        <div class="field"><label for="pw1">Mật khẩu mới (ít nhất 8 ký tự)</label><input type="password" id="pw1" autocomplete="new-password"></div>
+        <div class="field"><label for="pw2">Nhập lại mật khẩu</label><input type="password" id="pw2" autocomplete="new-password"></div>
+        <div class="row"><button class="btn primary" id="btnSetPw">Đặt mật khẩu đăng nhập</button></div>
+        <div class="mhint" id="pwMsg"></div>
+        <div class="mhint">Cấp / gia hạn key trên điện thoại cần có khoá ký ở trình duyệt điện thoại: panel <b>Chuyển dữ liệu</b> › đặt mật khẩu gói › <b>Tải gói chuyển dữ liệu</b> › gửi file sang điện thoại › nhập ở bước ⇄. Chỉ xem / thu hồi thì không cần.</div>
+      </div>
+
       <div class="panel" id="migratePanel">
         <h2>Chuyển dữ liệu sang trang khác (GitHub Pages)</h2>
         <p>Khoá ký &amp; cấu hình Firebase lưu <b>riêng theo từng địa chỉ web</b>. Trang đang mở: <code id="originText"></code>. Mở ở địa chỉ mới (vd. GitHub) sẽ trống nên phải chuyển sang. Key đã cấp, khách, dùng thử nằm trên Firestore, không cần chuyển.</p>
@@ -686,6 +699,11 @@ const LS_CFG = 'rsgis_admin_fbcfg', LS_KEY = 'rsgis_admin_signing_jwk', LS_TARGE
 const APP_PUBLIC_KEY = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1BojruGOCF7SHx5oGOhQgmektVzXX/rmQFwhJ8VMZrm5w5jRL9oENFYa0b/GDucVOjI/z2355pcAvCoPPwFHqg==';
 const BUNDLE_TYPE = 'rsgis-admin-bundle', RECV_HASH = '#nhan-du-lieu';
 const IS_LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+const UA = navigator.userAgent || '';
+const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(UA) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(UA));
+// Trình duyệt nhúng trong app (Zalo, Facebook, Messenger, Instagram, Line, WebView): Google chặn OAuth.
+const IN_APP = /Zalo|FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|; wv\)|MicroMessenger|TikTok/i.test(UA);
+const SS_REDIRECT = 'rsgis_admin_redirecting';
 const CROCK = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -811,13 +829,26 @@ async function connectFirebase(cfg) {
   const app = appMod.initializeApp(cfg);
   FB = { app, auth: authMod.getAuth(app), authMod, fs, db: fs.getFirestore(app) };
   authMod.onAuthStateChanged(FB.auth, user => user ? enterApp(user.email) : showSetup());
+  // Quay về từ signInWithRedirect (điện thoại): báo lỗi nếu có, hoặc báo trình duyệt chặn bộ nhớ.
+  authMod.getRedirectResult(FB.auth).then(r => {
+    const was = sessionStorage.getItem(SS_REDIRECT); sessionStorage.removeItem(SS_REDIRECT);
+    if (!r && was && !FB.auth.currentUser) {
+      $('#googleErr').innerHTML = 'Đã chọn tài khoản Google nhưng trình duyệt không trả kết quả về trang (thường do chặn cookie / bộ nhớ bên thứ ba, hay gặp trên iPhone và Samsung Internet). Bấm <b>Thử cách đăng nhập Google khác</b>, hoặc dùng <b>Email/Mật khẩu</b> bên dưới.';
+      $('#pwDetails').open = true;
+    }
+  }).catch(x => { sessionStorage.removeItem(SS_REDIRECT); showGoogleErr(x); });
 }
 
 let unsub = [];
 function subscribe() {
   unsub.forEach(u => u()); unsub = [];
   const { fs, db } = FB;
-  const onErr = e => toast('Không đọc được dữ liệu: ' + (e.code === 'permission-denied' ? 'email chưa có trong luật Firestore' : e.message), true);
+  const onErr = e => {
+    const u = FB.auth.currentUser;
+    toast('Không đọc được dữ liệu: ' + (e.code !== 'permission-denied' ? e.message
+      : u && !u.emailVerified ? 'tài khoản Email/Mật khẩu này CHƯA xác minh email. Đặt mật khẩu bằng nút "Đặt mật khẩu đăng nhập" khi đang đăng nhập Google ở máy tính, đừng tạo tài khoản riêng.'
+      : 'email chưa có trong luật Firestore'), true);
+  };
   const bind = (name, err = onErr) => unsub.push(fs.onSnapshot(fs.collection(db, name), snap => {
     const m = {}; snap.forEach(d => m[d.id] = d.data()); S[name] = m; S.loaded = true; render();
   }, err));
@@ -1640,6 +1671,7 @@ function renderSettings() {
   else if (Signer.pubB64 === APP_PUBLIC_KEY) { km.className = 'keystate ok'; km.innerHTML = '● Khớp khoá công khai trong app (LicenseConfig.PUBLIC_KEY): key cấp ra app nhận được.'; }
   else { km.className = 'keystate no'; km.innerHTML = S.demo ? '● Đang xem dữ liệu mẫu: khoá ký tạm, không phải khoá của app.' : '● KHÔNG khớp khoá công khai trong app: key cấp ra sẽ bị app từ chối. Nhập đúng file sao lưu / chuyển khoá từ trang cũ.'; }
   $('#originText').textContent = location.origin + location.pathname;
+  renderPwState();
   if (!$('#bxTarget').value) $('#bxTarget').value = localStorage.getItem(LS_TARGET) || '';
   $('#priceTable').innerHTML = PLANS.map(p => `<tr><td><span class="badge" style="--pc:${p.color}">${p.name}</span> ${p.label}</td>
     <td>${p.orig ? `<s style="color:var(--muted)">${money(p.orig)}</s>&nbsp; ` : ''}<b>${p.price ? money(p.price) : 'Miễn phí'}</b></td></tr>`).join('');
@@ -1748,6 +1780,55 @@ async function onDetailAction(act, box, btn) {
 // tự có ở https://ten.github.io. Licenses/customers/trials nằm trên Firestore nên
 // không cần chuyển. Gói chuyển = { cfg, jwk, pub }, có thể mã hoá AES-GCM bằng mật khẩu.
 // =====================================================================
+// =====================================================================
+// ĐĂNG NHẬP TRÊN ĐIỆN THOẠI: gắn mật khẩu vào CHÍNH tài khoản Google quản trị
+// (linkWithCredential) -> email vẫn emailVerified = true, luật isLicenseAdmin() vẫn nhận.
+// =====================================================================
+function renderPwState() {
+  const el = $('#pwState'); if (!el) return;
+  const u = FB?.auth?.currentUser;
+  if (S.demo || !u) { el.className = 'keystate'; el.textContent = S.demo ? 'Đang xem dữ liệu mẫu.' : 'Chưa đăng nhập.'; return; }
+  const ids = u.providerData.map(p => p.providerId);
+  const hasPw = ids.includes('password');
+  el.className = 'keystate ' + (hasPw ? 'ok' : '');
+  el.innerHTML = `● ${esc(u.email || '')}: ${ids.includes('google.com') ? 'Google' : ''}${ids.includes('google.com') && hasPw ? ' + ' : ''}${hasPw ? '<b>Mật khẩu</b> (điện thoại đăng nhập Email/Mật khẩu được)' : ' · chưa có mật khẩu'}${u.emailVerified ? '' : ' · <b>email CHƯA xác minh</b>'}`;
+  $('#btnSetPw').textContent = hasPw ? 'Đổi mật khẩu đăng nhập' : 'Đặt mật khẩu đăng nhập';
+}
+async function setAdminPassword() {
+  const msg = $('#pwMsg'); msg.className = 'mhint';
+  const u = FB?.auth?.currentUser;
+  if (S.demo || !u) { toast('Đăng nhập trước (dùng Google trên máy tính)', true); return; }
+  const a = $('#pw1').value, b = $('#pw2').value;
+  if (a.length < 8) { msg.className = 'mhint bad'; msg.textContent = 'Mật khẩu ít nhất 8 ký tự.'; return; }
+  if (a !== b) { msg.className = 'mhint bad'; msg.textContent = 'Hai lần nhập không giống nhau.'; return; }
+  const A = FB.authMod, btn = $('#btnSetPw'); btn.disabled = true;
+  const run = async () => {
+    if (u.providerData.some(p => p.providerId === 'password')) await A.updatePassword(u, a);
+    else await A.linkWithCredential(u, A.EmailAuthProvider.credential(u.email, a));
+  };
+  try {
+    try { await run(); }
+    catch (x) {
+      if (x.code !== 'auth/requires-recent-login') throw x;
+      msg.textContent = 'Cần xác nhận lại tài khoản Google...';
+      await A.reauthenticateWithPopup(u, new A.GoogleAuthProvider());
+      await run();
+    }
+    await u.reload();
+    $('#pw1').value = $('#pw2').value = '';
+    msg.className = 'mhint ok';
+    msg.innerHTML = `✓ Đã đặt mật khẩu. Trên điện thoại: mở trang › <b>Hoặc đăng nhập bằng Email/Mật khẩu</b> › email <b>${esc(u.email)}</b> + mật khẩu vừa đặt.`;
+    renderPwState();
+  } catch (x) {
+    msg.className = 'mhint bad';
+    msg.textContent = x.code === 'auth/operation-not-allowed' ? 'Chưa bật Email/Password: Firebase › Authentication › Sign-in method › Email/Password › Enable › Save, rồi bấm lại.'
+      : x.code === 'auth/weak-password' ? 'Mật khẩu quá yếu, đặt dài hơn.'
+      : x.code === 'auth/email-already-in-use' || x.code === 'auth/credential-already-in-use' ? 'Đã có một tài khoản Email/Mật khẩu RIÊNG trùng email này (thường chưa xác minh). Firebase › Authentication › Users › xoá dòng có biểu tượng phong bì của email này (giữ dòng Google), rồi bấm lại.'
+      : x.code === 'auth/popup-blocked' || x.code === 'auth/popup-closed-by-user' ? 'Cần cho phép cửa sổ xác nhận Google, bấm lại.'
+      : (x.message || String(x));
+  } finally { btn.disabled = false; }
+}
+
 const keyMatchesApp = () => !APP_PUBLIC_KEY || !Signer.pubB64 || Signer.pubB64 === APP_PUBLIC_KEY;
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 
@@ -1911,6 +1992,8 @@ function showSetup() {
   $('#btnGoogle').disabled = !has;
   if (has) $('#cfgInput').value = localStorage.getItem(LS_CFG);
   $('#originSetup').textContent = location.host;
+  $('#inAppWarn').classList.toggle('hidden', !IN_APP);
+  if (IS_MOBILE && !$('#pwDetails').dataset.touched) { $('#pwDetails').open = true; $('#pwDetails').dataset.touched = '1'; }
   // Ở localhost đã có khoá thì ẩn bước chuyển; ở địa chỉ mới (GitHub) luôn hiện.
   $('#stepMigrate').classList.toggle('hidden', IS_LOCAL && !!Signer.priv && location.hash !== RECV_HASH);
   $('#stepMigrate').classList.toggle('done', !!Signer.priv && has);
@@ -1981,11 +2064,28 @@ function wire() {
     catch (x) { $('#loginErr').textContent = x.code === 'auth/invalid-credential' ? 'Sai email hoặc mật khẩu.' : x.message; }
     finally { b.disabled = false; b.textContent = 'Đăng nhập'; }
   };
-  $('#btnGoogle').onclick = async () => {
+  const googleLogin = async (useRedirect) => {
     $('#googleErr').textContent = '';
     if (!FB) { $('#googleErr').textContent = 'Lưu cấu hình Firebase ở bước 1 trước.'; return; }
-    try { await FB.authMod.signInWithPopup(FB.auth, new FB.authMod.GoogleAuthProvider()); }
-    catch (x) {
+    if (IN_APP) { $('#inAppWarn').classList.remove('hidden'); $('#googleErr').textContent = 'Mở trang bằng Chrome / Safari rồi đăng nhập lại.'; return; }
+    const prov = new FB.authMod.GoogleAuthProvider();
+    prov.setCustomParameters({ prompt: 'select_account' });
+    try {
+      if (useRedirect) { sessionStorage.setItem(SS_REDIRECT, '1'); await FB.authMod.signInWithRedirect(FB.auth, prov); return; }
+      await FB.authMod.signInWithPopup(FB.auth, prov);
+    } catch (x) {
+      sessionStorage.removeItem(SS_REDIRECT);
+      if (!useRedirect && x.code === 'auth/popup-blocked') { googleLogin(true); return; }
+      showGoogleErr(x);
+    }
+  };
+  $('#btnGoogle').onclick = () => googleLogin(IS_MOBILE);
+  $('#btnGoogleAlt').onclick = () => googleLogin(!IS_MOBILE);
+  $('#btnCopyUrl').onclick = () => copyText(location.origin + location.pathname, 'Đã chép link, dán vào Chrome / Safari');
+  $('#btnSetPw').onclick = setAdminPassword;
+}
+
+function showGoogleErr(x) {
       const host = location.hostname, pid = FB.app.options.projectId || '';
       const consoleUrl = `https://console.firebase.google.com/project/${encodeURIComponent(pid)}/authentication/settings`;
       if (x.code === 'auth/unauthorized-domain') {
@@ -1995,10 +2095,13 @@ function wire() {
         $('#googleErr').innerHTML = `API key đang giới hạn website. Google Cloud Console › APIs &amp; Services › Credentials › <b>Browser key</b> › Website restrictions › thêm <code>${esc(location.origin)}/*</code> › Save.`;
       } else {
         $('#googleErr').textContent = x.code === 'auth/popup-closed-by-user' ? 'Đã đóng cửa sổ đăng nhập.'
-          : x.code === 'auth/popup-blocked' ? 'Trình duyệt chặn cửa sổ đăng nhập: cho phép popup cho trang này rồi bấm lại.' : x.message;
+          : x.code === 'auth/popup-blocked' ? 'Trình duyệt chặn cửa sổ đăng nhập: cho phép popup cho trang này rồi bấm lại.'
+          : x.code === 'auth/web-storage-unsupported' || x.code === 'auth/operation-not-supported-in-this-environment' ? 'Trình duyệt đang chặn bộ nhớ / cookie: tắt chế độ ẩn danh, chặn cookie bên thứ ba cho trang này, hoặc dùng Email/Mật khẩu.'
+          : x.code === 'auth/network-request-failed' ? 'Mất mạng hoặc bị chặn kết nối tới Google. Thử lại.' : (x.message || String(x));
       }
-    }
-  };
+}
+
+function wire2() {
   wireBroadcasts();
   $('#btnDemo').onclick = loadDemo;
   $('#btnLogout').onclick = () => { unsub.forEach(u => u()); unsub = []; FB && FB.authMod.signOut(FB.auth); };
@@ -2091,7 +2194,7 @@ async function start(cfg) {
 }
 
 (async function boot() {
-  wire();
+  wire(); wire2();
   await Signer.load();
   initReceiver();
   if (new URLSearchParams(location.search).has('demo')) { loadDemo(); return; }
