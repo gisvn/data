@@ -1,0 +1,2104 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Quản lý key · LField Maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: oklch(0.975 0.008 165);
+  --surface: oklch(0.995 0.004 165);
+  --sunken: oklch(0.955 0.01 165);
+  --ink: oklch(0.24 0.025 165);
+  --ink-2: oklch(0.44 0.02 165);
+  --muted: oklch(0.6 0.016 165);
+  --line: oklch(0.905 0.012 165);
+  --line-2: oklch(0.86 0.014 165);
+  --accent: oklch(0.5 0.13 158);
+  --accent-hover: oklch(0.45 0.125 158);
+  --accent-ink: oklch(0.34 0.085 158);
+  --accent-wash: oklch(0.94 0.04 158);
+  --ok: oklch(0.56 0.14 150);   --ok-wash: oklch(0.95 0.04 150);
+  --warn: oklch(0.66 0.15 70);  --warn-wash: oklch(0.96 0.05 80);
+  --bad: oklch(0.56 0.19 25);   --bad-wash: oklch(0.95 0.035 25);
+  --off: oklch(0.62 0.01 165);  --off-wash: oklch(0.94 0.006 165);
+  --p-starter: oklch(0.56 0.1 178);
+  --p-pro: oklch(0.53 0.17 262);
+  --p-ultimate: oklch(0.5 0.2 296);
+  --p-premium: oklch(0.64 0.15 62);
+  --p-diamond: oklch(0.52 0.11 215);
+  --radius: 12px;
+  --shadow-sm: 0 1px 2px oklch(0.3 0.03 165 / 0.06);
+  --shadow-md: 0 8px 24px -12px oklch(0.3 0.04 165 / 0.22);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.2}
+button,input,select,textarea{font:inherit;color:inherit}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.num{font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ---------- header ---------- */
+header.top{position:sticky;top:0;z-index:20;background:oklch(0.975 0.008 165 / 0.92);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--accent-ink);display:grid;place-items:center;color:var(--accent-wash);font-weight:700;font-size:13px;letter-spacing:.04em}
+.brand b{display:block;font-size:15px}
+.brand small{display:block;color:var(--muted);font-size:12px;margin-top:-2px}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--sunken);font-size:12px;color:var(--ink-2);white-space:nowrap}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.chip.demo{background:var(--warn-wash);color:oklch(0.45 0.1 70)}
+.chip.demo .dot{background:var(--warn)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer;transition:background .15s var(--ease),border-color .15s var(--ease),transform .1s var(--ease);white-space:nowrap}
+.btn:hover{background:var(--sunken)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:oklch(0.985 0.01 158)}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.danger{color:var(--bad);border-color:oklch(0.85 0.06 25)}
+.btn.danger:hover{background:var(--bad-wash)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.quiet:hover{background:var(--sunken)}
+.btn.sm{min-height:32px;padding:0 11px;font-size:13px;border-radius:8px}
+.btn svg{width:16px;height:16px}
+
+/* ---------- layout ---------- */
+main{max-width:1240px;margin:0 auto;padding:28px 24px 80px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px;overflow-x:auto}
+.tab{padding:10px 14px;border:0;background:none;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .count{font-weight:500;color:var(--muted);margin-left:4px}
+
+/* ---------- setup ---------- */
+.setup{max-width:560px;margin:56px auto;padding:0 24px}
+.setup h1{font-size:30px;letter-spacing:-.01em}
+.setup .lead{color:var(--ink-2);margin:10px 0 32px;max-width:52ch}
+.step{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:20px 0;border-top:1px solid var(--line)}
+.step-n{width:28px;height:28px;border-radius:50%;background:var(--accent-wash);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px}
+.step.done .step-n{background:var(--accent);color:var(--accent-wash)}
+.step h3{font-size:16px;margin-bottom:4px}
+.step p{margin:0 0 12px;color:var(--ink-2);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.field .hint{font-size:12px;color:var(--muted)}
+input[type=text],input[type=email],input[type=password],input[type=date],input[type=number],input[type=search],select,textarea{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
+textarea{min-height:110px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px oklch(0.5 0.13 158 / 0.15)}
+input.mono,textarea.mono{font-family:var(--mono);font-size:13.5px}
+.err{color:var(--bad);font-size:13px;margin-top:6px;min-height:1em}
+.demo-link{margin-top:28px;font-size:14px;color:var(--ink-2)}
+.demo-link button{border:0;background:none;color:var(--accent-ink);font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- toolbar ---------- */
+.sweep-note{margin:-4px 0 16px;font-size:13px;color:var(--muted);max-width:75ch}.sweep-note b{color:var(--ink-2)}
+.team-tag{display:inline-block;margin-top:2px;font-size:12px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:16px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filter{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s var(--ease)}
+.filter b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.filter:hover{border-color:var(--line-2)}
+.filter[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:oklch(0.9 0.01 165)}
+.filter[aria-pressed="true"] b{color:oklch(0.985 0.005 165)}
+.filter .sw{width:8px;height:8px;border-radius:50%}
+.search{margin-left:auto;position:relative;min-width:240px}
+.search input{padding-left:34px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+
+/* ---------- create panel ---------- */
+.create{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:24px;box-shadow:var(--shadow-sm);overflow:hidden}
+.create-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
+.create-head h2{font-size:18px}
+.create-body{padding:22px;display:grid;grid-template-columns:1.25fr 1fr;gap:28px}
+.plans{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.plan-opt{position:relative;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--surface);transition:border-color .15s var(--ease),background .15s var(--ease)}
+.plan-opt input{position:absolute;opacity:0;pointer-events:none}
+.plan-opt .pn{font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--pc)}
+.plan-opt .pp{font-size:18px;font-weight:700;margin-top:2px}
+.plan-opt .pd{font-size:12px;color:var(--muted)}
+.plan-opt .po{font-size:12px;color:var(--muted);text-decoration:line-through;margin-left:6px;font-weight:500}
+.plan-opt:has(input:checked){border-color:var(--pc);background:color-mix(in oklch, var(--pc) 7%, var(--surface))}
+.plan-opt:has(input:focus-visible){outline:2px solid var(--pc);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.result{background:var(--sunken);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.result.empty{justify-content:center;align-items:flex-start;color:var(--muted);font-size:14px}
+.result .keybig{font-family:var(--mono);font-size:21px;font-weight:700;letter-spacing:.04em;color:var(--accent-ink);word-break:break-all}
+.result textarea{min-height:150px;font-size:13.5px;background:var(--surface)}
+.result .row{display:flex;gap:8px;flex-wrap:wrap}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;color:var(--muted);text-transform:uppercase}
+
+/* ---------- table ---------- */
+.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--sunken);border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr.row{cursor:pointer;transition:background .12s var(--ease)}
+tbody tr.row:hover{background:oklch(0.97 0.01 165)}
+tbody tr.row.open{background:var(--accent-wash)}
+tbody td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+.cust b{display:block;font-weight:600}
+.cust small{color:var(--muted);font-size:12.5px}
+.badge{display:inline-block;padding:3px 9px;border-radius:7px;font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--pc);background:color-mix(in oklch, var(--pc) 12%, var(--surface))}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;white-space:nowrap}
+.status i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.s-active{color:var(--ok)} .s-soon{color:var(--warn)} .s-expired{color:var(--bad)} .s-revoked{color:var(--off)} .s-trial{color:var(--p-starter)}
+.exp{min-width:150px}
+.exp .d{font-weight:600}
+.exp small{display:block;color:var(--muted);font-size:12.5px}
+.meter{height:4px;border-radius:4px;background:var(--line);margin-top:6px;overflow:hidden;width:120px}
+.meter span{display:block;height:100%;border-radius:4px;background:currentColor;transform-origin:left}
+.keycell{display:flex;align-items:center;gap:6px}
+.icon-btn{width:30px;height:30px;border-radius:8px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.icon-btn:hover{background:var(--sunken);color:var(--ink)}
+.icon-btn svg{width:15px;height:15px}
+
+/* detail row */
+tr.detail td{background:oklch(0.985 0.008 158);padding:0;border-bottom:1px solid var(--line)}
+.detail-inner{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:28px;padding:22px 22px 24px;animation:reveal .35s var(--ease)}
+@keyframes reveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.detail-inner h4{margin:0 0 12px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.history{list-style:none;margin:0;padding:0;max-height:220px;overflow:auto;font-size:13px}
+.history li{padding:8px 0;border-bottom:1px dashed var(--line);display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.history time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px;white-space:nowrap}
+.warnbox{font-size:13px;padding:10px 12px;border-radius:10px;background:var(--warn-wash);color:oklch(0.42 0.1 70);margin-bottom:10px}
+
+/* empty + skeleton */
+.empty-state{padding:56px 24px;text-align:center;color:var(--ink-2)}
+.empty-state h3{font-size:17px;margin-bottom:6px;color:var(--ink)}
+.empty-state p{margin:0 auto 16px;max-width:44ch;font-size:14px}
+.skel td span{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--sunken),var(--line),var(--sunken));background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* settings */
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.panel h2{font-size:17px;margin-bottom:6px}
+.panel p{color:var(--ink-2);font-size:14px;margin:0 0 14px}
+.panel .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.keystate{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--sunken);margin-bottom:14px;font-size:14px}
+.keystate.ok{background:var(--ok-wash);color:oklch(0.36 0.09 150)}
+.keystate.no{background:var(--bad-wash);color:oklch(0.42 0.15 25)}
+ol.guide{margin:0;padding-left:20px;color:var(--ink-2);font-size:14px}
+ol.guide li{margin-bottom:6px}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1px 6px;border-radius:5px}
+.mhint{font-size:13px;color:var(--ink-2);margin-top:10px;line-height:1.5}
+.mhint.ok{color:oklch(0.36 0.09 150)}.mhint.bad{color:var(--bad)}
+.keystate b{font-weight:700}
+.err a{color:inherit;font-weight:600}
+.pdlg{border:1px solid var(--line);border-radius:14px;padding:20px;width:min(380px,92vw);background:var(--surface);color:var(--ink)}
+.pdlg::backdrop{background:rgb(0 0 0 / .35)}
+.pdlg h3{font-size:16px;margin:0 0 10px}
+.pdlg .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.pdlg .acts .btn.quiet{order:-1}
+.price-table{width:100%;font-size:13.5px}
+.price-table td{padding:8px 0;border-bottom:1px solid var(--line)}
+.price-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+
+/* toast */
+.toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:50;align-items:center}
+.toast{background:var(--ink);color:oklch(0.96 0.01 165);padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:var(--shadow-md);animation:tin .3s var(--ease)}
+.toast.bad{background:oklch(0.45 0.16 25)}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- THÔNG BÁO TOÀN BỘ NGƯỜI DÙNG ---------- */
+.bc-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.9fr);gap:24px;align-items:start;margin-bottom:28px}
+.bc-form .eyebrow{margin:14px 0 8px}
+.bc-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bc-templates{display:flex;flex-wrap:wrap;gap:6px}
+.bc-tpl{border:1px dashed var(--line-2);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-2);transition:all .15s var(--ease)}
+.bc-tpl:hover{border-style:solid;border-color:var(--accent);color:var(--accent-ink);background:var(--accent-wash)}
+.bc-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bc-theme{position:relative;border:1.5px solid var(--line);border-radius:12px;padding:10px 10px 10px 50px;cursor:pointer;min-height:52px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);transition:border-color .15s var(--ease)}
+.bc-theme input{position:absolute;opacity:0;pointer-events:none}
+.bc-theme .sw{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:16px;background:var(--g)}
+.bc-theme b{font-size:13.5px}
+.bc-theme small{font-size:11.5px;color:var(--muted);line-height:1.3}
+.bc-theme:has(input:checked){border-color:var(--c);background:color-mix(in oklch, var(--c) 7%, var(--surface))}
+.bc-theme:has(input:focus-visible){outline:2px solid var(--c);outline-offset:2px}
+.bc-tt{display:grid;grid-template-columns:76px 1fr;gap:0 12px}
+.bc-tt input#bcEmoji{text-align:center;font-size:22px;padding:4px}
+.hint-row{display:flex;justify-content:space-between;gap:10px}
+.switch{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink-2);cursor:pointer;margin:6px 0 4px;line-height:1.4}
+.switch input{appearance:none;flex:none;width:38px;height:22px;border-radius:999px;background:var(--line-2);position:relative;cursor:pointer;transition:background .2s var(--ease);margin:0}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:var(--shadow-sm);transition:transform .2s var(--ease)}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(16px)}
+.bc-more{margin:6px 0 10px;font-size:14px}
+.bc-more summary{cursor:pointer;color:var(--ink-2);font-weight:600;padding:6px 0}
+.bc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.bc-editing{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--warn-wash);color:oklch(0.45 0.1 70);font-weight:600}
+
+/* điện thoại xem trước */
+.bc-preview{position:sticky;top:84px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:300px;height:610px;border-radius:44px;padding:11px;background:oklch(0.22 0.02 165);box-shadow:0 30px 60px -30px oklch(0.2 0.05 165 / .55),inset 0 0 0 2px oklch(0.35 0.02 165)}
+.screen{position:relative;width:100%;height:100%;border-radius:34px;overflow:hidden;background:
+  linear-gradient(0deg,oklch(0.93 0.03 150 / .6) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,oklch(0.93 0.03 150 / .6) 1px,transparent 1px) 0 0/28px 28px,
+  radial-gradient(circle at 30% 40%,oklch(0.86 0.07 150),transparent 55%),
+  radial-gradient(circle at 75% 70%,oklch(0.85 0.06 220),transparent 50%),oklch(0.92 0.03 140)}
+.screen .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:84px;height:22px;border-radius:12px;background:oklch(0.22 0.02 165);z-index:5}
+.screen .scrim{position:absolute;inset:0;background:oklch(0.12 0.02 165 / .74)}
+.screen canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.pcard{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-50%);background:#fdfefd;border-radius:22px;overflow:hidden;box-shadow:0 20px 40px -12px rgb(0 0 0 / .5);max-height:540px;display:flex;flex-direction:column}
+.pcard.pop{animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{opacity:0;transform:translateY(-44%) scale(.86)}to{opacity:1;transform:translateY(-50%) scale(1)}}
+.phead{position:relative;padding:22px 16px 14px;text-align:center;color:#fff;overflow:hidden;flex:none}
+.phead::before{content:"";position:absolute;inset:-60%;background:repeating-conic-gradient(from 0deg,rgb(255 255 255 / .09) 0 7deg,transparent 7deg 30deg);animation:spin 60s linear infinite}
+.phead::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 60%,rgb(255 255 255 / .25),transparent 60%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phead > *{position:relative;z-index:1}
+.pemoji{width:70px;height:70px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:34px;background:rgb(255 255 255 / .2);box-shadow:inset 0 0 0 2px rgb(255 255 255 / .4)}
+.pcard.pop .pemoji{animation:emo .8s .25s cubic-bezier(.34,1.8,.64,1) both}
+@keyframes emo{from{transform:scale(.3) rotate(-25deg)}to{transform:none}}
+.peyebrow{margin-top:10px;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-shadow:0 1px 3px rgb(0 0 0 / .3)}
+.pclose{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:rgb(0 0 0 / .2);display:grid;place-items:center;font-size:13px;z-index:2}
+.plantern{position:absolute;top:0;width:26px;z-index:1;transform-origin:50% 0;animation:swing 2.6s ease-in-out infinite alternate}
+.plantern.l{left:14px}.plantern.r{right:18px;animation-delay:-1.2s;transform:scale(.8)}
+@keyframes swing{from{rotate:-7deg}to{rotate:7deg}}
+.pbody{padding:14px 18px 16px;text-align:center;overflow:auto}
+.ptitle{font-size:16.5px;font-weight:700;line-height:1.25;color:var(--ink)}
+.pmeta{font-size:11px;color:var(--muted);margin-top:3px}
+.pbar{width:36px;height:3px;border-radius:3px;margin:11px auto}
+.ptext{font-size:12.8px;line-height:1.55;color:var(--ink-2);white-space:pre-wrap;word-break:break-word}
+.ptext.left{text-align:left}
+.ptext a{color:var(--accent);text-decoration:underline;word-break:break-all}
+.pbtn{margin-top:14px;border-radius:12px;padding:11px;color:#fff;font-weight:700;font-size:13px}
+.pghost{margin-top:8px;border-radius:11px;padding:8px;border:1px solid var(--line);font-weight:600;font-size:12px;color:var(--ink-2)}
+.pmute{margin-top:9px;font-size:11px;color:var(--muted)}
+.pnotif{position:absolute;left:10px;right:10px;top:40px;background:rgb(255 255 255 / .96);border-radius:16px;padding:10px 12px;box-shadow:0 10px 24px -10px rgb(0 0 0 / .4);display:flex;gap:10px;font-size:11.5px;z-index:4;animation:drop .5s var(--ease)}
+@keyframes drop{from{transform:translateY(-30px);opacity:0}}
+.pnotif .ic{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:13px}
+.pnotif b{display:block;font-size:12px;color:var(--ink)}
+.pnotif span{color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.preview-tabs{display:flex;gap:4px;background:var(--sunken);padding:4px;border-radius:10px}
+.preview-tabs button{border:0;background:transparent;padding:6px 12px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.preview-tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+
+/* danh sách đã gửi */
+.bc-list-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:6px 0 14px}
+.bc-list-head h2{font-size:18px}
+.bc-list{display:grid;gap:12px}
+.bc-item{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.bc-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--g)}
+.bc-item .em{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:var(--g)}
+.bc-item h3{font-size:15.5px;margin-bottom:2px}
+.bc-item p{margin:0;color:var(--ink-2);font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.bc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bc-meta .chip{font-size:11.5px}
+.bc-st{font-weight:700}
+.bc-st.live{background:var(--ok-wash);color:oklch(0.4 0.1 150)}
+.bc-st.scheduled{background:oklch(0.95 0.03 262);color:oklch(0.42 0.14 262)}
+.bc-st.ended,.bc-st.off{background:var(--off-wash);color:var(--ink-2)}
+.bc-views{text-align:right;min-width:92px}
+.bc-views b{display:block;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.1}
+.bc-views small{color:var(--muted);font-size:12px}
+.bc-ops{grid-column:2 / -1;display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+@media (max-width: 960px){.bc-grid{grid-template-columns:1fr}.bc-preview{position:static}.bc-themes{grid-template-columns:repeat(2,1fr)}}
+@media (max-width: 640px){.bc-item{grid-template-columns:44px 1fr}.bc-views{grid-column:2;text-align:left}.bc-item .em{width:40px;height:40px;font-size:20px}}
+
+@media (max-width: 960px){
+  .create-body,.detail-inner,.settings{grid-template-columns:1fr}
+  .search{margin-left:0;flex:1 1 100%}
+  .col-key,.col-mid{display:none}
+}
+@media (max-width: 640px){
+  .top-inner{padding:12px 16px}
+  main{padding:20px 16px 72px}
+  .brand small,.top-right .who{display:none}
+  .plans,.grid2{grid-template-columns:1fr}
+  thead{display:none}
+  tbody tr.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  tbody tr.row td{border:0;padding:0}
+  tbody tr.row td.col-plan{grid-row:1;grid-column:2;text-align:right}
+  .meter{width:100%}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">LF</div>
+      <div><b>Quản lý key</b><small>LField Maps · bản quyền thiết bị</small></div>
+    </div>
+    <div class="top-right">
+      <span id="envChip" class="chip hidden"><span class="dot"></span><span id="envText"></span></span>
+      <span class="who" id="whoText"></span>
+      <button class="btn sm quiet hidden" id="btnLogout">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== THIẾT LẬP / ĐĂNG NHẬP ===================== -->
+<section class="setup hidden" id="setup">
+  <h1>Kết nối máy chủ bản quyền</h1>
+  <p class="lead">Trang này cấp, gia hạn và thu hồi key cho app. Dữ liệu nằm trên Firestore; khoá ký key chỉ lưu trong trình duyệt này.</p>
+
+  <div class="step" id="stepMigrate">
+    <div class="step-n">⇄</div>
+    <div>
+      <h3>Đã dùng trang ở localhost:8765? Chuyển dữ liệu sang đây trước</h3>
+      <p>Trình duyệt lưu khoá ký &amp; cấu hình <b>riêng theo từng địa chỉ web</b>, nên trang tại <code id="originSetup"></code> đang trống. Key đã cấp, khách, dùng thử nằm trên Firestore: đăng nhập là thấy, không cần chuyển.</p>
+      <p><b>Cách 1:</b> mở trang cũ <code>http://localhost:8765</code> › tab Khoá ký &amp; cài đặt › điền địa chỉ trang này › <b>Gửi trực tiếp</b>.<br><b>Cách 2:</b> nhập file gói chuyển dữ liệu (hoặc file sao lưu khoá <code>rsgis-khoa-ky-BI-MAT-*.json</code>).</p>
+      <label class="btn" for="importFile2">Nhập gói / file sao lưu khoá</label>
+      <input type="file" id="importFile2" accept=".json,application/json" class="hidden">
+      <div class="mhint" id="migrateMsg"></div>
+    </div>
+  </div>
+
+  <div class="step" id="stepConfig">
+    <div class="step-n">1</div>
+    <div>
+      <h3>Cấu hình Firebase</h3>
+      <p>Firebase Console › Project settings › Your apps › thêm <b>Web app</b> › dán khối <code>firebaseConfig</code>.</p>
+      <div class="field">
+        <textarea id="cfgInput" class="mono" spellcheck="false" placeholder='{ apiKey: "AIza...", authDomain: "...", projectId: "...", appId: "..." }'></textarea>
+      </div>
+      <button class="btn" id="btnSaveCfg">Lưu cấu hình</button>
+      <div class="err" id="cfgErr"></div>
+    </div>
+  </div>
+
+  <div class="step" id="stepLogin">
+    <div class="step-n">2</div>
+    <div>
+      <h3>Đăng nhập quản trị</h3>
+      <p>Dùng đúng tài khoản Google có email ghi trong luật Firestore (hàm <code>isLicenseAdmin</code>).</p>
+      <button class="btn primary" type="button" id="btnGoogle" style="margin-bottom:14px">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.35 11.1H12v2.98h5.35c-.23 1.4-1.64 4.1-5.35 4.1-3.22 0-5.85-2.67-5.85-5.95S8.78 6.28 12 6.28c1.83 0 3.06.78 3.76 1.45l2.56-2.47C16.7 3.73 14.56 2.8 12 2.8 6.92 2.8 2.8 6.92 2.8 12s4.12 9.2 9.2 9.2c5.31 0 8.83-3.73 8.83-8.99 0-.6-.07-1.06-.15-1.51z"/></svg>
+        Đăng nhập bằng Google</button>
+      <div class="err" id="googleErr"></div>
+      <details style="margin-top:6px"><summary style="cursor:pointer;color:var(--ink-2);font-size:14px">Hoặc đăng nhập bằng Email/Mật khẩu</summary>
+      <form id="loginForm" style="margin-top:12px">
+        <div class="field"><label for="lgEmail">Email</label><input type="email" id="lgEmail" autocomplete="username" required></div>
+        <div class="field"><label for="lgPass">Mật khẩu</label><input type="password" id="lgPass" autocomplete="current-password" required></div>
+        <button class="btn primary" type="submit" id="btnLogin">Đăng nhập</button>
+        <div class="err" id="loginErr"></div>
+      </form></details>
+    </div>
+  </div>
+
+  <p class="demo-link">Chưa có Firebase? <button id="btnDemo" type="button">Xem thử với dữ liệu mẫu</button> (không ghi gì lên máy chủ).</p>
+</section>
+
+<!-- ===================== ỨNG DỤNG ===================== -->
+<main id="app" class="hidden">
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="keys" aria-selected="true">Key đã cấp<span class="count" id="cKeys"></span></button>
+    <button class="tab" role="tab" data-tab="trials" aria-selected="false">Dùng thử<span class="count" id="cTrials"></span></button>
+    <button class="tab" role="tab" data-tab="deletions" aria-selected="false">Yêu cầu xoá TK<span class="count" id="cDel"></span></button>
+    <button class="tab" role="tab" data-tab="broadcasts" aria-selected="false">Thông báo<span class="count" id="cBc"></span></button>
+    <button class="tab" role="tab" data-tab="settings" aria-selected="false">Khoá ký &amp; cài đặt</button>
+  </nav>
+
+  <!-- ---------- TAB KEY ---------- -->
+  <section data-panel="keys">
+    <div class="warnbox hidden" id="noKeyWarn">Chưa có khoá ký. Vào tab <b>Khoá ký &amp; cài đặt</b> để tạo trước khi cấp key.</div>
+
+    <div class="create hidden" id="createPanel">
+      <div class="create-head">
+        <h2>Cấp key mới</h2>
+        <button class="btn sm quiet" id="btnCloseCreate">Đóng</button>
+      </div>
+      <div class="create-body">
+        <form id="createForm" autocomplete="off">
+          <div class="field">
+            <label for="cMid">Mã máy khách gửi</label>
+            <input type="text" id="cMid" class="mono" placeholder="7F3A-92KD-QW8M-PX4T" required>
+            <span class="hint" id="cMidHint">Khách xem ở app › Menu › Kích hoạt bản quyền.</span>
+          </div>
+          <div class="eyebrow" style="margin:6px 0 8px">Gói</div>
+          <div class="plans" id="planOpts"></div>
+          <div class="grid2">
+            <div class="field"><label for="cExp">Hạn dùng đến</label><input type="date" id="cExp"><span class="hint" id="cExpHint"></span></div>
+            <div class="field"><label for="cPaid">Đã thu (đ)</label><input type="number" id="cPaid" min="0" step="1000"></div>
+            <div class="field"><label for="cName">Tên khách</label><input type="text" id="cName" placeholder="Nguyễn Văn A"></div>
+            <div class="field"><label for="cPhone">Số điện thoại / Zalo</label><input type="text" id="cPhone" placeholder="09xx xxx xxx"></div>
+          </div>
+          <div class="field"><label for="cNote">Ghi chú</label><input type="text" id="cNote" placeholder="Công ty, dự án, hình thức thanh toán..."></div>
+          <button class="btn primary" type="submit" id="btnCreate">Tạo key &amp; ký</button>
+          <div class="err" id="createErr"></div>
+        </form>
+        <div class="result empty" id="createResult">Key vừa tạo và tin nhắn gửi khách sẽ hiện ở đây.</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filters" id="filters"></div>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Tìm tên, SĐT, mã máy, key..." aria-label="Tìm kiếm">
+      </label>
+      <button class="btn primary" id="btnNew">+ Cấp key mới</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Khách hàng</th><th class="col-mid">Mã máy</th><th class="col-plan">Gói</th><th>Hạn dùng</th><th>Trạng thái</th><th class="col-key">Key</th></tr></thead>
+        <tbody id="keyRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- TAB DÙNG THỬ ---------- -->
+  <section data-panel="trials" class="hidden">
+    <div class="toolbar">
+      <div class="filters" id="trialFilters"></div>
+      <button class="btn danger" id="btnSweep" type="button" title="Xoá dữ liệu làm việc nhóm trên cloud của máy hết dùng thử mà chưa mua key">Dọn dữ liệu nhóm hết hạn</button>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="tq" placeholder="Tìm mã máy, dòng máy..." aria-label="Tìm máy dùng thử">
+      </label>
+    </div>
+    <p class="sweep-note" id="sweepNote"></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mã máy</th><th>Thiết bị</th><th>Bắt đầu</th><th>Dùng thử</th><th>Online lần cuối</th><th></th></tr></thead>
+        <tbody id="trialRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- TAB YÊU CẦU XOÁ TÀI KHOẢN (từ trang web/xoa-tai-khoan.html) ---------- -->
+  <section data-panel="deletions" class="hidden">
+    <div class="toolbar">
+      <div class="filters" id="delFilters"></div>
+      <a class="btn sm quiet" id="lnkAuth" target="_blank" rel="noopener" href="https://console.firebase.google.com/">Mở Firebase › Authentication ↗</a>
+    </div>
+    <p class="sweep-note" id="delNote">Yêu cầu gửi từ trang web xoá tài khoản. <b>Dọn dữ liệu</b> xoá các nhóm người đó làm trưởng nhóm, dữ liệu của họ trong nhóm khác (thu thập, ảnh, chat, gói chia sẻ, biểu mẫu), lời mời và hồ sơ <code>users/{uid}</code>.
+      Tài khoản đăng nhập (Firebase Auth) trình duyệt không có quyền xoá: mở <b>Authentication</b>, tìm theo email, bấm ⋮ › <b>Delete account</b>, rồi bấm <b>Hoàn tất</b>. Chính sách: xử lý trong 7 ngày (tối đa 30 ngày).</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Gửi lúc</th><th>Email</th><th>Yêu cầu</th><th>Ghi chú</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="delRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- TAB THÔNG BÁO TOÀN BỘ NGƯỜI DÙNG ---------- -->
+  <section data-panel="broadcasts" class="hidden">
+    <p class="sweep-note">Gửi lời chúc / tin tức tới <b>mọi máy đang cài app</b>. App đang mở nhận <b>ngay lập tức</b> (hộp thoại có hiệu ứng); app đang đóng nhận qua <b>thông báo trên thanh trạng thái</b> nếu bật công tắc bên dưới (tự kiểm tra 3 giờ/lần, thông báo hẹn giờ thì đúng giờ). Mỗi máy chỉ thấy 1 lần.</p>
+    <div class="warnbox hidden" id="bcRulesWarn">Chưa đọc được thông báo: dán lại <code>firestore.rules</code> / <code>license_firestore.rules</code> mới (có phần <code>broadcasts</code>) rồi bấm <b>Publish</b>.</div>
+    <div class="bc-grid">
+      <form class="panel bc-form" id="bcForm" autocomplete="off">
+        <div class="bc-head">
+          <h2 id="bcFormTitle">Soạn thông báo</h2>
+          <span class="bc-editing hidden" id="bcEditing">Đang sửa</span>
+        </div>
+        <div class="eyebrow">Mẫu nhanh</div>
+        <div class="bc-templates" id="bcTemplates"></div>
+        <div class="eyebrow">Chủ đề &amp; hiệu ứng</div>
+        <div class="bc-themes" id="bcThemes"></div>
+        <div class="eyebrow">Nội dung</div>
+        <div class="bc-tt">
+          <div class="field"><label for="bcEmoji">Biểu tượng</label><input type="text" id="bcEmoji" maxlength="8" placeholder="🧧"></div>
+          <div class="field"><label for="bcTitle">Tiêu đề</label><input type="text" id="bcTitle" maxlength="120" placeholder="Chúc mừng năm mới!" required></div>
+        </div>
+        <div class="field">
+          <label for="bcBody">Lời nhắn</label>
+          <textarea id="bcBody" maxlength="2000" placeholder="Viết lời chúc hoặc nội dung thông báo... Link và số điện thoại tự bấm được trong app."></textarea>
+          <div class="hint-row"><span class="hint">Xuống dòng được. Emoji hiển thị đẹp trên Android.</span><span class="hint num" id="bcCount">0/2000</span></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="bcAudience">Gửi tới</label>
+            <select id="bcAudience">
+              <option value="all">Tất cả người dùng</option>
+              <option value="licensed">Máy đã mua key (đang còn hạn)</option>
+              <option value="unlicensed">Máy chưa có key (dùng thử + hết hạn)</option>
+              <option value="trial">Máy đang dùng thử</option>
+              <option value="expired">Máy hết hạn / bị khoá</option>
+            </select><span class="hint" id="bcAudHint"></span></div>
+          <div class="field"><label for="bcSender">Người gửi</label><input type="text" id="bcSender" maxlength="60" placeholder="LField Maps"></div>
+          <div class="field"><label for="bcStart">Bắt đầu hiện</label><input type="datetime-local" id="bcStart"><span class="hint">Để trống = gửi ngay</span></div>
+          <div class="field"><label for="bcEnd">Ngừng hiện sau</label><input type="datetime-local" id="bcEnd"><span class="hint">Để trống = không giới hạn</span></div>
+          <div class="field"><label for="bcRepeat">Tần suất</label>
+            <select id="bcRepeat"><option value="once">1 lần mỗi máy</option><option value="daily">Mỗi ngày 1 lần (tới khi hết hạn)</option></select></div>
+          <div class="field"><label for="bcPriority">Ưu tiên</label>
+            <select id="bcPriority"><option value="0">Bình thường</option><option value="10">Cao, hiện trước</option></select></div>
+        </div>
+        <details class="bc-more" id="bcMore"><summary>Nút hành động (tuỳ chọn)</summary>
+          <div class="grid2" style="margin-top:8px">
+            <div class="field"><label for="bcBtnText">Chữ trên nút</label><input type="text" id="bcBtnText" maxlength="40" placeholder="Xem chi tiết"></div>
+            <div class="field"><label for="bcBtnUrl">Link mở khi bấm</label><input type="text" id="bcBtnUrl" maxlength="500" placeholder="https://zalo.me/... hoặc www.abc.vn"></div>
+          </div>
+        </details>
+        <label class="switch"><input type="checkbox" id="bcNotify" checked><span>Đẩy lên <b>thanh thông báo</b> của điện thoại (nhận được cả khi app đang đóng)</span></label>
+        <div class="bc-actions">
+          <button class="btn primary" type="submit" id="bcSend">Gửi tới mọi người</button>
+          <button class="btn" type="button" id="bcDraft" title="Lưu lại nhưng chưa hiện trên app">Lưu nháp</button>
+          <button class="btn quiet hidden" type="button" id="bcCancel">Huỷ sửa</button>
+          <button class="btn quiet" type="button" id="bcClear">Xoá form</button>
+        </div>
+        <div class="err" id="bcErr"></div>
+      </form>
+
+      <div class="bc-preview">
+        <div class="preview-tabs" role="group" aria-label="Kiểu xem trước">
+          <button type="button" data-pv="dialog" aria-pressed="true">Trong app</button>
+          <button type="button" data-pv="notif" aria-pressed="false">Thanh thông báo</button>
+        </div>
+        <div class="phone"><div class="screen" id="bcScreen">
+          <div class="notch"></div>
+          <div class="scrim" id="pvScrim"></div>
+          <canvas id="pvFx"></canvas>
+          <div class="pnotif hidden" id="pvNotif"><div class="ic" id="pvNIc">★</div><div><b id="pvNTitle"></b><span id="pvNText"></span></div></div>
+          <div class="pcard" id="pvCard">
+            <div class="phead" id="pvHead">
+              <svg class="plantern l" id="pvLanL" viewBox="0 0 26 80" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="30" stroke="#ffe8a3" stroke-width="1.2"/><rect x="7" y="29" width="12" height="4" rx="1.5" fill="#f2b233"/><ellipse cx="13" cy="46" rx="12" ry="14" fill="#e02b2b"/><ellipse cx="13" cy="46" rx="5" ry="13" fill="none" stroke="#ffd27a" stroke-opacity=".5"/><rect x="8" y="58" width="10" height="4" rx="1.5" fill="#f2b233"/><path d="M10 62v14M13 62v16M16 62v14" stroke="#e03131" stroke-width="1.2"/></svg>
+              <svg class="plantern r" id="pvLanR" viewBox="0 0 26 80" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="30" stroke="#ffe8a3" stroke-width="1.2"/><rect x="7" y="29" width="12" height="4" rx="1.5" fill="#f2b233"/><ellipse cx="13" cy="46" rx="12" ry="14" fill="#e02b2b"/><ellipse cx="13" cy="46" rx="5" ry="13" fill="none" stroke="#ffd27a" stroke-opacity=".5"/><rect x="8" y="58" width="10" height="4" rx="1.5" fill="#f2b233"/><path d="M10 62v14M13 62v16M16 62v14" stroke="#e03131" stroke-width="1.2"/></svg>
+              <div class="pclose" aria-hidden="true">✕</div>
+              <div class="pemoji" id="pvEmoji"></div>
+              <div class="peyebrow" id="pvEyebrow"></div>
+            </div>
+            <div class="pbody">
+              <div class="ptitle" id="pvTitle"></div>
+              <div class="pmeta" id="pvMeta"></div>
+              <div class="pbar" id="pvBar"></div>
+              <div class="ptext" id="pvText"></div>
+              <div class="pbtn" id="pvBtn"></div>
+              <div class="pghost hidden" id="pvLater">Để sau</div>
+              <div class="pmute hidden" id="pvMute">Không hiện lại thông báo này</div>
+            </div>
+          </div>
+        </div></div>
+        <button class="btn sm quiet" type="button" id="bcReplay">↻ Phát lại hiệu ứng</button>
+      </div>
+    </div>
+
+    <div class="bc-list-head">
+      <h2>Đã gửi</h2>
+      <div class="filters" id="bcFilters"></div>
+      <button class="btn sm quiet" type="button" id="bcRefreshViews" style="margin-left:auto">↻ Cập nhật lượt xem</button>
+    </div>
+    <div class="bc-list" id="bcList"></div>
+  </section>
+
+  <!-- ---------- TAB CÀI ĐẶT ---------- -->
+  <section data-panel="settings" class="hidden">
+    <div class="settings">
+      <div class="panel">
+        <h2>Khoá ký key</h2>
+        <p>Key được ký bằng khoá bí mật này; app giữ khoá công khai để kiểm tra. Mất khoá bí mật là không cấp được key cho bản app đang phát hành.</p>
+        <div class="keystate" id="keyState"></div>
+        <div class="keystate hidden" id="keyMatch"></div>
+        <div class="field">
+          <label for="pubKey">Khoá công khai · dán vào <code>LicenseConfig.PUBLIC_KEY</code></label>
+          <textarea id="pubKey" class="mono" readonly rows="3" style="min-height:84px"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnCopyPub">Chép khoá công khai</button>
+          <button class="btn" id="btnBackup">Tải file sao lưu</button>
+          <label class="btn" for="importFile">Nhập file khoá</label>
+          <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+          <button class="btn danger" id="btnGen">Tạo cặp khoá mới</button>
+        </div>
+      </div>
+
+      <div class="panel" id="migratePanel">
+        <h2>Chuyển dữ liệu sang trang khác (GitHub Pages)</h2>
+        <p>Khoá ký &amp; cấu hình Firebase lưu <b>riêng theo từng địa chỉ web</b>. Trang đang mở: <code id="originText"></code>. Mở ở địa chỉ mới (vd. GitHub) sẽ trống nên phải chuyển sang. Key đã cấp, khách, dùng thử nằm trên Firestore, không cần chuyển.</p>
+        <div class="field">
+          <label for="bxTarget">Địa chỉ trang mới</label>
+          <input type="text" id="bxTarget" class="mono" spellcheck="false" placeholder="https://ten-github.github.io/lfield-key-admin/">
+          <span class="hint">Trang mới phải là bản index.html này (có chức năng nhận dữ liệu).</span>
+        </div>
+        <div class="field">
+          <label for="bxPass">Mật khẩu bảo vệ gói (tuỳ chọn, nên đặt khi tải file)</label>
+          <input type="password" id="bxPass" autocomplete="new-password">
+        </div>
+        <div class="row">
+          <button class="btn primary" id="btnSendDirect">Gửi trực tiếp sang trang mới</button>
+          <button class="btn" id="btnExportBundle">Tải gói chuyển dữ liệu</button>
+          <button class="btn danger" id="btnForget">Xoá khoá khỏi trình duyệt này</button>
+        </div>
+        <div class="mhint" id="bxStatus"></div>
+        <div class="mhint">Nhận gói ở trang mới: nút <b>Nhập file khoá</b> (panel Khoá ký) nhận cả gói chuyển dữ liệu lẫn file sao lưu khoá cũ.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Các bước cài đặt</h2>
+        <ol class="guide">
+          <li>Tạo cặp khoá, <b>tải file sao lưu</b> cất vào nơi an toàn (Drive riêng, USB).</li>
+          <li>Dán khoá công khai vào <code>license/LicenseConfig.java</code> rồi build app.</li>
+          <li>Dán <code>license_firestore.rules</code> vào Firestore › Rules, sửa email quản trị.</li>
+          <li>Authentication › bật Email/Password, tạo tài khoản quản trị, rồi tắt tự đăng ký.</li>
+          <li>Khách gửi Mã máy › bấm <b>Cấp key mới</b> › gửi key cho khách.</li>
+          <li>Dùng trên GitHub Pages: Firebase › Authentication › Settings › <b>Authorized domains</b> › thêm <code>ten-github.github.io</code>, rồi chuyển khoá ở panel <b>Chuyển dữ liệu</b>.</li>
+          <li>Muốn nhắn tin cho toàn bộ người dùng (chúc Tết...): dán lại luật Firestore mới (có <code>broadcasts</code>) › tab <b>Thông báo</b>.</li>
+        </ol>
+        <div class="row"><button class="btn quiet" id="btnResetCfg">Đổi cấu hình Firebase</button></div>
+      </div>
+
+      <div class="panel">
+        <h2>Bảng giá (khớp với app)</h2>
+        <p>Sửa ở <code>PlanCatalog.java</code> và biến <code>PLANS</code> trong trang này.</p>
+        <table class="price-table" id="priceTable"></table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<dialog class="pdlg" id="passDlg">
+  <form method="dialog">
+    <h3 id="passTitle">Mật khẩu</h3>
+    <input type="password" id="passInput" autocomplete="off">
+    <div class="acts"><button class="btn primary" value="ok">OK</button><button class="btn quiet" value="cancel">Huỷ</button></div>
+  </form>
+</dialog>
+
+<script type="module">
+// =====================================================================
+// CẤU HÌNH GÓI - khớp PlanCatalog.java
+// =====================================================================
+const PLANS = [
+  { code: 'STARTER',  name: 'STARTER',  label: '7 ngày',    days: 7,   price: 0,      orig: 0,       color: 'var(--p-starter)' },
+  { code: 'PRO',      name: 'PRO',      label: '1 tháng',   days: 30,  price: 150000, orig: 299000,  color: 'var(--p-pro)' },
+  { code: 'ULTIMATE', name: 'ULTIMATE', label: 'Vĩnh viễn', days: 0,   price: 750000, orig: 2490000, color: 'var(--p-ultimate)' },
+  { code: 'PREMIUM',  name: 'PREMIUM',  label: '1 năm',     days: 365, price: 980000, orig: 1790000, color: 'var(--p-premium)', transfers: 1 },
+  // Gói VIP: vĩnh viễn, chuyển thiết bị TRỌN ĐỜI (không giới hạn lượt), tặng tài khoản ảnh SKY 3 m.
+  { code: 'DIAMOND',  name: 'DIAMOND',  label: 'Vĩnh viễn', days: 0,   price: 5000000, orig: 9990000, color: 'var(--p-diamond)', transfers: Infinity, gift: 'Tài khoản ảnh SKY 3m x 3m' },
+];
+const TRIAL_DAYS = 7;
+const APP_NAME = 'LField Maps';
+const DAY = 86400000;
+const FB_VER = '10.12.2';
+const LS_CFG = 'rsgis_admin_fbcfg', LS_KEY = 'rsgis_admin_signing_jwk', LS_TARGET = 'rsgis_admin_target_url';
+// Khoá CÔNG KHAI đang build trong app (LicenseConfig.PUBLIC_KEY / KHOA_CONG_KHAI.txt).
+// Trang dùng để kiểm tra khoá ký trong trình duyệt có đúng khoá của app không
+// (tránh tạo nhầm khoá mới khi mở trang ở địa chỉ mới như GitHub Pages).
+// Đổi khoá thì sửa CẢ 2 nơi. Để '' = bỏ kiểm tra.
+const APP_PUBLIC_KEY = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1BojruGOCF7SHx5oGOhQgmektVzXX/rmQFwhJ8VMZrm5w5jRL9oENFYa0b/GDucVOjI/z2355pcAvCoPPwFHqg==';
+const BUNDLE_TYPE = 'rsgis-admin-bundle', RECV_HASH = '#nhan-du-lieu';
+const IS_LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+const CROCK = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const planOf = c => PLANS.find(p => p.code === c) || { code: c, name: c || '?', label: '', days: 30, price: 0, color: 'var(--off)' };
+const money = v => (v || 0).toLocaleString('vi-VN') + 'đ';
+const fmtDate = ms => ms ? new Date(ms).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Vĩnh viễn';
+const fmtDT = ms => ms ? new Date(ms).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const endOfDay = ms => { const d = new Date(ms); d.setHours(23, 59, 59, 999); return d.getTime(); };
+const toDateInput = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const fromDateInput = v => { if (!v) return 0; const [y, m, d] = v.split('-').map(Number); return endOfDay(new Date(y, m - 1, d).getTime()); };
+const tsMs = t => t == null ? 0 : (typeof t === 'number' ? t : (t.toMillis ? t.toMillis() : 0));
+
+function toast(msg, bad = false) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (bad ? ' bad' : '');
+  t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => t.remove(), bad ? 5200 : 2800);
+}
+async function copyText(s, msg = 'Đã chép') {
+  try { await navigator.clipboard.writeText(s); toast(msg); }
+  catch { const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(msg); }
+}
+
+// =====================================================================
+// MÃ, KEY, CHỮ KÝ - khớp LicenseCrypto.java
+// =====================================================================
+function normalizeCode(s) {
+  let c = String(s || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+  let prefix = '';
+  if (c.startsWith('RSG')) { prefix = 'RSG'; c = c.slice(3); }
+  c = c.replace(/O/g, '0').replace(/[IL]/g, '1').split('').filter(ch => CROCK.includes(ch)).join('');
+  let out = prefix;
+  for (let i = 0; i < c.length; i++) { if (out.length && i % 4 === 0) out += '-'; out += c[i]; }
+  return out;
+}
+const MID_RE = /^[0-9A-Z]{4}(-[0-9A-Z]{4}){3}$/;
+function newKey() {
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  let s = 'RSG';
+  for (let i = 0; i < 16; i++) { if (i % 4 === 0) s += '-'; s += CROCK[b[i] & 31]; }
+  return s;
+}
+const canonical = (mid, key, plan, exp, status) => `RSGIS1|${mid}|${key}|${plan}|${Math.round(exp)}|${status}`;
+const b64 = buf => { let s = ''; new Uint8Array(buf).forEach(x => s += String.fromCharCode(x)); return btoa(s); };
+
+const Signer = {
+  priv: null, pubB64: '',
+  async load() {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) { this.priv = null; this.pubB64 = ''; return; }
+    try { await this.fromJwk(JSON.parse(raw)); } catch { this.priv = null; this.pubB64 = ''; }
+  },
+  async fromJwk(jwk, persist = true) {
+    if (jwk.kty !== 'EC' || jwk.crv !== 'P-256' || !jwk.d) throw new Error('File không phải khoá bí mật ECDSA P-256');
+    this.priv = await crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign']);
+    const pub = await crypto.subtle.importKey('jwk', { kty: 'EC', crv: 'P-256', x: jwk.x, y: jwk.y, ext: true }, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']);
+    this.pubB64 = b64(await crypto.subtle.exportKey('spki', pub));
+    this.pubKey = pub;
+    if (persist) localStorage.setItem(LS_KEY, JSON.stringify(jwk));
+  },
+  async generate(persist = true) {
+    const kp = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+    await this.fromJwk(await crypto.subtle.exportKey('jwk', kp.privateKey), persist);
+  },
+  async sign(text) {
+    if (!this.priv) throw new Error(APP_PUBLIC_KEY ? 'Trình duyệt ở địa chỉ này chưa có khoá ký. Chuyển khoá từ trang cũ (localhost:8765) hoặc nhập file sao lưu ở tab Khoá ký & cài đặt.' : 'Chưa có khoá ký. Vào tab Khoá ký & cài đặt để tạo.');
+    if (!S.demo && APP_PUBLIC_KEY && this.pubB64 !== APP_PUBLIC_KEY)
+      throw new Error('Khoá ký trong trình duyệt KHÔNG khớp khoá công khai của app: key cấp ra app sẽ không nhận. Nhập đúng file sao lưu / chuyển khoá từ trang cũ.');
+    const data = new TextEncoder().encode(text);
+    const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, this.priv, data);
+    const ok = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, this.pubKey, sig, data);
+    if (!ok) throw new Error('Tự kiểm tra chữ ký thất bại');
+    return b64(sig);
+  }
+};
+
+// =====================================================================
+// KHO DỮ LIỆU - Firestore thật hoặc bộ nhớ (xem thử)
+// =====================================================================
+const S = { licenses: {}, customers: {}, trials: {}, deletionRequests: {}, broadcasts: {}, bcViews: {}, bcErr: '', loaded: false, demo: false };
+let FB = null;   // { db, fs, auth, authMod }
+
+const Store = {
+  async saveLicense(mid, lic, cust, histEntry) {
+    lic.updatedAt = Date.now();
+    if (S.demo) {
+      S.licenses[mid] = { ...lic };
+      const c = S.customers[mid] || { history: [] };
+      S.customers[mid] = { ...c, ...cust, history: [...(c.history || []), histEntry].filter(Boolean) };
+      render(); return;
+    }
+    const { fs, db } = FB;
+    const batch = fs.writeBatch(db);
+    batch.set(fs.doc(db, 'licenses', mid), lic);
+    const cd = { ...cust };
+    if (histEntry) cd.history = fs.arrayUnion(histEntry);
+    batch.set(fs.doc(db, 'customers', mid), cd, { merge: true });
+    await batch.commit();
+  },
+  async remove(mid) {
+    if (S.demo) { delete S.licenses[mid]; delete S.customers[mid]; render(); return; }
+    const { fs, db } = FB;
+    const batch = fs.writeBatch(db);
+    batch.delete(fs.doc(db, 'licenses', mid));
+    batch.delete(fs.doc(db, 'customers', mid));
+    await batch.commit();
+  },
+  async resetTrial(mid) {
+    if (S.demo) { S.trials[mid].startAt = Date.now(); render(); return; }
+    const { fs, db } = FB;
+    await fs.updateDoc(fs.doc(db, 'trials', mid), { startAt: fs.serverTimestamp() });
+  }
+};
+
+async function connectFirebase(cfg) {
+  const base = `https://www.gstatic.com/firebasejs/${FB_VER}`;
+  const [appMod, authMod, fs] = await Promise.all([
+    import(`${base}/firebase-app.js`), import(`${base}/firebase-auth.js`), import(`${base}/firebase-firestore.js`)
+  ]);
+  const app = appMod.initializeApp(cfg);
+  FB = { app, auth: authMod.getAuth(app), authMod, fs, db: fs.getFirestore(app) };
+  authMod.onAuthStateChanged(FB.auth, user => user ? enterApp(user.email) : showSetup());
+}
+
+let unsub = [];
+function subscribe() {
+  unsub.forEach(u => u()); unsub = [];
+  const { fs, db } = FB;
+  const onErr = e => toast('Không đọc được dữ liệu: ' + (e.code === 'permission-denied' ? 'email chưa có trong luật Firestore' : e.message), true);
+  const bind = (name, err = onErr) => unsub.push(fs.onSnapshot(fs.collection(db, name), snap => {
+    const m = {}; snap.forEach(d => m[d.id] = d.data()); S[name] = m; S.loaded = true; render();
+  }, err));
+  ['licenses', 'customers', 'trials'].forEach(n => bind(n));
+  // Yêu cầu xoá tài khoản: luật cũ chưa có collection này thì chỉ báo nhẹ ở tab, không làm phiền.
+  // Thông báo toàn bộ người dùng: luật cũ chưa có "broadcasts" thì chỉ báo ở tab Thông báo.
+  bind('broadcasts', e => { S.bcErr = e.code === 'permission-denied' ? 'Chưa dán luật Firestore mới (có broadcasts) nên chưa đọc / gửi được thông báo.' : e.message; renderBroadcasts(); });
+  bind('deletionRequests', e => { S.delErr = e.code === 'permission-denied' ? 'Chưa dán firestore.rules mới (có deletionRequests) nên chưa đọc được yêu cầu xoá.' : e.message; renderDeletions(); });
+  const pid = FB.app.options.projectId;
+  if (pid) $('#lnkAuth').href = `https://console.firebase.google.com/project/${pid}/authentication/users`;
+}
+
+// =====================================================================
+// SUY TRẠNG THÁI
+// =====================================================================
+function licState(l) {
+  if (!l) return 'none';
+  if (l.status === 'revoked') return 'revoked';
+  if (l.expiresAt && Date.now() >= l.expiresAt) return 'expired';
+  if (l.expiresAt && l.expiresAt - Date.now() <= 7 * DAY) return 'soon';
+  return 'active';
+}
+const STATE_LABEL = { active: 'Đang dùng', soon: 'Sắp hết hạn', expired: 'Hết hạn', revoked: 'Thu hồi' };
+const daysLeft = ms => Math.ceil((ms - Date.now()) / DAY);
+
+// =====================================================================
+// GIAO DIỆN
+// =====================================================================
+let keyFilter = 'all', trialFilter = 'all', openRow = null, selPlan = 'PRO';
+
+function render() {
+  if (!S.loaded) { skeleton(); return; }
+  renderFilters(); renderKeys(); renderTrials(); renderDeletions(); renderSettings();
+  if (Object.keys(S.broadcasts).length) S.bcErr = '';
+  renderBroadcasts();
+  if (!S.demo && !S.bcViewsLoaded && Object.keys(S.broadcasts).length) { S.bcViewsLoaded = true; bcLoadViews(); }
+  const nNew = Object.values(S.deletionRequests).filter(r => r.status !== 'done').length;
+  $('#cDel').textContent = nNew || '';
+  $('#cKeys').textContent = Object.keys(S.licenses).length || '';
+  $('#cTrials').textContent = Object.keys(S.trials).length || '';
+  const w = $('#noKeyWarn');
+  w.classList.toggle('hidden', !!Signer.priv && (S.demo || keyMatchesApp()));
+  w.innerHTML = !Signer.priv
+    ? (APP_PUBLIC_KEY ? `Trình duyệt ở <b>${esc(location.host)}</b> chưa có khoá ký. <b>Đừng tạo khoá mới</b>: vào tab <b>Khoá ký &amp; cài đặt</b> chuyển khoá từ trang cũ hoặc nhập file sao lưu.` : 'Chưa có khoá ký. Vào tab <b>Khoá ký &amp; cài đặt</b> để tạo trước khi cấp key.')
+    : 'Khoá ký trong trình duyệt <b>không khớp</b> khoá công khai của app: chưa cấp / gia hạn key được. Vào tab <b>Khoá ký &amp; cài đặt</b> nhập đúng khoá.';
+}
+
+function skeleton() {
+  $('#keyRows').innerHTML = Array.from({ length: 5 }, () =>
+    `<tr class="skel">${'<td><span style="width:' + (50 + Math.random() * 40) + '%"></span></td>'.repeat(6)}</tr>`).join('');
+}
+
+function renderFilters() {
+  const all = Object.values(S.licenses);
+  const cnt = s => all.filter(l => licState(l) === s).length;
+  const defs = [
+    ['all', 'Tất cả', all.length, 'var(--ink-2)'], ['active', 'Đang dùng', cnt('active'), 'var(--ok)'],
+    ['soon', 'Sắp hết hạn', cnt('soon'), 'var(--warn)'], ['expired', 'Hết hạn', cnt('expired'), 'var(--bad)'],
+    ['revoked', 'Thu hồi', cnt('revoked'), 'var(--off)']
+  ];
+  $('#filters').innerHTML = defs.map(([k, l, n, c]) =>
+    `<button class="filter" data-f="${k}" aria-pressed="${keyFilter === k}">${k === 'all' ? '' : `<span class="sw" style="background:${c}"></span>`}${l} <b>${n}</b></button>`).join('');
+}
+
+function renderKeys() {
+  const q = $('#q').value.trim().toLowerCase();
+  const rows = Object.entries(S.licenses).map(([id, l]) => ({ id, l, c: S.customers[id] || {}, st: licState(l) }))
+    .filter(r => keyFilter === 'all' || r.st === keyFilter)
+    .filter(r => !q || [r.id, r.l.key, r.c.customer, r.c.phone, r.c.note, r.l.plan].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => (b.l.updatedAt || 0) - (a.l.updatedAt || 0));
+  const tb = $('#keyRows');
+  if (!rows.length) {
+    const none = !Object.keys(S.licenses).length;
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <h3>${none ? 'Chưa cấp key nào' : 'Không có key khớp bộ lọc'}</h3>
+      <p>${none ? 'Khi khách gửi Mã máy qua Zalo, bấm Cấp key mới, chọn gói rồi gửi key lại cho khách.' : 'Thử bỏ bộ lọc hoặc tìm bằng từ khác.'}</p>
+      ${none ? '<button class="btn primary" data-act="new">+ Cấp key đầu tiên</button>' : ''}</div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = rows.map(({ id, l, c, st }) => {
+    const p = planOf(l.plan);
+    const dl = l.expiresAt ? daysLeft(l.expiresAt) : null;
+    const total = (p.days || 30) * DAY;
+    const frac = l.expiresAt ? Math.max(0, Math.min(1, (l.expiresAt - Date.now()) / total)) : 1;
+    const color = { active: 'var(--ok)', soon: 'var(--warn)', expired: 'var(--bad)', revoked: 'var(--off)' }[st];
+    const open = openRow === id;
+    return `<tr class="row${open ? ' open' : ''}" data-id="${esc(id)}" tabindex="0" aria-expanded="${open}">
+      <td class="cust"><b>${esc(c.customer || 'Chưa đặt tên')}</b><small>${esc(c.phone || '')}</small></td>
+      <td class="col-mid mono">${esc(id)}</td>
+      <td class="col-plan"><span class="badge" style="--pc:${p.color}">${esc(p.name)}</span></td>
+      <td class="exp" style="color:${color}"><span class="d" style="color:var(--ink)">${fmtDate(l.expiresAt)}</span>
+        <small>${l.expiresAt ? (dl > 0 ? `còn ${dl} ngày` : `quá ${-dl} ngày`) : 'không giới hạn'}</small>
+        <div class="meter"><span style="transform:scaleX(${frac})"></span></div></td>
+      <td><span class="status s-${st}"><i></i>${STATE_LABEL[st]}</span></td>
+      <td class="col-key"><div class="keycell"><span class="mono" style="font-size:13px">${esc(l.key)}</span>
+        <button class="icon-btn" data-copy="${esc(l.key)}" title="Chép key" aria-label="Chép key">${ICON.copy}</button></div></td>
+    </tr>${open ? detailRow(id, l, c, st) : ''}`;
+  }).join('');
+}
+
+function detailRow(id, l, c, st) {
+  const p = planOf(l.plan);
+  const hist = (c.history || []).slice().reverse();
+  const canTransfer = (p.transfers || 0) > (c.transfersUsed || 0);
+  return `<tr class="detail"><td colspan="6"><div class="detail-inner" data-id="${esc(id)}">
+    <div>
+      <h4>Thông tin</h4>
+      <div class="grid2">
+        <div class="field"><label>Tên khách</label><input type="text" data-f="customer" value="${esc(c.customer || '')}"></div>
+        <div class="field"><label>SĐT / Zalo</label><input type="text" data-f="phone" value="${esc(c.phone || '')}"></div>
+        <div class="field"><label>Gói</label><select data-f="plan">${PLANS.map(x => `<option value="${x.code}"${x.code === l.plan ? ' selected' : ''}>${x.name} · ${x.label}</option>`).join('')}</select></div>
+        <div class="field"><label>Hạn dùng (trống = vĩnh viễn)</label><input type="date" data-f="exp" value="${l.expiresAt ? toDateInput(l.expiresAt) : ''}"></div>
+      </div>
+      <div class="field"><label>Ghi chú</label><input type="text" data-f="note" value="${esc(c.note || '')}"></div>
+      <div class="quick"><button class="btn primary sm" data-act="save">Lưu thay đổi</button>
+        <button class="btn sm" data-act="msg">Chép tin nhắn gửi khách</button></div>
+    </div>
+    <div>
+      <h4>Gia hạn &amp; trạng thái</h4>
+      <div class="quick">
+        <button class="btn sm" data-act="ext" data-days="30">+30 ngày</button>
+        <button class="btn sm" data-act="ext" data-days="365">+1 năm</button>
+        <button class="btn sm" data-act="ext" data-days="0">Vĩnh viễn</button>
+      </div>
+      <div class="quick">${st === 'revoked'
+        ? '<button class="btn sm" data-act="restore">Khôi phục key</button>'
+        : '<button class="btn sm danger" data-act="revoke">Thu hồi key</button>'}
+        <button class="btn sm danger" data-act="delete">Xoá hẳn</button></div>
+      <h4 style="margin-top:18px">Chuyển thiết bị</h4>
+      ${canTransfer ? '' : `<div class="warnbox">${p.transfers ? 'Đã dùng hết lượt chuyển máy của gói.' : `Gói ${esc(p.name)} không kèm chuyển máy.`} Vẫn chuyển được nếu bạn đồng ý hỗ trợ.</div>`}
+      <div class="field"><input type="text" class="mono" data-f="newMid" placeholder="Mã máy mới"></div>
+      <button class="btn sm" data-act="transfer">Chuyển key sang máy mới</button>
+    </div>
+    <div>
+      <h4>Lịch sử</h4>
+      ${hist.length ? `<ul class="history">${hist.map(h => `<li><time>${fmtDT(h.at)}</time><span>${esc(h.text)}</span></li>`).join('')}</ul>` : '<p style="color:var(--muted);font-size:13px;margin:0">Chưa có thao tác.</p>'}
+      ${c.pricePaid ? `<p style="font-size:13px;color:var(--ink-2);margin-top:12px">Đã thu: <b class="num">${money(c.pricePaid)}</b></p>` : ''}
+    </div>
+  </div></td></tr>`;
+}
+
+function renderTrials() {
+  const cand = sweepCandidates();
+  $('#btnSweep').textContent = cand.length ? `Dọn dữ liệu nhóm hết hạn (${cand.length})` : 'Dọn dữ liệu nhóm hết hạn';
+  $('#btnSweep').disabled = !cand.length || sweeping;
+  $('#sweepNote').innerHTML = cand.length
+    ? `<b>${cand.length} tài khoản</b> hết ${TRIAL_DAYS} ngày dùng thử, chưa mua key nhưng còn dữ liệu nhóm trên cloud. App tự dọn khi họ mở lại máy; bấm nút để dọn ngay cả máy không bao giờ mở lại.`
+    : 'Không có máy hết dùng thử nào còn dữ liệu nhóm cần dọn.';
+  const q = $('#tq').value.trim().toLowerCase();
+  const all = Object.entries(S.trials).map(([id, t]) => {
+    const start = tsMs(t.startAt), end = start + TRIAL_DAYS * DAY;
+    const bought = !!S.licenses[id];
+    const st = bought ? 'bought' : (Date.now() < end ? 'running' : 'ended');
+    return { id, t, start, end, st, seen: tsMs(t.lastSeen) };
+  });
+  const cnt = s => all.filter(r => r.st === s).length;
+  $('#trialFilters').innerHTML = [['all', 'Tất cả', all.length], ['running', 'Đang dùng thử', cnt('running')], ['ended', 'Hết hạn, chưa mua', cnt('ended')], ['bought', 'Đã mua', cnt('bought')]]
+    .map(([k, l, n]) => `<button class="filter" data-tf="${k}" aria-pressed="${trialFilter === k}">${l} <b>${n}</b></button>`).join('');
+  const rows = all.filter(r => trialFilter === 'all' || r.st === trialFilter)
+    .filter(r => !q || [r.id, r.t.model, r.t.appVersion].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => b.seen - a.seen);
+  const tb = $('#trialRows');
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><h3>${all.length ? 'Không có máy khớp bộ lọc' : 'Chưa có máy nào dùng thử'}</h3><p>Máy cài app và có mạng lần đầu sẽ tự xuất hiện ở đây.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = rows.map(r => {
+    const dl = Math.ceil((r.end - Date.now()) / DAY);
+    const label = r.st === 'bought' ? `<span class="status s-active"><i></i>Đã mua ${esc(planOf(S.licenses[r.id].plan).name)}</span>`
+      : r.st === 'running' ? `<span class="status s-trial"><i></i>Còn ${dl} ngày</span>` : `<span class="status s-expired"><i></i>Hết ${fmtDate(r.end)}</span>`;
+    return `<tr><td class="mono">${esc(r.id)}</td><td>${esc(r.t.model || '–')}<br><small style="color:var(--muted)">v${esc(r.t.appVersion || '?')}</small>${r.t.teamEmail ? `<br><span class="team-tag">Nhóm: ${esc(r.t.teamEmail)}${tsMs(r.t.teamWipedAt) ? ' · đã dọn ' + fmtDate(tsMs(r.t.teamWipedAt)) : ''}</span>` : ''}</td>
+      <td class="num">${fmtDate(r.start)}</td><td>${label}</td><td class="num">${fmtDT(r.seen)}</td>
+      <td style="text-align:right;white-space:nowrap">${r.st === 'bought' ? '' : `<button class="btn sm primary" data-grant="${esc(r.id)}">Cấp key</button>`}
+        <button class="btn sm quiet" data-reset="${esc(r.id)}">Reset dùng thử</button></td></tr>`;
+  }).join('');
+}
+
+// =====================================================================
+// DỌN DỮ LIỆU NHÓM CỦA MÁY HẾT DÙNG THỬ (khớp TeamDataPolicy trong app)
+// =====================================================================
+const TEAM_WIPE_GRACE_HOURS = 0;   // khớp LicenseConfig.TEAM_WIPE_GRACE_HOURS
+const TEAM_SUBS = ['members', 'locations', 'features', 'photos', 'tasks', 'formPhotos', 'messages', 'chatImages', 'typing'];
+const TEAM_NESTED = { forms: ['records'], shares: ['chunks'] };
+let sweeping = false;
+
+/** Tài khoản nhóm cần dọn: máy hết dùng thử, CHƯA từng mua key, và tài khoản đó không dùng trên máy nào đã mua. */
+function sweepCandidates() {
+  const paid = new Set();
+  Object.entries(S.trials).forEach(([mid, t]) => { if (t.teamUid && S.licenses[mid] && ['active', 'soon'].includes(licState(S.licenses[mid]))) paid.add(t.teamUid); });
+  const out = new Map();
+  Object.entries(S.trials).forEach(([mid, t]) => {
+    const start = tsMs(t.startAt);
+    if (!t.teamUid || !start || S.licenses[mid] || paid.has(t.teamUid)) return;
+    if (Date.now() < start + TRIAL_DAYS * DAY + TEAM_WIPE_GRACE_HOURS * 3600000) return;
+    if (tsMs(t.teamWipedAt) && tsMs(t.teamWipedAt) >= tsMs(t.lastSeen)) return;   // đã dọn, chưa quay lại
+    const c = out.get(t.teamUid) || { uid: t.teamUid, email: t.teamEmail || '', mids: [] };
+    c.mids.push(mid); out.set(t.teamUid, c);
+  });
+  return [...out.values()];
+}
+
+async function delQuery(q) {
+  const { fs, db } = FB; let n = 0;
+  for (;;) {
+    const snap = await fs.getDocs(fs.query(q, fs.limit(300)));
+    if (snap.empty) break;
+    const b = fs.writeBatch(db); snap.docs.forEach(d => b.delete(d.ref)); await b.commit();
+    n += snap.size; if (snap.size < 300) break;
+  }
+  return n;
+}
+
+/** Xoá hẳn 1 nhóm: bộ sưu tập con trước, tài liệu nhóm sau cùng. */
+async function wipeWholeTeam(ref) {
+  const { fs } = FB; let n = 0;
+  for (const [parent, kids] of Object.entries(TEAM_NESTED)) {
+    const ps = await fs.getDocs(fs.collection(ref, parent));
+    for (const d of ps.docs) for (const k of kids) n += await delQuery(fs.collection(d.ref, k));
+    n += await delQuery(fs.collection(ref, parent));
+  }
+  for (const c of TEAM_SUBS) n += await delQuery(fs.collection(ref, c));
+  await fs.deleteDoc(ref);
+  return n + 1;
+}
+
+/** Thành viên hết hạn trong nhóm người khác: xoá dữ liệu họ thu thập + ảnh, gỡ khỏi nhóm. */
+async function wipeMemberIn(ref, uid, email) {
+  const { fs } = FB; let n = 0;
+  for (const c of ['features', 'photos']) n += await delQuery(fs.query(fs.collection(ref, c), fs.where('createdByUid', '==', uid)));
+  for (const c of ['members', 'locations']) { await fs.deleteDoc(fs.doc(ref, c, uid)); n++; }
+  const upd = { memberUids: fs.arrayRemove(uid), fullViewUids: fs.arrayRemove(uid) };
+  if (email) upd.memberEmails = fs.arrayRemove(email.trim().toLowerCase());
+  await fs.updateDoc(ref, upd);
+  return n;
+}
+
+async function runSweep() {
+  const cand = sweepCandidates();
+  if (!cand.length || sweeping) return;
+  const list = cand.slice(0, 8).map(c => '• ' + (c.email || c.uid)).join('\n') + (cand.length > 8 ? `\n… và ${cand.length - 8} tài khoản khác` : '');
+  if (!confirm(`Xoá VĨNH VIỄN dữ liệu làm việc nhóm trên cloud của ${cand.length} tài khoản hết dùng thử?\n\n${list}\n\n` +
+    'Trưởng nhóm: xoá toàn bộ nhóm (kể cả dữ liệu thành viên).\nThành viên: xoá dữ liệu họ thu thập + ảnh và gỡ khỏi nhóm.\nKhông khôi phục được.')) return;
+  sweeping = true; renderTrials();
+  let teams = 0, members = 0, docs = 0, fails = 0;
+  try {
+    for (const c of cand) {
+      try {
+        if (S.demo) { await new Promise(r => setTimeout(r, 250)); teams++; }
+        else {
+          const { fs, db } = FB;
+          const owned = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('ownerUid', '==', c.uid)));
+          for (const d of owned.docs) { docs += await wipeWholeTeam(d.ref); teams++; }
+          const joined = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('memberUids', 'array-contains', c.uid)));
+          for (const d of joined.docs) { if (d.data().ownerUid === c.uid) continue; docs += await wipeMemberIn(d.ref, c.uid, c.email); members++; }
+        }
+        for (const mid of c.mids) {
+          if (S.demo) S.trials[mid].teamWipedAt = Date.now();
+          else await FB.fs.updateDoc(FB.fs.doc(FB.db, 'trials', mid), { teamWipedAt: FB.fs.serverTimestamp() });
+        }
+        toast(`Đã dọn ${c.email || c.uid}`);
+      } catch (x) { fails++; console.error(c, x); toast(`Lỗi khi dọn ${c.email || c.uid}: ${x.code === 'permission-denied' ? 'chưa dán firestore.rules mới' : x.message}`, true); }
+    }
+  } finally { sweeping = false; }
+  toast(`Xong: xoá ${teams} nhóm, gỡ ${members} lượt thành viên, ${docs} tài liệu${fails ? ` · ${fails} lỗi` : ''}`, !!fails);
+  render();
+}
+
+// =====================================================================
+// YÊU CẦU XOÁ TÀI KHOẢN (khớp AccountDeletion.java trong app)
+// =====================================================================
+let delFilter = 'open', delBusy = null;
+const DEL_STATUS = { new: ['Chờ xử lý', 's-soon'], cleaned: ['Đã dọn dữ liệu · còn xoá Auth', 's-trial'], done: ['Hoàn tất', 's-active'], rejected: ['Từ chối', 's-revoked'] };
+
+function renderDeletions() {
+  const all = Object.entries(S.deletionRequests).map(([id, r]) => ({ id, r, at: tsMs(r.createdAt) })).sort((a, b) => b.at - a.at);
+  const open = all.filter(x => x.r.status !== 'done' && x.r.status !== 'rejected');
+  $('#delFilters').innerHTML = [['open', 'Chưa xong', open.length], ['all', 'Tất cả', all.length]]
+    .map(([k, l, n]) => `<button class="filter" data-df="${k}" aria-pressed="${delFilter === k}">${l} <b>${n}</b></button>`).join('');
+  const rows = delFilter === 'open' ? open : all;
+  const tb = $('#delRows');
+  if (S.delErr && !all.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><h3>Chưa đọc được yêu cầu</h3><p>${esc(S.delErr)}</p></div></td></tr>`; return; }
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><h3>${all.length ? 'Không còn yêu cầu nào chờ xử lý' : 'Chưa có yêu cầu xoá tài khoản'}</h3><p>Người dùng gửi từ trang web xoá tài khoản sẽ hiện ở đây.</p></div></td></tr>`; return; }
+  tb.innerHTML = rows.map(({ id, r, at }) => {
+    const [lab, cls] = DEL_STATUS[r.status] || [r.status || '?', 's-revoked'];
+    const busy = delBusy === id;
+    const ver = r.verified ? '<span class="status s-active"><i></i>Đã xác minh Google</span>' : '<span class="status s-soon"><i></i>Chưa xác minh</span>';
+    return `<tr><td class="num">${fmtDT(at)}</td>
+      <td><b>${esc(r.email)}</b><br>${ver}${r.uid ? `<br><small class="mono" style="color:var(--muted)">${esc(r.uid)}</small>` : ''}</td>
+      <td>${r.scope === 'data' ? 'Chỉ xoá một phần dữ liệu' : 'Xoá tài khoản + toàn bộ dữ liệu'}</td>
+      <td style="max-width:280px;white-space:pre-wrap">${esc(r.note || '–')}${r.result ? `<br><small style="color:var(--muted)">${esc(r.result)}</small>` : ''}</td>
+      <td><span class="status ${cls}"><i></i>${esc(lab)}</span></td>
+      <td style="text-align:right;white-space:nowrap">
+        ${r.status === 'new' ? `<button class="btn sm danger" data-delwipe="${esc(id)}" ${busy ? 'disabled' : ''}>${busy ? 'Đang dọn…' : 'Dọn dữ liệu'}</button>` : ''}
+        ${r.status !== 'done' ? `<button class="btn sm primary" data-deldone="${esc(id)}">Hoàn tất</button>` : ''}
+        <button class="btn sm quiet" data-delrm="${esc(id)}" title="Xoá bản ghi yêu cầu">✕</button></td></tr>`;
+  }).join('');
+}
+
+/** Xoá mọi dữ liệu của uid trong nhóm người khác rồi gỡ khỏi nhóm. */
+async function wipeMemberFull(ref, uid, email) {
+  const { fs } = FB; let n = 0;
+  const q = (c, f) => fs.query(fs.collection(ref, c), fs.where(f, '==', uid));
+  for (const c of ['features', 'photos', 'formPhotos']) n += await delQuery(q(c, 'createdByUid'));
+  for (const c of ['messages', 'chatImages']) n += await delQuery(q(c, 'fromUid'));
+  const shares = await fs.getDocs(q('shares', 'fromUid'));
+  for (const d of shares.docs) { n += await delQuery(fs.collection(d.ref, 'chunks')); await fs.deleteDoc(d.ref); n++; }
+  const forms = await fs.getDocs(fs.collection(ref, 'forms'));
+  for (const f of forms.docs) n += await delQuery(fs.query(fs.collection(f.ref, 'records'), fs.where('createdByUid', '==', uid)));
+  for (const c of ['typing']) { await fs.deleteDoc(fs.doc(ref, c, uid)); }
+  n += await wipeMemberIn(ref, uid, email);
+  return n;
+}
+
+async function runDeletion(id) {
+  const r = S.deletionRequests[id]; if (!r || delBusy) return;
+  if (r.scope === 'data') { alert('Yêu cầu CHỈ XOÁ MỘT PHẦN dữ liệu: đọc ghi chú, xử lý tay trong Firebase Console, rồi bấm "Hoàn tất".'); return; }
+  const email = String(r.email || '').trim().toLowerCase();
+  if (!r.verified && !confirm(`Yêu cầu CHƯA xác minh bằng Google.\nHãy chắc chắn đã liên hệ xác nhận với chủ ${email} (ví dụ gửi email hỏi lại).\n\nTiếp tục dọn dữ liệu?`)) return;
+  delBusy = id; renderDeletions();
+  const { fs, db } = FB;
+  try {
+    let uid = r.uid || '';
+    if (!uid && !S.demo) {
+      const us = await fs.getDocs(fs.query(fs.collection(db, 'users'), fs.where('email', '==', email)));
+      if (!us.empty) uid = us.docs[0].id;
+    }
+    if (!uid && !S.demo) {
+      if (confirm(`Không tìm thấy hồ sơ làm việc nhóm của ${email} (có thể chưa từng đăng nhập). Đánh dấu "Hoàn tất"?`))
+        await fs.updateDoc(fs.doc(db, 'deletionRequests', id), { status: 'done', doneAt: fs.serverTimestamp(), result: 'Không có dữ liệu trên máy chủ' });
+      return;
+    }
+    if (!confirm(`XOÁ VĨNH VIỄN dữ liệu làm việc nhóm của ${email}?\n\n• Nhóm họ làm trưởng nhóm: xoá toàn bộ.\n• Nhóm khác: xoá dữ liệu họ gửi lên và gỡ khỏi nhóm.\n• Lời mời, hồ sơ users/{uid}.\nKhông khôi phục được.`)) return;
+    if (S.demo) { await new Promise(res => setTimeout(res, 600)); r.status = 'cleaned'; r.result = 'Demo: đã dọn'; toast('Demo: đã dọn'); return; }
+    let teams = 0, left = 0, docs = 0, inv = 0;
+    const owned = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('ownerUid', '==', uid)));
+    for (const d of owned.docs) { docs += await wipeWholeTeam(d.ref); teams++; }
+    const joined = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('memberUids', 'array-contains', uid)));
+    for (const d of joined.docs) { if (d.data().ownerUid === uid) continue; docs += await wipeMemberFull(d.ref, uid, email); left++; }
+    if (email) {
+      const invited = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('invitedEmails', 'array-contains', email)));
+      for (const d of invited.docs) { await fs.updateDoc(d.ref, { invitedEmails: fs.arrayRemove(email) }); inv++; }
+    }
+    for (const [mid, t] of Object.entries(S.trials)) if (t.teamUid === uid) await fs.updateDoc(fs.doc(db, 'trials', mid), { teamUid: '', teamEmail: '' });
+    await fs.deleteDoc(fs.doc(db, 'users', uid));
+    const result = `Đã xoá ${teams} nhóm, rời ${left} nhóm, ${inv} lời mời, ${docs} tài liệu · ${new Date().toLocaleString('vi-VN')}`;
+    await fs.updateDoc(fs.doc(db, 'deletionRequests', id), { status: 'cleaned', cleanedAt: fs.serverTimestamp(), resolvedUid: uid, result });
+    toast('Đã dọn dữ liệu. Còn bước xoá tài khoản ở Firebase › Authentication.');
+  } catch (x) {
+    console.error(x); toast('Lỗi khi dọn: ' + (x.code === 'permission-denied' ? 'chưa dán firestore.rules mới' : x.message), true);
+  } finally { delBusy = null; render(); }
+}
+
+async function setDeletion(id, patch, remove = false) {
+  try {
+    if (S.demo) { if (remove) delete S.deletionRequests[id]; else Object.assign(S.deletionRequests[id], patch); render(); return; }
+    const ref = FB.fs.doc(FB.db, 'deletionRequests', id);
+    if (remove) await FB.fs.deleteDoc(ref); else await FB.fs.updateDoc(ref, patch);
+  } catch (x) { toast(x.message, true); }
+}
+
+// =====================================================================
+// THÔNG BÁO TOÀN BỘ NGƯỜI DÙNG - khớp license/Broadcast.java + BroadcastDialog.java
+// Firestore: broadcasts/{id}  (+ views/{mãMáy} app báo đã xem)
+// =====================================================================
+const BC_THEMES = [
+  { code: 'tet', name: 'Tết Nguyên đán', sub: 'Mai, đào, pháo hoa, đèn lồng', emoji: '🧧', eyebrow: 'CHÚC MỪNG NĂM MỚI', ok: 'Cảm ơn, chúc bạn năm mới an khang!', grad: ['#9B1111', '#D62828', '#F08C00'], fx: 'tet' },
+  { code: 'celebrate', name: 'Chúc mừng', sub: 'Giấy màu, khuyến mãi', emoji: '🎉', eyebrow: 'CHÚC MỪNG', ok: 'Tuyệt vời!', grad: ['#6D28D9', '#DB2777', '#F59E0B'], fx: 'confetti' },
+  { code: 'noel', name: 'Giáng sinh', sub: 'Tuyết rơi', emoji: '🎄', eyebrow: 'GIÁNG SINH AN LÀNH', ok: 'Merry Christmas!', grad: ['#064E3B', '#047857', '#B91C1C'], fx: 'snow' },
+  { code: 'info', name: 'Thông tin', sub: 'Lấp lánh nhẹ', emoji: '📢', eyebrow: 'THÔNG BÁO', ok: 'Đã hiểu', grad: ['#063D2A', '#0B6E52', '#102A52'], fx: 'sparkle' },
+  { code: 'update', name: 'Bản cập nhật', sub: 'Sao bay lên', emoji: '🚀', eyebrow: 'CÓ GÌ MỚI', ok: 'Đã hiểu', grad: ['#1E3A8A', '#2563EB', '#06B6D4'], fx: 'rise' },
+  { code: 'warning', name: 'Quan trọng', sub: 'Bảo trì, cảnh báo', emoji: '⚠️', eyebrow: 'THÔNG BÁO QUAN TRỌNG', ok: 'Đã hiểu', grad: ['#92400E', '#D97706', '#F59E0B'], fx: 'none' },
+];
+const themeOf = c => BC_THEMES.find(t => t.code === c) || BC_THEMES[3];
+const gradCss = t => `linear-gradient(135deg, ${t.grad.join(', ')})`;
+const AUD_LABEL = { all: 'Tất cả người dùng', licensed: 'Máy đã mua key', unlicensed: 'Máy chưa có key', trial: 'Máy đang dùng thử', expired: 'Máy hết hạn / bị khoá' };
+const BC_ST = { live: 'Đang hiển thị', scheduled: 'Hẹn giờ', ended: 'Đã kết thúc', off: 'Đã tắt / nháp' };
+const CONTACT_ZALO = 'https://zalo.me/0364400660';
+const STORE_URL = 'https://play.google.com/store/apps/details?id=com.rsgis.fieldmap';
+let bcSel = 'tet', bcEditId = null, bcFilter = 'all', bcPv = 'dialog';
+
+// Âm lịch: ngày mùng 1 Tết + can chi
+const CAN = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
+const CHI = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi'];
+const TET = { 2026: '2026-02-17', 2027: '2027-02-06', 2028: '2028-01-26', 2029: '2029-02-13', 2030: '2030-02-03', 2031: '2031-01-23', 2032: '2032-02-11', 2033: '2033-01-31', 2034: '2034-02-19', 2035: '2035-02-08' };
+function nextTet() {
+  const y0 = new Date().getFullYear();
+  for (let y = y0; y <= y0 + 2; y++) {
+    if (!TET[y]) continue;
+    const d = new Date(TET[y] + 'T00:00');
+    if (d.getTime() + 7 * DAY > Date.now()) return { y, ms: d.getTime() };
+  }
+  return { y: y0 + 1, ms: new Date(y0 + 1, 1, 1).getTime() };
+}
+const canChi = y => `${CAN[y % 10]} ${CHI[y % 12]}`;
+
+const BC_TEMPLATES = [
+  { label: '🧧 Chúc Tết', make() {
+    const { y, ms } = nextTet(), cc = canChi(y);
+    return { theme: 'tet', emoji: '🧧', title: `Chúc mừng năm mới ${cc} ${y}`,
+      body: `Nhân dịp Xuân ${cc} ${y}, ${APP_NAME} kính chúc anh chị em đồng nghiệp cùng gia đình một năm mới an khang, thịnh vượng, vạn sự như ý.\n\nChúc mọi chuyến thực địa đều thuận buồm xuôi gió, số liệu chuẩn xác, bản đồ luôn rõ ràng! 🌸`,
+      audience: 'all', repeat: 'once', notify: true, startAt: ms, endAt: ms + 7 * DAY };
+  } },
+  { label: '🎄 Giáng sinh', make() {
+    const y = new Date().getFullYear();
+    return { theme: 'noel', emoji: '🎄', title: 'Merry Christmas!',
+      body: `${APP_NAME} chúc bạn và gia đình một mùa Giáng sinh ấm áp, an lành và thật nhiều niềm vui. Cảm ơn bạn đã đồng hành cùng chúng tôi suốt năm qua! ❄️`,
+      audience: 'all', repeat: 'once', notify: true, startAt: new Date(y, 11, 24, 18, 0).getTime(), endAt: new Date(y, 11, 27, 0, 0).getTime() };
+  } },
+  { label: '🎁 Khuyến mãi', make: () => ({ theme: 'celebrate', emoji: '🎁', title: 'Ưu đãi đặc biệt: giảm 50% gói PREMIUM',
+      body: 'Chỉ trong 7 ngày, nâng cấp PREMIUM 1 năm với giá chỉ còn 490.000đ. Đầy đủ tính năng đo đạc, làm việc nhóm, bản đồ offline.\n\nNhắn Zalo để nhận key ngay!',
+      audience: 'unlicensed', repeat: 'daily', notify: true, startAt: 0, endAt: endOfDay(Date.now() + 6 * DAY), buttonText: 'Nhắn Zalo nhận ưu đãi', buttonUrl: CONTACT_ZALO }) },
+  { label: '🛠️ Bảo trì', make: () => ({ theme: 'warning', emoji: '🛠️', title: 'Bảo trì máy chủ tối nay',
+      body: 'Máy chủ làm việc nhóm sẽ bảo trì từ 22:00 đến 23:30 hôm nay. Trong thời gian này đồng bộ nhóm có thể chậm; dữ liệu đo đạc lưu trên máy vẫn an toàn.\n\nXin lỗi vì sự bất tiện!',
+      audience: 'all', repeat: 'once', notify: true, startAt: 0, endAt: endOfDay(Date.now()) }) },
+  { label: '🚀 Bản mới', make: () => ({ theme: 'update', emoji: '🚀', title: 'Đã có phiên bản mới',
+      body: 'Phiên bản mới tải bản đồ nhanh hơn, đo diện tích chính xác hơn và sửa một số lỗi. Cập nhật để có trải nghiệm tốt nhất!',
+      audience: 'all', repeat: 'once', notify: true, startAt: 0, endAt: 0, buttonText: 'Cập nhật ngay', buttonUrl: STORE_URL }) },
+];
+
+const pad2 = n => String(n).padStart(2, '0');
+const toDT = ms => { if (!ms) return ''; const d = new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+const fromDT = v => v ? new Date(v).getTime() : 0;
+// Chuẩn hoá link giống Broadcast.normalizeUrl() trong app: "zalo.me/..." / "www.abc.vn" › thêm https://
+function normUrl(raw) {
+  let u = String(raw ?? '').trim();
+  u = u.replace(/[.,;:!?)\]}>"']+$/, '').replace(/^[(\[{<"']+/, '');
+  if (!u || /\s/.test(u)) return '';
+  const m = /^(https?):(\/\/.+)$/i.exec(u);
+  if (m) return m[1].toLowerCase() + ':' + m[2];
+  if (/^https?:/i.test(u)) return '';
+  const sc = /^(tel|mailto|sms|smsto|geo|market|intent|zalo|fb):(.+)$/i.exec(u);
+  if (sc) return sc[1].toLowerCase() + ':' + sc[2];
+  if (u.startsWith('//')) u = u.slice(2);
+  const host = u.split(/[\/?#]/)[0].split(':')[0];
+  if (/^([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,24}$/i.test(host) || /^\d{1,3}(\.\d{1,3}){3}$/.test(host)) return 'https://' + u;
+  return '';
+}
+const validUrl = u => !!normUrl(u);
+// Lời nhắn xem trước: link web / email bấm được (mở tab mới) giống trong app.
+function linkifyHtml(text) {
+  const re = /((?:https?:\/\/|www\.)[^\s<]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:vn|com|net|org|me|io|app|info|edu|gov|xyz|link)(?:\/[^\s<]*)?|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)/gi;
+  let out = '', last = 0, m;
+  while ((m = re.exec(text))) {
+    out += esc(text.slice(last, m.index));
+    const all = m[0], trail = (/[.,;:!?)\]}"']+$/.exec(all) || [''])[0], raw = all.slice(0, all.length - trail.length);
+    const isMail = /@/.test(raw) && !/^(https?:|www\.)/i.test(raw);
+    const href = isMail ? 'mailto:' + raw : normUrl(raw);
+    out += (href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(raw)}</a>` : esc(raw)) + esc(trail);
+    last = m.index + all.length;
+  }
+  return out + esc(text.slice(last));
+}
+
+function bcState(b) {
+  const now = Date.now();
+  if (!b.active) return 'off';
+  if (b.startAt && now < b.startAt) return 'scheduled';
+  if (b.endAt && now >= b.endAt) return 'ended';
+  return 'live';
+}
+
+/** Ước lượng số máy theo danh sách key + dùng thử (máy chưa từng online không có trong đây). */
+function audienceCounts() {
+  const ids = new Set([...Object.keys(S.trials), ...Object.keys(S.licenses)]);
+  let licensed = 0, trial = 0, expired = 0;
+  ids.forEach(id => {
+    const l = S.licenses[id], st = licState(l);
+    if (l && (st === 'active' || st === 'soon')) { licensed++; return; }
+    const t = S.trials[id];
+    if (!l && t && tsMs(t.startAt) + TRIAL_DAYS * DAY > Date.now()) trial++; else expired++;
+  });
+  return { all: ids.size, licensed, trial, expired, unlicensed: trial + expired };
+}
+
+// ----------------------------------------------------------------- form
+function bcRead() {
+  return {
+    theme: bcSel,
+    emoji: $('#bcEmoji').value.trim(),
+    title: $('#bcTitle').value.trim(),
+    body: $('#bcBody').value.replace(/\s+$/, ''),
+    sender: $('#bcSender').value.trim(),
+    audience: $('#bcAudience').value,
+    repeat: $('#bcRepeat').value,
+    priority: Number($('#bcPriority').value) || 0,
+    notify: $('#bcNotify').checked,
+    buttonText: $('#bcBtnText').value.trim(),
+    buttonUrl: (v => normUrl(v) || v)($('#bcBtnUrl').value.trim()),
+    startAt: fromDT($('#bcStart').value),
+    endAt: fromDT($('#bcEnd').value),
+  };
+}
+function bcFill(o) {
+  bcSel = o.theme || 'info';
+  $('#bcEmoji').value = o.emoji || '';
+  $('#bcTitle').value = o.title || '';
+  $('#bcBody').value = o.body || '';
+  $('#bcSender').value = o.sender || '';
+  $('#bcAudience').value = o.audience || 'all';
+  $('#bcRepeat').value = o.repeat || 'once';
+  $('#bcPriority').value = String(o.priority >= 10 ? 10 : 0);
+  $('#bcNotify').checked = o.notify !== false;
+  $('#bcBtnText').value = o.buttonText || '';
+  $('#bcBtnUrl').value = o.buttonUrl || '';
+  $('#bcStart').value = toDT(o.startAt);
+  $('#bcEnd').value = toDT(o.endAt);
+  $('#bcMore').open = !!(o.buttonUrl || o.buttonText);
+  renderBcThemes(); bcPreview(true);
+}
+function bcSetEditing(id) {
+  bcEditId = id;
+  $('#bcEditing').classList.toggle('hidden', !id);
+  $('#bcCancel').classList.toggle('hidden', !id);
+  $('#bcFormTitle').textContent = id ? 'Sửa thông báo' : 'Soạn thông báo';
+  $('#bcSend').textContent = id ? 'Lưu & hiển thị' : 'Gửi tới mọi người';
+}
+function bcReset() {
+  bcSetEditing(null);
+  bcFill({ theme: bcSel, notify: true });
+  $('#bcErr').textContent = '';
+}
+
+function renderBcThemes() {
+  $('#bcThemes').innerHTML = BC_THEMES.map(t => `<label class="bc-theme" style="--c:${t.grad[1]};--g:${gradCss(t)}">
+    <input type="radio" name="bctheme" value="${t.code}" ${t.code === bcSel ? 'checked' : ''}>
+    <span class="sw">${t.emoji}</span><b>${t.name}</b><small>${t.sub}</small></label>`).join('');
+}
+
+// ----------------------------------------------------------------- xem trước
+function bcPreview(replay = false) {
+  if (!$('#pvCard')) return;
+  const d = bcRead(), t = themeOf(d.theme), g = t.grad, emoji = d.emoji || t.emoji;
+  $('#bcEmoji').placeholder = t.emoji;
+  $('#bcCount').textContent = `${d.body.length}/2000`;
+  $('#pvHead').style.background = gradCss(t);
+  $('#pvEmoji').textContent = emoji;
+  $('#pvEyebrow').textContent = t.eyebrow;
+  $('#pvLanL').style.display = $('#pvLanR').style.display = t.code === 'tet' ? '' : 'none';
+  $('#pvTitle').textContent = d.title || 'Tiêu đề thông báo';
+  $('#pvMeta').textContent = `${d.sender || APP_NAME}  ·  ${fmtDate(d.startAt || Date.now())}`;
+  $('#pvBar').style.background = `linear-gradient(90deg, ${g[1]}, ${g[g.length - 1]})`;
+  const tx = $('#pvText');
+  if (d.body) tx.innerHTML = linkifyHtml(d.body); else tx.textContent = 'Nội dung lời chúc / thông báo sẽ hiện ở đây.';
+  tx.classList.toggle('left', d.body.length > 260);
+  const act = d.buttonUrl && validUrl(d.buttonUrl);
+  const btn = $('#pvBtn');
+  btn.textContent = act ? (d.buttonText || 'Xem chi tiết') : t.ok;
+  btn.style.background = `linear-gradient(135deg, ${g[0]}, ${g[g.length - 1]})`;
+  $('#pvLater').classList.toggle('hidden', !act);
+  $('#pvMute').classList.toggle('hidden', d.repeat !== 'daily');
+  $('#pvNIc').style.background = g[1];
+  $('#pvNTitle').textContent = `${emoji} ${d.title || 'Thông báo'}`;
+  $('#pvNText').textContent = d.body || 'Chạm để xem';
+  const dialog = bcPv === 'dialog';
+  $('#pvCard').classList.toggle('hidden', !dialog);
+  $('#pvScrim').classList.toggle('hidden', !dialog);
+  $('#pvNotif').classList.toggle('hidden', dialog);
+  const aud = audienceCounts()[d.audience] ?? 0;
+  $('#bcAudHint').textContent = `≈ ${aud} máy đã biết (theo tab Key + Dùng thử)`;
+  if (replay) {
+    const c = $('#pvCard'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+    const n = $('#pvNotif'); n.style.animation = 'none'; void n.offsetWidth; n.style.animation = '';
+  }
+  Fx.set(dialog ? t.fx : 'none', replay);
+}
+
+// Hiệu ứng hạt trên canvas - giống FestiveView.java
+const Fx = {
+  mode: 'none', raf: 0, parts: [], sparks: [], last: 0, t0: 0, nextBurst: 0,
+  reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+  set(mode, restart = false) {
+    if (mode === this.mode && !restart && this.raf) return;
+    this.mode = mode; this.parts = []; this.sparks = []; this.t0 = performance.now(); this.last = this.t0; this.nextBurst = .4;
+    const cv = $('#pvFx'); if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+    if (!this.raf && !this.reduced && mode !== 'none') this.raf = requestAnimationFrame(ts => this.tick(ts));
+  },
+  target() { return { tet: 30, confetti: 60, snow: 55, sparkle: 20, rise: 24 }[this.mode] || 0; },
+  spawn(w, h, anywhere) {
+    const r = Math.random, p = { x: r() * w, ph: r() * 6.28, rot: r() * 360, vr: (r() - .5) * 160, life: 0 };
+    const pick = a => a[Math.floor(r() * a.length)];
+    switch (this.mode) {
+      case 'tet': p.kind = r() < .62 ? 0 : 1; p.c = p.kind ? pick(['#FF8FB1', '#FFB3C7', '#F06595']) : pick(['#FFD43B', '#FFC107', '#FFE066']);
+        p.s = 4 + r() * 5; p.vy = 30 + r() * 40; p.vx = (r() - .5) * 16; p.y = anywhere ? r() * h : -10; break;
+      case 'confetti': p.c = pick(['#F59E0B', '#EF4444', '#10B981', '#3B82F6', '#A855F7', '#EC4899', '#FDE047']);
+        p.s = 3 + r() * 4; p.vy = 55 + r() * 70; p.vx = (r() - .5) * 50; p.vr = (r() - .5) * 540; p.y = anywhere ? r() * h : -10; break;
+      case 'snow': p.c = '#fff'; p.s = 1.2 + r() * 2.6; p.vy = 18 + r() * 32; p.vx = 0; p.y = anywhere ? r() * h : -6; break;
+      case 'sparkle': p.c = r() < .5 ? '#fff' : '#A8E6D2'; p.s = 2.5 + r() * 4; p.y = r() * h; p.max = 1.6 + r() * 2.2; p.life = anywhere ? r() * p.max : 0; break;
+      case 'rise': p.c = r() < .5 ? '#fff' : '#93C5FD'; p.s = 2 + r() * 3.2; p.vy = -(25 + r() * 50); p.vx = 0; p.y = anywhere ? r() * h : h + 6; break;
+    }
+    return p;
+  },
+  star(ctx, s) { ctx.beginPath(); ctx.moveTo(0, -s); ctx.quadraticCurveTo(s * .12, -s * .12, s, 0); ctx.quadraticCurveTo(s * .12, s * .12, 0, s); ctx.quadraticCurveTo(-s * .12, s * .12, -s, 0); ctx.quadraticCurveTo(-s * .12, -s * .12, 0, -s); ctx.fill(); },
+  tick(ts) {
+    const cv = $('#pvFx');
+    if (!cv || cv.offsetParent === null || this.mode === 'none') { this.raf = 0; return; }
+    const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    const dt = Math.min(.05, (ts - this.last) / 1000); this.last = ts;
+    const age = (ts - this.t0) / 1000, first = !this.parts.length && age < .1;
+    while (this.parts.length < this.target()) this.parts.push(this.spawn(w, h, first));
+    for (let i = 0; i < this.parts.length; i++) {
+      let p = this.parts[i];
+      p.ph += dt * 1.6; p.rot += p.vr * dt;
+      let dead;
+      if (this.mode === 'sparkle') { p.life += dt; dead = p.life >= p.max; }
+      else {
+        const sway = this.mode === 'snow' ? 14 : this.mode === 'tet' ? 20 : 8;
+        p.x += (p.vx + Math.sin(p.ph) * sway) * dt; p.y += p.vy * dt;
+        dead = p.vy > 0 ? p.y > h + 12 : p.y < -12;
+      }
+      if (dead) { this.parts[i] = p = this.spawn(w, h, false); }
+      ctx.save(); ctx.translate(p.x, p.y); ctx.fillStyle = p.c;
+      if (this.mode === 'tet') {
+        ctx.rotate(p.rot * Math.PI / 180); ctx.globalAlpha = .92;
+        for (let k = 0; k < 5; k++) { const a = (k * 72 - 90) * Math.PI / 180; ctx.beginPath(); ctx.arc(Math.cos(a) * p.s * .55, Math.sin(a) * p.s * .55, p.s * .48, 0, 7); ctx.fill(); }
+        ctx.globalAlpha = 1; ctx.fillStyle = p.kind ? '#FFF0F6' : '#E8590C'; ctx.beginPath(); ctx.arc(0, 0, p.s * .26, 0, 7); ctx.fill();
+      } else if (this.mode === 'confetti') {
+        ctx.rotate(p.rot * Math.PI / 180); ctx.scale(Math.cos(p.ph * 2.2), 1); ctx.fillRect(-p.s / 2, -p.s, p.s, p.s * 2);
+      } else if (this.mode === 'snow') {
+        ctx.globalAlpha = .8; ctx.beginPath(); ctx.arc(0, 0, p.s, 0, 7); ctx.fill();
+      } else if (this.mode === 'sparkle') {
+        const a = Math.sin(Math.PI * p.life / p.max); ctx.globalAlpha = .85 * a; this.star(ctx, p.s * (.4 + .6 * a));
+      } else if (this.mode === 'rise') {
+        ctx.globalAlpha = .6 + .4 * Math.abs(Math.sin(p.ph * 2)); this.star(ctx, p.s);
+      }
+      ctx.restore();
+    }
+    if (this.mode === 'tet') {
+      this.nextBurst -= dt;
+      if (this.nextBurst <= 0) {
+        const cx = w * (.15 + Math.random() * .7), cy = h * (.06 + Math.random() * .25);
+        const col = ['#FFD43B', '#FF6B6B', '#FFA94D', '#FFF3BF', '#F783AC'][Math.floor(Math.random() * 5)];
+        const n = 28 + Math.floor(Math.random() * 12), sp = 70 + Math.random() * 50;
+        for (let k = 0; k < n; k++) { const a = Math.PI * 2 * k / n, s = sp * (.7 + Math.random() * .3);
+          this.sparks.push({ x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: 1.1 + Math.random() * .5, c: Math.random() < .8 ? col : '#fff', s: 1.3 + Math.random() }); }
+        this.nextBurst = .9 + Math.random() * 1.3;
+      }
+      this.sparks = this.sparks.filter(s => (s.life += dt) < s.max);
+      for (const s of this.sparks) {
+        s.vx *= 1 - 1.6 * dt; s.vy = s.vy * (1 - 1.6 * dt) + 55 * dt; s.x += s.vx * dt; s.y += s.vy * dt;
+        const k = 1 - s.life / s.max; ctx.globalAlpha = k; ctx.fillStyle = s.c;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.s * (.6 + .4 * k), 0, 7); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    this.raf = requestAnimationFrame(t => this.tick(t));
+  }
+};
+
+// ----------------------------------------------------------------- ghi Firestore
+async function bcSave(id, data) {
+  if (S.demo) {
+    const now = Date.now();
+    if (id) Object.assign(S.broadcasts[id], data, { updatedAt: now });
+    else { const nid = 'demo' + now; S.broadcasts[nid] = { ...data, rev: 1, createdAt: now, updatedAt: now }; S.bcViews[nid] = 0; }
+    render(); return;
+  }
+  const { fs, db } = FB;
+  if (id) await fs.updateDoc(fs.doc(db, 'broadcasts', id), { ...data, updatedAt: fs.serverTimestamp() });
+  else {
+    const ref = await fs.addDoc(fs.collection(db, 'broadcasts'), { ...data, rev: 1, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp(), createdBy: FB.auth.currentUser?.email || '' });
+    S.bcViews[ref.id] = 0;
+  }
+}
+async function bcPatch(id, patch) {
+  if (S.demo) { Object.assign(S.broadcasts[id], patch, { updatedAt: Date.now() }); render(); return; }
+  await FB.fs.updateDoc(FB.fs.doc(FB.db, 'broadcasts', id), { ...patch, updatedAt: FB.fs.serverTimestamp() });
+}
+async function bcRemove(id) {
+  if (S.demo) { delete S.broadcasts[id]; render(); return; }
+  const { fs, db } = FB;
+  await delQuery(fs.collection(db, 'broadcasts', id, 'views'));
+  await fs.deleteDoc(fs.doc(db, 'broadcasts', id));
+}
+async function bcLoadViews(ids = Object.keys(S.broadcasts)) {
+  if (S.demo || !FB) return;
+  const { fs, db } = FB;
+  await Promise.all(ids.map(async id => {
+    try { const c = await fs.getCountFromServer(fs.collection(db, 'broadcasts', id, 'views')); S.bcViews[id] = c.data().count; }
+    catch (x) { if (!(id in S.bcViews)) S.bcViews[id] = null; }
+  }));
+  renderBroadcasts();
+}
+
+async function bcSubmit(draft) {
+  $('#bcErr').textContent = '';
+  const d = bcRead();
+  const bad = m => { $('#bcErr').textContent = m; };
+  if (!d.title) return bad('Nhập tiêu đề thông báo.');
+  if (d.endAt && d.startAt && d.endAt <= d.startAt) return bad('"Ngừng hiện sau" phải muộn hơn "Bắt đầu hiện".');
+  if (d.endAt && d.endAt <= Date.now() && !draft) return bad('Thời điểm ngừng hiện đã qua, sửa lại hoặc để trống.');
+  if (d.buttonUrl && !validUrl(d.buttonUrl)) return bad('Link nút chưa đúng. Ví dụ: https://zalo.me/0912345678, www.abc.vn, tel:0912345678 hoặc mailto:ten@abc.vn');
+  if (d.buttonText && !d.buttonUrl) return bad('Có chữ trên nút thì cần nhập link mở khi bấm.');
+  if (!draft) {
+    const n = audienceCounts()[d.audience] ?? 0;
+    const when = d.startAt > Date.now() ? `vào lúc ${fmtDT(d.startAt)}` : 'ngay bây giờ';
+    const verb = bcEditId ? 'Lưu và hiển thị' : 'Gửi';
+    if (!confirm(`${verb} "${d.title}"\ntới: ${AUD_LABEL[d.audience]} (≈ ${n} máy đã biết)\n${when}${d.notify ? ', kèm thông báo trên thanh trạng thái' : ''}?`)) return;
+  }
+  const btn = draft ? $('#bcDraft') : $('#bcSend'); btn.disabled = true;
+  try {
+    await bcSave(bcEditId, { ...d, active: !draft });
+    toast(draft ? 'Đã lưu nháp (chưa hiện trên app)' : (bcEditId ? 'Đã lưu thông báo' : (d.startAt > Date.now() ? 'Đã hẹn giờ gửi' : 'Đã gửi! App đang mở sẽ hiện ngay')));
+    bcReset(); bcFilter = 'all'; renderBroadcasts();
+  } catch (x) {
+    bad(x.code === 'permission-denied' ? 'Không có quyền ghi: dán luật Firestore mới (có broadcasts) và đăng nhập đúng email quản trị.' : x.message);
+  } finally { btn.disabled = false; }
+}
+
+// ----------------------------------------------------------------- danh sách
+function renderBroadcasts() {
+  const box = $('#bcList'); if (!box) return;
+  $('#bcRulesWarn').classList.toggle('hidden', !S.bcErr);
+  const all = Object.entries(S.broadcasts || {}).map(([id, b]) => ({ id, b, st: bcState(b) }))
+    .sort((x, y) => (tsMs(y.b.createdAt) || Date.now()) - (tsMs(x.b.createdAt) || Date.now()));
+  const n = k => k === 'all' ? all.length : all.filter(r => r.st === k).length;
+  $('#cBc').textContent = n('live') || '';
+  $('#bcFilters').innerHTML = [['all', 'Tất cả'], ['live', BC_ST.live], ['scheduled', BC_ST.scheduled], ['ended', BC_ST.ended], ['off', BC_ST.off]]
+    .map(([k, l]) => `<button class="filter" data-bf="${k}" aria-pressed="${bcFilter === k}">${l} <b>${n(k)}</b></button>`).join('');
+  const rows = bcFilter === 'all' ? all : all.filter(r => r.st === bcFilter);
+  if (!rows.length) {
+    box.innerHTML = `<div class="table-wrap"><div class="empty-state"><h3>${all.length ? 'Không có thông báo khớp bộ lọc' : 'Chưa gửi thông báo nào'}</h3><p>${S.bcErr ? esc(S.bcErr) : 'Chọn một mẫu nhanh ở trên (ví dụ Chúc Tết), sửa lời nhắn rồi bấm Gửi tới mọi người.'}</p></div></div>`;
+    return;
+  }
+  box.innerHTML = rows.map(({ id, b, st }) => {
+    const t = themeOf(b.theme), v = S.bcViews[id];
+    const from = b.startAt || tsMs(b.createdAt);
+    const win = `${from ? fmtDT(from) : 'ngay'} → ${b.endAt ? fmtDT(b.endAt) : 'không giới hạn'}`;
+    return `<article class="bc-item" style="--g:${gradCss(t)}">
+      <div class="em">${esc(b.emoji || t.emoji)}</div>
+      <div style="min-width:0"><h3>${esc(b.title)}</h3><p>${esc(b.body || '')}</p>
+        <div class="bc-meta">
+          <span class="chip bc-st ${st}">${BC_ST[st]}</span>
+          <span class="chip">${t.name}</span>
+          <span class="chip">👥 ${AUD_LABEL[b.audience] || AUD_LABEL.all}</span>
+          <span class="chip">${b.repeat === 'daily' ? '🔁 Mỗi ngày 1 lần' : '1 lần mỗi máy'}</span>
+          ${b.notify ? '<span class="chip">🔔 Thanh thông báo</span>' : ''}
+          ${b.buttonUrl ? '<span class="chip">🔗 Có nút</span>' : ''}
+          ${(b.priority || 0) >= 10 ? '<span class="chip">⬆ Ưu tiên</span>' : ''}
+          <span class="chip">🕒 ${win}</span>
+          ${(b.rev || 1) > 1 ? `<span class="chip">Đã gửi lại ${(b.rev || 1) - 1} lần</span>` : ''}
+        </div></div>
+      <div class="bc-views"><b>${v == null ? '–' : v.toLocaleString('vi-VN')}</b><small>máy đã xem</small></div>
+      <div class="bc-ops">
+        <button class="btn sm" data-bc="edit" data-id="${esc(id)}">Sửa</button>
+        <button class="btn sm" data-bc="toggle" data-id="${esc(id)}">${b.active ? 'Tắt' : 'Bật lại'}</button>
+        <button class="btn sm" data-bc="resend" data-id="${esc(id)}" title="Hiện lại cho mọi máy, kể cả máy đã xem">Gửi lại</button>
+        <button class="btn sm quiet" data-bc="dup" data-id="${esc(id)}">Nhân bản</button>
+        <button class="btn sm quiet danger" data-bc="del" data-id="${esc(id)}">Xoá</button>
+      </div></article>`;
+  }).join('');
+}
+
+async function onBcAction(act, id) {
+  const b = S.broadcasts[id]; if (!b) return;
+  try {
+    if (act === 'edit') {
+      bcSetEditing(id); bcFill(b);
+      $('#bcForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      toast('Sửa nội dung không làm hiện lại trên máy đã xem. Muốn hiện lại, bấm Gửi lại.');
+    } else if (act === 'dup') {
+      bcSetEditing(null); bcFill({ ...b, startAt: 0, endAt: 0 });
+      $('#bcForm').scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('Đã chép vào form soạn');
+    } else if (act === 'toggle') {
+      await bcPatch(id, { active: !b.active }); toast(b.active ? 'Đã tắt: app không hiện nữa' : 'Đã bật lại');
+    } else if (act === 'resend') {
+      if (!confirm(`Hiện lại "${b.title}" cho MỌI máy (kể cả máy đã xem)?`)) return;
+      const patch = { rev: (b.rev || 1) + 1, active: true };
+      if (b.endAt && b.endAt <= Date.now()) patch.endAt = 0;
+      await bcPatch(id, patch); toast('Đã gửi lại');
+    } else if (act === 'del') {
+      if (!confirm(`Xoá hẳn "${b.title}" và thống kê lượt xem?`)) return;
+      await bcRemove(id); toast('Đã xoá thông báo');
+      if (bcEditId === id) bcReset();
+    }
+  } catch (x) { toast(x.code === 'permission-denied' ? 'Không có quyền: dán luật Firestore mới (có broadcasts)' : x.message, true); }
+}
+
+function wireBroadcasts() {
+  $('#bcTemplates').innerHTML = BC_TEMPLATES.map((t, i) => `<button type="button" class="bc-tpl" data-tpl="${i}">${t.label}</button>`).join('');
+  $('#bcTemplates').onclick = e => {
+    const b = e.target.closest('[data-tpl]'); if (!b) return;
+    const keep = { sender: $('#bcSender').value.trim() };
+    bcFill({ ...BC_TEMPLATES[+b.dataset.tpl].make(), ...keep });
+  };
+  $('#bcThemes').onchange = e => {
+    if (e.target.name !== 'bctheme') return;
+    const old = themeOf(bcSel); bcSel = e.target.value;
+    if ($('#bcEmoji').value.trim() === old.emoji) $('#bcEmoji').value = themeOf(bcSel).emoji;
+    bcPreview(true);
+  };
+  $('#bcForm').addEventListener('input', () => bcPreview(false));
+  $('#bcForm').addEventListener('change', e => { if (e.target.name !== 'bctheme') bcPreview(false); });
+  $('#bcForm').onsubmit = e => { e.preventDefault(); bcSubmit(false); };
+  $('#bcDraft').onclick = () => bcSubmit(true);
+  $('#bcCancel').onclick = bcReset;
+  $('#bcClear').onclick = bcReset;
+  $('#bcReplay').onclick = () => bcPreview(true);
+  $$('[data-pv]').forEach(b => b.onclick = () => {
+    bcPv = b.dataset.pv; $$('[data-pv]').forEach(x => x.setAttribute('aria-pressed', x === b)); bcPreview(true);
+  });
+  $('#bcFilters').onclick = e => { const f = e.target.closest('[data-bf]'); if (f) { bcFilter = f.dataset.bf; renderBroadcasts(); } };
+  $('#bcList').onclick = e => { const a = e.target.closest('[data-bc]'); if (a) { e.stopPropagation(); onBcAction(a.dataset.bc, a.dataset.id); } };
+  $('#bcRefreshViews').onclick = async () => { if (S.demo) { toast('Dữ liệu mẫu'); return; } await bcLoadViews(); toast('Đã cập nhật lượt xem'); };
+  $$('.tab').forEach(t => { if (t.dataset.tab === 'broadcasts') t.addEventListener('click', () => { bcPreview(true); if (!S.demo) bcLoadViews(); }); });
+  renderBcThemes();
+  bcFill(BC_TEMPLATES[0].make());   // mở sẵn mẫu Chúc Tết
+}
+
+function renderSettings() {
+  const ks = $('#keyState');
+  if (Signer.priv) { ks.className = 'keystate ok'; ks.innerHTML = '● Đã có khoá ký trong trình duyệt này.'; }
+  else { ks.className = 'keystate no'; ks.innerHTML = '● Chưa có khoá ký: tạo mới hoặc nhập file sao lưu.'; }
+  $('#pubKey').value = Signer.pubB64;
+  const km = $('#keyMatch');
+  if (!APP_PUBLIC_KEY) km.className = 'keystate hidden';
+  else if (!Signer.priv) { km.className = 'keystate no'; km.innerHTML = `● Địa chỉ <b>${esc(location.host)}</b> chưa có khoá ký. ĐỪNG bấm "Tạo cặp khoá mới": chuyển khoá cũ sang (panel Chuyển dữ liệu) hoặc nhập file sao lưu.`; }
+  else if (Signer.pubB64 === APP_PUBLIC_KEY) { km.className = 'keystate ok'; km.innerHTML = '● Khớp khoá công khai trong app (LicenseConfig.PUBLIC_KEY): key cấp ra app nhận được.'; }
+  else { km.className = 'keystate no'; km.innerHTML = S.demo ? '● Đang xem dữ liệu mẫu: khoá ký tạm, không phải khoá của app.' : '● KHÔNG khớp khoá công khai trong app: key cấp ra sẽ bị app từ chối. Nhập đúng file sao lưu / chuyển khoá từ trang cũ.'; }
+  $('#originText').textContent = location.origin + location.pathname;
+  if (!$('#bxTarget').value) $('#bxTarget').value = localStorage.getItem(LS_TARGET) || '';
+  $('#priceTable').innerHTML = PLANS.map(p => `<tr><td><span class="badge" style="--pc:${p.color}">${p.name}</span> ${p.label}</td>
+    <td>${p.orig ? `<s style="color:var(--muted)">${money(p.orig)}</s>&nbsp; ` : ''}<b>${p.price ? money(p.price) : 'Miễn phí'}</b></td></tr>`).join('');
+}
+
+function renderPlanOpts() {
+  $('#planOpts').innerHTML = PLANS.map(p => `<label class="plan-opt" style="--pc:${p.color}">
+    <input type="radio" name="plan" value="${p.code}"${p.code === selPlan ? ' checked' : ''}>
+    <div class="pn">${p.name}</div>
+    <div class="pp num">${p.price ? money(p.price) : '0đ'}${p.orig ? `<span class="po">${money(p.orig)}</span>` : ''}</div>
+    <div class="pd">${p.label}${p.transfers === Infinity ? ' · chuyển máy trọn đời' : p.transfers ? ' · chuyển máy 1 lần' : ''}${p.gift ? ' · tặng ' + p.gift : ''}</div></label>`).join('');
+  applyPlanDefaults();
+}
+function applyPlanDefaults() {
+  const p = planOf(selPlan);
+  $('#cExp').value = p.days ? toDateInput(Date.now() + p.days * DAY) : '';
+  $('#cExp').disabled = !p.days;
+  $('#cExpHint').textContent = p.days ? `Mặc định ${p.days} ngày kể từ hôm nay` : 'Gói vĩnh viễn, không có hạn';
+  $('#cPaid').value = p.price;
+}
+
+function messageFor(id, l) {
+  const p = planOf(l.plan);
+  return `Cảm ơn anh/chị đã mua ${APP_NAME}!\n\nGói: ${p.name} (${p.label})\nHạn dùng: ${fmtDate(l.expiresAt)}\nMã máy: ${id}\nKEY: ${l.key}\n\nCách kích hoạt: mở app › Menu › Kích hoạt bản quyền › dán key › Kích hoạt (cần có mạng).`;
+}
+
+// =====================================================================
+// HÀNH ĐỘNG
+// =====================================================================
+async function writeLic(mid, { key, plan, expiresAt, status }, cust, text) {
+  const sig = await Signer.sign(canonical(mid, key, plan, expiresAt, status));
+  await Store.saveLicense(mid, { machineId: mid, key, plan, expiresAt, status, sig }, cust, text ? { at: Date.now(), text } : null);
+}
+
+async function onCreate(e) {
+  e.preventDefault();
+  const err = $('#createErr'); err.textContent = '';
+  const mid = normalizeCode($('#cMid').value);
+  if (!MID_RE.test(mid)) { err.textContent = 'Mã máy phải có dạng XXXX-XXXX-XXXX-XXXX.'; return; }
+  const p = planOf(selPlan);
+  const exp = p.days ? fromDateInput($('#cExp').value) : 0;
+  if (p.days && !exp) { err.textContent = 'Chọn ngày hết hạn.'; return; }
+  if (S.licenses[mid] && !confirm(`Máy ${mid} đã có key ${S.licenses[mid].key}. Cấp key MỚI sẽ thay key cũ. Tiếp tục?`)) return;
+  const btn = $('#btnCreate'); btn.disabled = true; btn.textContent = 'Đang ký...';
+  try {
+    const lic = { key: newKey(), plan: p.code, expiresAt: exp, status: 'active' };
+    await writeLic(mid, lic, {
+      customer: $('#cName').value.trim(), phone: $('#cPhone').value.trim(), note: $('#cNote').value.trim(),
+      pricePaid: Number($('#cPaid').value) || 0, transfersUsed: 0, createdAt: Date.now()
+    }, `Cấp key ${p.name}, hạn ${fmtDate(exp)}`);
+    const msg = messageFor(mid, lic);
+    $('#createResult').className = 'result';
+    $('#createResult').innerHTML = `<div class="eyebrow">Key đã tạo cho ${esc(mid)}</div>
+      <div class="keybig">${esc(lic.key)}</div>
+      <textarea readonly>${esc(msg)}</textarea>
+      <div class="row"><button class="btn primary sm" data-copy="${esc(msg)}">Chép tin nhắn</button><button class="btn sm" data-copy="${esc(lic.key)}">Chép key</button></div>`;
+    toast('Đã cấp key ' + lic.key);
+    $('#createForm').reset(); renderPlanOpts();
+  } catch (x) { err.textContent = x.message; }
+  finally { btn.disabled = false; btn.textContent = 'Tạo key & ký'; }
+}
+
+async function onDetailAction(act, box, btn) {
+  const id = box.dataset.id, l = S.licenses[id], c = S.customers[id] || {};
+  if (!l) return;
+  const val = f => box.querySelector(`[data-f="${f}"]`).value.trim();
+  try {
+    if (act === 'save') {
+      const plan = val('plan'), exp = fromDateInput(val('exp'));
+      await writeLic(id, { ...l, plan, expiresAt: exp }, { customer: val('customer'), phone: val('phone'), note: val('note') },
+        (plan !== l.plan || exp !== l.expiresAt) ? `Sửa: gói ${planOf(plan).name}, hạn ${fmtDate(exp)}` : 'Sửa thông tin khách');
+      toast('Đã lưu');
+    } else if (act === 'ext') {
+      const days = Number(btn.dataset.days);
+      let exp = 0, text = 'Nâng lên vĩnh viễn';
+      if (days) { exp = endOfDay(Math.max(Date.now(), l.expiresAt || Date.now()) + days * DAY); text = `Gia hạn +${days} ngày, đến ${fmtDate(exp)}`; }
+      await writeLic(id, { ...l, expiresAt: exp, status: 'active' }, {}, text);
+      toast(text);
+    } else if (act === 'revoke') {
+      if (!confirm(`Thu hồi key của ${c.customer || id}? App sẽ khoá khi có mạng.`)) return;
+      await writeLic(id, { ...l, status: 'revoked' }, {}, 'Thu hồi key'); toast('Đã thu hồi');
+    } else if (act === 'restore') {
+      await writeLic(id, { ...l, status: 'active' }, {}, 'Khôi phục key'); toast('Đã khôi phục');
+    } else if (act === 'delete') {
+      if (!confirm(`Xoá hẳn key ${l.key} và thông tin khách? Không hoàn tác được.`)) return;
+      await Store.remove(id); openRow = null; toast('Đã xoá'); render();
+    } else if (act === 'msg') {
+      copyText(messageFor(id, l), 'Đã chép tin nhắn gửi khách');
+    } else if (act === 'transfer') {
+      const nm = normalizeCode(val('newMid'));
+      if (!MID_RE.test(nm)) { toast('Mã máy mới không hợp lệ', true); return; }
+      if (nm === id) { toast('Mã máy mới trùng máy cũ', true); return; }
+      if (S.licenses[nm] && !confirm(`Máy ${nm} đã có key, ghi đè?`)) return;
+      if (!confirm(`Chuyển key ${l.key} từ ${id} sang ${nm}? Máy cũ sẽ bị khoá.`)) return;
+      const { history, ...rest } = c;
+      await writeLic(nm, { ...l, status: 'active' }, { ...rest, transfersUsed: (c.transfersUsed || 0) + 1, transferredFrom: id }, `Chuyển từ máy ${id}`);
+      await writeLic(id, { ...l, status: 'revoked' }, { note: (c.note ? c.note + ' · ' : '') + 'Đã chuyển sang ' + nm }, `Chuyển sang máy ${nm}`);
+      openRow = nm; toast('Đã chuyển sang ' + nm);
+    }
+  } catch (x) { toast(x.message, true); }
+}
+
+// =====================================================================
+// CHUYỂN / ĐỒNG BỘ DỮ LIỆU GIỮA CÁC ĐỊA CHỈ (localhost:8765 <-> GitHub Pages)
+// localStorage tách theo origin: khoá ký + cấu hình ở http://localhost:8765 KHÔNG
+// tự có ở https://ten.github.io. Licenses/customers/trials nằm trên Firestore nên
+// không cần chuyển. Gói chuyển = { cfg, jwk, pub }, có thể mã hoá AES-GCM bằng mật khẩu.
+// =====================================================================
+const keyMatchesApp = () => !APP_PUBLIC_KEY || !Signer.pubB64 || Signer.pubB64 === APP_PUBLIC_KEY;
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function pubOfJwk(jwk) {
+  if (!jwk || jwk.kty !== 'EC' || jwk.crv !== 'P-256' || !jwk.d) throw new Error('Không phải khoá bí mật ECDSA P-256');
+  const pub = await crypto.subtle.importKey('jwk', { kty: 'EC', crv: 'P-256', x: jwk.x, y: jwk.y, ext: true }, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']);
+  return b64(await crypto.subtle.exportKey('spki', pub));
+}
+async function passKey(pass, salt) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 250000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+function askPassword(title) {
+  return new Promise(res => {
+    const d = $('#passDlg');
+    $('#passTitle').textContent = title; $('#passInput').value = ''; d.returnValue = '';
+    d.onclose = () => res(d.returnValue === 'ok' ? $('#passInput').value : '');
+    d.showModal(); $('#passInput').focus();
+  });
+}
+async function makeBundle(pass) {
+  const rawKey = localStorage.getItem(LS_KEY), rawCfg = localStorage.getItem(LS_CFG);
+  if (!rawKey && !rawCfg) throw new Error('Trình duyệt ở địa chỉ này chưa có khoá ký lẫn cấu hình để chuyển');
+  const payload = { cfg: rawCfg || '', jwk: rawKey ? JSON.parse(rawKey) : null };
+  const out = { type: BUNDLE_TYPE, v: 1, from: location.origin, createdAt: Date.now(), pub: Signer.pubB64 || '' };
+  if (pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await passKey(pass, salt), new TextEncoder().encode(JSON.stringify(payload)));
+    out.enc = { alg: 'PBKDF2-SHA256-250000/AES-GCM-256', salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+  } else out.data = payload;
+  return out;
+}
+async function openBundle(b) {
+  if (b.data) return b.data;
+  if (!b.enc) throw new Error('Gói không có dữ liệu');
+  const pass = await askPassword('Mật khẩu của gói chuyển dữ liệu');
+  if (!pass) throw new Error('Chưa nhập mật khẩu gói');
+  try {
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(b.enc.iv) }, await passKey(pass, unb64(b.enc.salt)), unb64(b.enc.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  } catch { throw new Error('Sai mật khẩu gói hoặc file bị hỏng'); }
+}
+// Ghi gói vào trình duyệt hiện tại; kiểm tra khoá có khớp app và không ghi đè nhầm.
+async function applyPayload(p) {
+  const msgs = []; let cfgChanged = false;
+  if (p.jwk) {
+    const pub = await pubOfJwk(p.jwk);
+    if (APP_PUBLIC_KEY && pub !== APP_PUBLIC_KEY
+      && !confirm('Khoá ký trong file KHÔNG khớp khoá công khai của app (LicenseConfig.PUBLIC_KEY): key ký bằng khoá này app sẽ không nhận.\n\nVẫn nhập?')) throw new Error('Đã huỷ: khoá không khớp app');
+    if (Signer.priv && Signer.pubB64 && Signer.pubB64 !== pub
+      && !confirm('Trình duyệt này đang có MỘT KHOÁ KÝ KHÁC. Ghi đè bằng khoá trong file?\n(Nên tải file sao lưu khoá hiện tại trước.)')) throw new Error('Đã huỷ: giữ khoá hiện tại');
+    await Signer.fromJwk(p.jwk);
+    msgs.push(APP_PUBLIC_KEY && pub === APP_PUBLIC_KEY ? 'khoá ký (khớp app ✓)' : 'khoá ký');
+  }
+  if (p.cfg) {
+    parseCfg(p.cfg);
+    cfgChanged = localStorage.getItem(LS_CFG) !== p.cfg;
+    localStorage.setItem(LS_CFG, p.cfg);
+    msgs.push('cấu hình Firebase');
+  }
+  if (!msgs.length) throw new Error('File không có khoá ký hay cấu hình');
+  return { msgs, cfgChanged };
+}
+async function importAnyFile(f) {
+  const obj = JSON.parse(await f.text());
+  if (obj && obj.type === BUNDLE_TYPE) return applyPayload(await openBundle(obj));
+  return applyPayload({ jwk: obj });   // file sao lưu khoá kiểu cũ (JWK)
+}
+function afterImport({ msgs, cfgChanged }) {
+  toast('Đã nhập: ' + msgs.join(' + '));
+  const mm = $('#migrateMsg'); if (mm) { mm.className = 'mhint ok'; mm.textContent = '✓ Đã nhận ' + msgs.join(' + ') + '. Tiếp tục bước Đăng nhập.'; }
+  renderSettings(); if (S.loaded) render();
+  if (!$('#setup').classList.contains('hidden')) showSetup();
+  if (cfgChanged && !FB?.auth?.currentUser) setTimeout(() => location.replace(location.pathname + location.search), 900);
+}
+function download(text, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function exportBundle() {
+  try {
+    const pass = $('#bxPass').value;
+    if (!pass && !confirm('Chưa đặt mật khẩu: file sẽ chứa khoá BÍ MẬT ở dạng đọc được. Vẫn tải?')) return;
+    const b = await makeBundle(pass);
+    download(JSON.stringify(b, null, 1), `rsgis-chuyen-du-lieu-${toDateInput(Date.now())}.json`);
+    toast(pass ? 'Đã tải gói (có mật khẩu)' : 'Đã tải gói. Xoá file sau khi nhập xong!');
+  } catch (x) { toast(x.message, true); }
+}
+// Cách 1: gửi thẳng sang trang mới bằng postMessage (không qua máy chủ, không lưu file).
+async function sendDirect() {
+  const st = $('#bxStatus'); st.className = 'mhint';
+  let url = $('#bxTarget').value.trim();
+  if (!url) { toast('Điền địa chỉ trang mới (vd. https://ten.github.io/lfield-key-admin/)', true); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  let target; try { target = new URL(url); } catch { toast('Địa chỉ không hợp lệ', true); return; }
+  if (target.origin === location.origin) { toast('Đây chính là địa chỉ đang mở', true); return; }
+  if (!/^https:$/.test(target.protocol) && !['localhost', '127.0.0.1'].includes(target.hostname)) { toast('Trang mới phải dùng https://', true); return; }
+  let bundle; try { bundle = await makeBundle($('#bxPass').value); } catch (x) { toast(x.message, true); return; }
+  localStorage.setItem(LS_TARGET, target.href);
+  target.hash = RECV_HASH.slice(1);
+  const win = window.open(target.href, 'rsgis_admin_recv');
+  if (!win) { toast('Trình duyệt chặn cửa sổ mới: cho phép popup rồi bấm lại', true); return; }
+  st.textContent = 'Đang chờ trang mới mở xong...';
+  let done = false;
+  const onMsg = e => {
+    if (e.source !== win || e.origin !== target.origin || !e.data || typeof e.data !== 'object') return;
+    if (e.data.type === 'rsgis-recv-ready' && !done) { win.postMessage({ type: 'rsgis-bundle', bundle }, target.origin); st.textContent = 'Đã gửi, chờ xác nhận ở trang mới (bấm OK bên đó)...'; }
+    else if (e.data.type === 'rsgis-recv-done') { done = true; window.removeEventListener('message', onMsg); st.className = 'mhint ok'; st.textContent = `✓ ${target.host} đã nhận: ${e.data.what || ''}. Đăng nhập ở trang mới là dùng được.`; toast('Đã chuyển sang ' + target.host); }
+    else if (e.data.type === 'rsgis-recv-fail') { st.className = 'mhint bad'; st.textContent = '✗ Trang mới báo: ' + (e.data.msg || 'không nhận được'); }
+  };
+  window.addEventListener('message', onMsg);
+  setTimeout(() => { if (!done && st.textContent.startsWith('Đang chờ')) { st.className = 'mhint bad'; st.textContent = 'Chưa thấy trang mới phản hồi. Kiểm tra: đúng địa chỉ, đã đưa bản index.html MỚI NHẤT lên GitHub, GitHub Pages đã chạy (mở thử link). Hoặc dùng Tải gói chuyển dữ liệu.'; } }, 25000);
+}
+// Phía trang mới: mở với #nhan-du-lieu từ trang cũ -> báo sẵn sàng -> nhận gói -> hỏi xác nhận.
+function initReceiver() {
+  if (location.hash !== RECV_HASH) return;
+  const opener = window.opener, mm = $('#migrateMsg');
+  if (!opener) { if (mm) mm.textContent = 'Mở trang này bằng nút "Gửi trực tiếp" ở trang cũ để nhận dữ liệu.'; return; }
+  if (mm) mm.textContent = 'Đang nhận dữ liệu từ trang cũ...';
+  let busy = false, got = false;
+  const ping = setInterval(() => { try { opener.postMessage({ type: 'rsgis-recv-ready' }, '*'); } catch { } }, 700);
+  setTimeout(() => clearInterval(ping), 30000);
+  window.addEventListener('message', async e => {
+    if (busy || got || e.source !== opener || !e.data || e.data.type !== 'rsgis-bundle') return;
+    busy = true; clearInterval(ping);
+    const reply = m => { try { opener.postMessage(m, e.origin); } catch { } };
+    try {
+      if (!confirm(`Nhận khoá ký + cấu hình Firebase từ trang ${e.origin}?\n\nChỉ bấm OK nếu chính bạn vừa bấm "Gửi trực tiếp" ở trang đó.`)) throw new Error('Đã huỷ ở trang mới');
+      const r = await applyPayload(await openBundle(e.data.bundle));
+      got = true;
+      reply({ type: 'rsgis-recv-done', what: r.msgs.join(' + ') });
+      history.replaceState(null, '', location.pathname + location.search);
+      afterImport(r);
+    } catch (x) {
+      reply({ type: 'rsgis-recv-fail', msg: x.message });
+      if (mm) { mm.className = 'mhint bad'; mm.textContent = '✗ ' + x.message; }
+      toast(x.message, true);
+    } finally { busy = false; }
+  });
+}
+
+// =====================================================================
+// KHỞI ĐỘNG
+// =====================================================================
+function parseCfg(txt) {
+  const pick = k => (txt.match(new RegExp(`["']?${k}["']?\\s*:\\s*["']([^"']+)["']`)) || [])[1];
+  const cfg = { apiKey: pick('apiKey'), authDomain: pick('authDomain'), projectId: pick('projectId'), appId: pick('appId'), storageBucket: pick('storageBucket'), messagingSenderId: pick('messagingSenderId') };
+  if (!cfg.apiKey || !cfg.projectId || !cfg.appId) throw new Error('Thiếu apiKey / projectId / appId');
+  Object.keys(cfg).forEach(k => cfg[k] || delete cfg[k]);
+  return cfg;
+}
+
+function showSetup() {
+  $('#app').classList.add('hidden'); $('#setup').classList.remove('hidden');
+  $('#btnLogout').classList.add('hidden'); $('#whoText').textContent = '';
+  const has = !!localStorage.getItem(LS_CFG);
+  $('#stepConfig').classList.toggle('done', has);
+  $('#stepLogin').style.opacity = has ? 1 : .45;
+  $('#btnLogin').disabled = !has;
+  $('#btnGoogle').disabled = !has;
+  if (has) $('#cfgInput').value = localStorage.getItem(LS_CFG);
+  $('#originSetup').textContent = location.host;
+  // Ở localhost đã có khoá thì ẩn bước chuyển; ở địa chỉ mới (GitHub) luôn hiện.
+  $('#stepMigrate').classList.toggle('hidden', IS_LOCAL && !!Signer.priv && location.hash !== RECV_HASH);
+  $('#stepMigrate').classList.toggle('done', !!Signer.priv && has);
+}
+
+function enterApp(email) {
+  $('#setup').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#whoText').textContent = email || '';
+  $('#btnLogout').classList.toggle('hidden', S.demo);
+  const chip = $('#envChip'); chip.classList.remove('hidden');
+  chip.classList.toggle('demo', S.demo);
+  $('#envText').textContent = S.demo ? 'Dữ liệu mẫu' : (FB?.app?.options?.projectId || '');
+  renderPlanOpts(); render();
+  if (!S.demo) subscribe();
+}
+
+async function loadDemo() {
+  S.demo = true;
+  // Xem thử: khoá ký tạm chỉ trong bộ nhớ, KHÔNG lưu đè khoá thật của trình duyệt.
+  if (!Signer.priv) await Signer.generate(false);
+  const now = Date.now();
+  const mk = (mid, plan, expDays, status, customer, phone, paid, note) => {
+    const key = newKey(), exp = expDays === null ? 0 : endOfDay(now + expDays * DAY);
+    S.licenses[mid] = { machineId: mid, key, plan, expiresAt: exp, status, sig: 'demo', updatedAt: now - Math.random() * 30 * DAY };
+    S.customers[mid] = { customer, phone, pricePaid: paid, note, transfersUsed: 0, history: [{ at: now - 20 * DAY, text: `Cấp key ${plan}` }] };
+  };
+  mk('7F3A-92KD-QW8M-PX4T', 'PREMIUM', 212, 'active', 'Công ty TNHH Đo đạc Miền Tây', '0918 223 456', 980000, 'Chuyển khoản VCB');
+  mk('K2M8-1QZX-7HWD-4NRT', 'PRO', 5, 'active', 'Lê Minh Tuấn', '0977 110 552', 150000, 'Dự án kiểm kê rừng Lâm Đồng');
+  mk('P9XR-3VBN-2KTE-8MGA', 'ULTIMATE', null, 'active', 'Phạm Thu Hà', '0903 668 214', 750000, '');
+  mk('Z4TC-6YHP-0DSW-9EFB', 'PRO', -12, 'active', 'Trần Quốc Bảo', '0862 457 390', 150000, 'Chưa gia hạn');
+  mk('B7NQ-5JRM-8XAV-1TCK', 'PRO', 18, 'revoked', 'Nguyễn Hoàng Nam', '0345 901 227', 150000, 'Hoàn tiền');
+  mk('H3WE-9PAD-6MZQ-2RXN', 'PREMIUM', 341, 'active', 'Viện Quy hoạch Thuỷ lợi', '0243 868 1122', 980000, 'Xuất hoá đơn VAT');
+  const tr = (mid, model, startDaysAgo, seenH) => S.trials[mid] = { machineId: mid, model, appVersion: '1.0.0', startAt: now - startDaysAgo * DAY, lastSeen: now - seenH * 3600000 };
+  tr('7F3A-92KD-QW8M-PX4T', 'samsung SM-A546E', 160, 3); tr('K2M8-1QZX-7HWD-4NRT', 'Xiaomi 23053RN02A', 40, 20);
+  tr('C8JT-4MVR-1WQE-7ZPH', 'OPPO CPH2591', 2, 1); tr('D1XK-7NBQ-3RTC-5VMW', 'vivo V2322', 5, 30);
+  tr('E6QA-2HZN-9KPD-0SJT', 'samsung SM-S918B', 11, 190); tr('F5RM-8TWX-4BCE-6NYG', 'realme RMX3834', 9, 55);
+  S.trials['F5RM-8TWX-4BCE-6NYG'].teamUid = 'demoUidA'; S.trials['F5RM-8TWX-4BCE-6NYG'].teamEmail = 'doan.khaosat@gmail.com';
+  S.trials['E6QA-2HZN-9KPD-0SJT'].teamUid = 'demoUidB'; S.trials['E6QA-2HZN-9KPD-0SJT'].teamEmail = 'tovien.dodac@gmail.com';
+  S.deletionRequests = {
+    reqA: { email: 'nguyenvan.khaosat@gmail.com', uid: 'demoUidC', verified: true, scope: 'account', note: 'Tôi không dùng app nữa', status: 'new', createdAt: now - 26 * 3600000 },
+    reqB: { email: 'thuha.gis@gmail.com', uid: '', verified: false, scope: 'data', note: 'Xoá giúp các ảnh tôi đã gửi trong nhóm Kiểm kê rừng', status: 'new', createdAt: now - 3 * DAY },
+    reqC: { email: 'minhtuan.dodac@gmail.com', uid: 'demoUidD', verified: true, scope: 'account', note: '', status: 'done', createdAt: now - 12 * DAY, result: 'Đã xoá 1 nhóm, rời 0 nhóm' }
+  };
+  const tet26 = new Date('2026-02-17T00:00').getTime();
+  S.broadcasts = {
+    bcA: { theme: 'tet', emoji: '🧧', title: 'Chúc mừng năm mới Bính Ngọ 2026', body: 'Nhân dịp Xuân Bính Ngọ 2026, LField Maps kính chúc anh chị em đồng nghiệp cùng gia đình một năm mới an khang, thịnh vượng, vạn sự như ý. 🌸',
+      sender: 'LField Maps', audience: 'all', repeat: 'once', notify: true, priority: 10, active: true, rev: 1, startAt: tet26, endAt: tet26 + 7 * DAY, createdAt: tet26 - 3 * DAY },
+    bcB: { theme: 'update', emoji: '🚀', title: 'Đã có phiên bản mới', body: 'Phiên bản mới tải bản đồ nhanh hơn, đo diện tích chính xác hơn và sửa một số lỗi.', buttonText: 'Cập nhật ngay', buttonUrl: STORE_URL,
+      sender: 'LField Maps', audience: 'all', repeat: 'once', notify: true, priority: 0, active: true, rev: 2, startAt: 0, endAt: 0, createdAt: now - 2 * DAY },
+    bcC: { theme: 'celebrate', emoji: '🎁', title: 'Ưu đãi đặc biệt: giảm 50% gói PREMIUM', body: 'Chỉ trong 7 ngày, nâng cấp PREMIUM 1 năm với giá chỉ còn 490.000đ.', buttonText: 'Nhắn Zalo nhận ưu đãi', buttonUrl: CONTACT_ZALO,
+      sender: 'LField Maps', audience: 'unlicensed', repeat: 'daily', notify: true, priority: 0, active: true, rev: 1, startAt: endOfDay(now + 4 * DAY) - DAY + 1 + 8 * 3600000, endAt: endOfDay(now + 11 * DAY), createdAt: now - 3600000 },
+  };
+  S.bcViews = { bcA: 1284, bcB: 342, bcC: 0 };
+  S.loaded = true;
+  enterApp('');
+}
+
+function wire() {
+  $('#btnSaveCfg').onclick = () => {
+    try { const cfg = parseCfg($('#cfgInput').value); localStorage.setItem(LS_CFG, $('#cfgInput').value); $('#cfgErr').textContent = ''; start(cfg); }
+    catch (x) { $('#cfgErr').textContent = 'Không đọc được cấu hình: ' + x.message; }
+  };
+  $('#loginForm').onsubmit = async e => {
+    e.preventDefault(); $('#loginErr').textContent = '';
+    if (!FB) return;
+    const b = $('#btnLogin'); b.disabled = true; b.textContent = 'Đang đăng nhập...';
+    try { await FB.authMod.signInWithEmailAndPassword(FB.auth, $('#lgEmail').value.trim(), $('#lgPass').value); }
+    catch (x) { $('#loginErr').textContent = x.code === 'auth/invalid-credential' ? 'Sai email hoặc mật khẩu.' : x.message; }
+    finally { b.disabled = false; b.textContent = 'Đăng nhập'; }
+  };
+  $('#btnGoogle').onclick = async () => {
+    $('#googleErr').textContent = '';
+    if (!FB) { $('#googleErr').textContent = 'Lưu cấu hình Firebase ở bước 1 trước.'; return; }
+    try { await FB.authMod.signInWithPopup(FB.auth, new FB.authMod.GoogleAuthProvider()); }
+    catch (x) {
+      const host = location.hostname, pid = FB.app.options.projectId || '';
+      const consoleUrl = `https://console.firebase.google.com/project/${encodeURIComponent(pid)}/authentication/settings`;
+      if (x.code === 'auth/unauthorized-domain') {
+        $('#googleErr').innerHTML = `Tên miền <b>${esc(host)}</b> chưa được phép đăng nhập. Firebase › Authentication › Settings › <b>Authorized domains</b> › Add domain › nhập đúng <code>${esc(host)}</code> (không có https://, không có /đường-dẫn) › Add. Chờ 1-2 phút rồi bấm lại.
+          <br><a href="${consoleUrl}" target="_blank" rel="noopener">Mở trang Authorized domains</a> · <button type="button" class="btn sm quiet" data-copy="${esc(host)}">Chép tên miền</button>`;
+      } else if (String(x.code || '').startsWith('auth/requests-from-referer')) {
+        $('#googleErr').innerHTML = `API key đang giới hạn website. Google Cloud Console › APIs &amp; Services › Credentials › <b>Browser key</b> › Website restrictions › thêm <code>${esc(location.origin)}/*</code> › Save.`;
+      } else {
+        $('#googleErr').textContent = x.code === 'auth/popup-closed-by-user' ? 'Đã đóng cửa sổ đăng nhập.'
+          : x.code === 'auth/popup-blocked' ? 'Trình duyệt chặn cửa sổ đăng nhập: cho phép popup cho trang này rồi bấm lại.' : x.message;
+      }
+    }
+  };
+  wireBroadcasts();
+  $('#btnDemo').onclick = loadDemo;
+  $('#btnLogout').onclick = () => { unsub.forEach(u => u()); unsub = []; FB && FB.authMod.signOut(FB.auth); };
+  $('#btnResetCfg').onclick = () => { if (confirm('Xoá cấu hình Firebase đã lưu và đăng xuất?')) { localStorage.removeItem(LS_CFG); location.reload(); } };
+
+  $$('.tab').forEach(t => t.onclick = () => {
+    $$('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+    $$('[data-panel]').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== t.dataset.tab));
+  });
+
+  const openCreate = (mid = '') => {
+    if (!Signer.priv) { toast('Chưa có khoá ký, tạo ở tab Khoá ký & cài đặt', true); }
+    $('#createPanel').classList.remove('hidden');
+    if (mid) $('#cMid').value = mid;
+    $('#cMid').focus();
+    $('#createPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  $('#btnNew').onclick = () => openCreate();
+  $('#btnCloseCreate').onclick = () => $('#createPanel').classList.add('hidden');
+  $('#createForm').onsubmit = onCreate;
+  $('#cMid').addEventListener('blur', e => { e.target.value = normalizeCode(e.target.value); });
+  $('#planOpts').addEventListener('change', e => { if (e.target.name === 'plan') { selPlan = e.target.value; applyPlanDefaults(); } });
+  $('#q').oninput = renderKeys;
+  $('#tq').oninput = renderTrials;
+  $('#btnSweep').onclick = runSweep;
+
+  document.addEventListener('click', async e => {
+    const cp = e.target.closest('[data-copy]'); if (cp) { e.stopPropagation(); copyText(cp.dataset.copy); return; }
+    const f = e.target.closest('[data-f]'); if (f && f.classList.contains('filter')) { keyFilter = f.dataset.f; render(); return; }
+    const tf = e.target.closest('[data-tf]'); if (tf) { trialFilter = tf.dataset.tf; renderTrials(); return; }
+    const df = e.target.closest('[data-df]'); if (df) { delFilter = df.dataset.df; renderDeletions(); return; }
+    const dw = e.target.closest('[data-delwipe]'); if (dw) { await runDeletion(dw.dataset.delwipe); return; }
+    const dd = e.target.closest('[data-deldone]');
+    if (dd) { if (confirm('Đã xoá tài khoản ở Firebase › Authentication và xử lý xong yêu cầu này?')) await setDeletion(dd.dataset.deldone, { status: 'done', doneAt: S.demo ? Date.now() : FB.fs.serverTimestamp() }); return; }
+    const dr = e.target.closest('[data-delrm]'); if (dr) { if (confirm('Xoá bản ghi yêu cầu này (không ảnh hưởng dữ liệu người dùng)?')) await setDeletion(dr.dataset.delrm, null, true); return; }
+    const nw = e.target.closest('[data-act="new"]'); if (nw) { openCreate(); return; }
+    const g = e.target.closest('[data-grant]'); if (g) { $$('.tab')[0].click(); openCreate(g.dataset.grant); return; }
+    const rs = e.target.closest('[data-reset]');
+    if (rs) { if (confirm(`Cho máy ${rs.dataset.reset} dùng thử lại ${TRIAL_DAYS} ngày từ bây giờ?`)) { try { await Store.resetTrial(rs.dataset.reset); toast('Đã reset dùng thử'); } catch (x) { toast(x.message, true); } } return; }
+    const act = e.target.closest('.detail-inner [data-act]');
+    if (act) { const box = act.closest('.detail-inner'); act.disabled = true; await onDetailAction(act.dataset.act, box, act); act.disabled = false; return; }
+    const row = e.target.closest('tr.row');
+    if (row) { openRow = openRow === row.dataset.id ? null : row.dataset.id; renderKeys(); }
+  });
+  document.addEventListener('keydown', e => {
+    const row = e.target.closest?.('tr.row');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); row.click(); }
+  });
+
+  // ----- khoá ký -----
+  $('#btnGen').onclick = async () => {
+    if (S.demo) { toast('Đang xem dữ liệu mẫu: khoá ký chỉ tạm thời', true); }
+    if (!S.demo && APP_PUBLIC_KEY) {
+      const ans = prompt(`App đang phát hành dùng khoá công khai ${APP_PUBLIC_KEY.slice(-12)}...\n\nTạo khoá mới = MỌI key đã bán bị app từ chối, phải sửa LicenseConfig.PUBLIC_KEY và build lại app.\nNếu bạn chỉ vừa chuyển trang sang địa chỉ mới (GitHub), hãy BẤM HUỶ và chuyển khoá cũ sang.\n\nVẫn tạo? Gõ TAO KHOA MOI để xác nhận:`);
+      if (ans !== 'TAO KHOA MOI') { toast('Đã huỷ, không tạo khoá mới'); return; }
+    } else if (Signer.priv && !confirm('ĐÃ có khoá ký. Tạo khoá mới thì MỌI key cũ sẽ không còn hợp lệ với app đã phát hành. Chắc chắn?')) return;
+    await Signer.generate(!S.demo); renderSettings(); render(); toast('Đã tạo cặp khoá. Nhớ tải file sao lưu!');
+  };
+  $('#btnCopyPub').onclick = () => Signer.pubB64 ? copyText(Signer.pubB64, 'Đã chép khoá công khai') : toast('Chưa có khoá', true);
+  $('#btnBackup').onclick = () => {
+    const raw = localStorage.getItem(LS_KEY); if (!raw) { toast('Chưa có khoá', true); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([raw], { type: 'application/json' }));
+    a.download = `rsgis-khoa-ky-BI-MAT-${toDateInput(Date.now())}.json`; a.click();
+  };
+  $('#importFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { afterImport(await importAnyFile(f)); }
+    catch (x) { toast('Không nhập được: ' + x.message, true); }
+    e.target.value = '';
+  };
+  $('#importFile2').onchange = $('#importFile').onchange;
+  $('#btnExportBundle').onclick = exportBundle;
+  $('#btnSendDirect').onclick = sendDirect;
+  $('#btnForget').onclick = () => {
+    if (!localStorage.getItem(LS_KEY)) { toast('Trình duyệt này chưa có khoá', true); return; }
+    if (prompt('Xoá khoá ký khỏi trình duyệt ở địa chỉ này (Firestore và các trang khác không bị ảnh hưởng).\nChắc chắn đã có file sao lưu? Gõ XOA để xác nhận:') !== 'XOA') return;
+    localStorage.removeItem(LS_KEY); Signer.priv = null; Signer.pubB64 = ''; Signer.pubKey = null;
+    renderSettings(); if (S.loaded) render(); toast('Đã xoá khoá ký khỏi trình duyệt này');
+  };
+}
+
+const ICON = {
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
+};
+
+async function start(cfg) {
+  try { await connectFirebase(cfg); }
+  catch (x) { $('#cfgErr').textContent = 'Không tải được Firebase (cần Internet): ' + x.message; showSetup(); }
+}
+
+(async function boot() {
+  wire();
+  await Signer.load();
+  initReceiver();
+  if (new URLSearchParams(location.search).has('demo')) { loadDemo(); return; }
+  const saved = localStorage.getItem(LS_CFG);
+  if (saved) { try { await start(parseCfg(saved)); return; } catch { } }
+  showSetup();
+})();
+</script>
+</body>
+</html>
