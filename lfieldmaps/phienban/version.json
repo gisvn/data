@@ -8,7 +8,7 @@
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "Thêm tính năng mở dữ liệu *Zip hoặc *rar cho dữ liệu *tab và *shp",
+    "Cập nhập tính năng thu vệ tinh tăng độ chính xác GPS",
     "Thêm mục Cập nhật phiên bản: kiểm tra, tải và cài bản mới ngay trong app",
     "Tự động báo khi có phiên bản mới"
   ]
