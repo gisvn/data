@@ -1,7 +1,7 @@
 {
-  "versionCode": 6,
-  "versionName": "1.0.7",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=6",
+  "versionCode": 7,
+  "versionName": "1.0.8",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=7",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-02",
@@ -9,7 +9,6 @@
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
     "Cập nhập tính năng thu vệ tinh tăng độ chính xác GPS",
-    "Thêm mục Cập nhật phiên bản: kiểm tra, tải và cài bản mới ngay trong app",
-    "Tự động báo khi có phiên bản mới"
+    "Thêm hướng dẫn sử dụng tại mục menu: Hướng dẫn sử dụng"
   ]
 }
