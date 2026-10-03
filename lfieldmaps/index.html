@@ -967,7 +967,7 @@ var YT={
       +'<span class="cap">'+(isNew(v)?'<span class="tagc sun">MỚI</span>':'')+(v.duration?'<span class="tagc">'+esc(dur(v.duration))+'</span>':'')+'<span class="tagc">Bài '+(v.pos+1)+'/'+ALL.length+'</span></span></button>';
     stage.querySelector('.facade').onclick=function(){play(v)};
   }
-  function play(v){embed('https://www.youtube-nocookie.com/embed/'+v.id+'?autoplay=1&rel=0&playsinline=1&modestbranding=1&list='+YT.playlist)}
+  function play(v){embed('https://www.youtube.com/embed/'+v.id+'?autoplay=1&rel=0&playsinline=1&modestbranding=1&list='+YT.playlist)}
   function showMeta(v){
     var d=v.description||'';
     meta.innerHTML='<h3>'+esc(v.title)+'</h3><div class="row">'+(v.published?'<span>Đăng '+dmy(v.published)+'</span>':'')+(v.views?'<span>'+(+v.views).toLocaleString('vi-VN')+' lượt xem</span>':'')
@@ -1009,7 +1009,7 @@ var YT={
     syncTxt.textContent='Playlist YouTube · luôn cập nhật video mới';
     stage.innerHTML='<button class="facade" aria-label="Phát playlist hướng dẫn"><span class="plogo" data-logo="light"></span>'+PLAY+'<span class="cap"><span class="tagc">Phát toàn bộ playlist</span></span></button>';
     stage.querySelector('.plogo').innerHTML=logoSVG('light');
-    stage.querySelector('.facade').onclick=function(){embed('https://www.youtube-nocookie.com/embed/videoseries?list='+YT.playlist+'&autoplay=1&rel=0&playsinline=1')};
+    stage.querySelector('.facade').onclick=function(){embed('https://www.youtube.com/embed/videoseries?list='+YT.playlist+'&autoplay=1&rel=0&playsinline=1')};
     meta.innerHTML='<h3>Trọn bộ hướng dẫn sử dụng LField Maps</h3><div class="row"><span>Bấm phát để xem, chuyển bài trong trình phát</span></div>';
     queue.innerHTML='<div class="qempty">Danh sách bài sẽ hiện ở đây sau lần đồng bộ đầu tiên.<br><a class="btn glass" href="'+plUrl+'" target="_blank" rel="noopener">Xem danh sách trên YouTube ↗</a></div>';
     side.querySelector('.vtools').style.display='none';fit();
