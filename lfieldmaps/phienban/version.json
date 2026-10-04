@@ -1,16 +1,15 @@
 {
-  "versionCode": 13,
-  "versionName": "1.1.4",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=13",
+  "versionCode": 14,
+  "versionName": "1.1.5",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=14",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-04",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Cập nhập tính năng sửa thuộc tính của đối tượng",
-    "2. Tô màu sáng đối tượng khi chọn đối tượng trên bản đồ",
-	"3. Tích hợp tính năng A-GPS lấy nhanh vị trí GPS"
+    "1. Tích hợp tính năng A-GPS lấy nhanh vị trí GPS",
+    "2. Tô màu sáng đối tượng khi chọn đối tượng trên bản đồ"
 	
   ]
 }
