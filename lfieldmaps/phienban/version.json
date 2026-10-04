@@ -1,14 +1,14 @@
 {
-  "versionCode": 11,
-  "versionName": "1.1.2",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=11",
+  "versionCode": 12,
+  "versionName": "1.1.3",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=12",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-04",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Cập nhập tính năng xem ảnh Google Satellite hằng năm",
-    "2. Tích hợp ảnh Sentinel hằng năm"
+    "1. Cập nhập tính năng cập nhập video hướng dẫn sử dụng",
+    "2. Công cụ thu thập dữ liệu thêm một số tính năng mới"
   ]
 }
