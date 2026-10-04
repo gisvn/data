@@ -1,15 +1,18 @@
 {
-  "versionCode": 15,
-  "versionName": "1.1.6",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=15",
+  "versionCode": 16,
+  "versionName": "1.1.7",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=16",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-04",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Cập nhập tính năng khảo sát dữ liệu",
-    "2. Tăng cường chức năng A-GPS"
+    "1. Cắm điểm theo danh sách",
+    "2.  Cháy rừng NASA FIRMS",
+	"3.  Ô tiêu chuẩn",
+	"4.  Tách gộp thửa",
+	"5.  Trích đo PDF: Theo Thông tư 26/2024/TT-BTNMT"
 	
   ]
 }
