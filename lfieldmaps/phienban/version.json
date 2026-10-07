@@ -1,15 +1,15 @@
 {
-  "versionCode": 21,
-  "versionName": "1.2.2",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=21",
+  "versionCode": 22,
+  "versionName": "1.2.3",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=22",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-10-05",
+  "releaseDate": "2026-10-07",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Cập nhập vị trí GPS cho bản đồ chế độ 3D",
-	"2. Cập nhập hiển thị thuộc tính cho tính năng bản đồ 3D"
+    "1. Thêm tính năng thêm dữ liệu *gpx",
+	"2. Cập nhập chế độ thu thập dữ liệu Live cho một số dòng máy cấu hình yếu"
 	
   ]
 }
