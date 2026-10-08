@@ -29,6 +29,7 @@
   --p-starter: oklch(0.56 0.1 178);
   --p-pro: oklch(0.53 0.17 262);
   --p-ultimate: oklch(0.5 0.2 296);
+  --p-forest: oklch(0.48 0.13 150);
   --p-premium: oklch(0.64 0.15 62);
   --p-diamond: oklch(0.52 0.11 215);
   --radius: 12px;
@@ -700,6 +701,7 @@ const PLANS = [
   { code: 'STARTER',  name: 'STARTER',  label: '7 ngày',    days: 7,   price: 0,      orig: 0,       color: 'var(--p-starter)' },
   { code: 'PRO',      name: 'PRO',      label: '1 tháng',   days: 30,  price: 150000, orig: 299000,  color: 'var(--p-pro)' },
   { code: 'ULTIMATE', name: 'ULTIMATE', label: 'Vĩnh viễn', days: 0,   price: 750000, orig: 2490000, color: 'var(--p-ultimate)' },
+  { code: 'ULTIMATE_FOREST', name: 'ULTIMATE FOREST', label: 'Vĩnh viễn', days: 0, price: 1900000, orig: 4990000, color: 'var(--p-forest)', transfers: 0, gift: 'Hồ sơ lâm nghiệp' },
   { code: 'PREMIUM',  name: 'PREMIUM',  label: '1 năm',     days: 365, price: 980000, orig: 1790000, color: 'var(--p-premium)', transfers: 1 },
   // Gói VIP: vĩnh viễn, chuyển thiết bị TRỌN ĐỜI (không giới hạn lượt), tặng tài khoản ảnh SKY 3 m.
   { code: 'DIAMOND',  name: 'DIAMOND',  label: 'Vĩnh viễn', days: 0,   price: 5000000, orig: 9990000, color: 'var(--p-diamond)', transfers: Infinity, gift: 'Tài khoản ảnh SKY 3m x 3m' },
