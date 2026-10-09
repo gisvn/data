@@ -1,14 +1,14 @@
 {
-  "versionCode": 28,
-  "versionName": "1.2.9",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=28",
+  "versionCode": 29,
+  "versionName": "1.3.1",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=29",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-09",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Fix lỗi đo GNSS và RTK xử lý pha độ chính xác 5 cm đến 50 cm "
+    "Tích hợp tính năng đồng bộ dữ liệu lên Google Drive lưu trữ dữ liệu trực tuyến"
 	
   ]
 }
