@@ -1,14 +1,14 @@
 {
-  "versionCode": 31,
-  "versionName": "1.3.3",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=31",
+  "versionCode": 32,
+  "versionName": "1.3.4",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=32",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-10-09",
+  "releaseDate": "2026-10-10",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "Tích hợp tính năng đồng bộ dữ liệu lên Google Drive lưu trữ dữ liệu trực tuyến"
+    " Bổ sung tính năng Quét bảng tọa độ sổ đỏ (OCR): Chụp ảnh bảng kê tọa độ góc ranh trên sổ là app tự động dựng thửa và định vị vị trí đất ngoài thực địa"
 	
   ]
 }
