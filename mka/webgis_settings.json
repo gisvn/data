@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "version": 1,
+    "project": "Unnamed",
+    "saved_at": "2026-06-06T18:36:56",
+    "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export"
+  },
+  "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export",
+  "webgis_settings": {
+    "name": "FORWET",
+    "subtitle": "Ứng dụng quản lý cơ sở dữ liệu bản đồ mẫu khóa ảnh VQG Phú Quốc",
+    "icon_url": "https://img.icons8.com/?size=100&id=bUIFSU12eoHZ&format=png&color=000000",
+    "icon_local_path": "",
+    "name_font": "inherit",
+    "name_size": 20,
+    "name_bold": true,
+    "name_italic": false,
+    "name_color": "#0000ff",
+    "sub_font": "inherit",
+    "sub_size": 14,
+    "sub_bold": false,
+    "sub_italic": false,
+    "sub_color": "#616261",
+    "web_theme": "light"
+  },
+  "initial_view": {
+    "mode": "qgis_extent",
+    "lat": 10.19527,
+    "lng": 104.276634,
+    "zoom": 10,
+    "bounds": [
+      9.858734,
+      103.115723,
+      10.52763,
+      105.435208
+    ]
+  },
+  "planet_preset": [
+    {
+      "display_name": "global_monthly_2026_01_mosaic",
+      "first_acquired": "2026-01-01",
+      "tile_url": "",
+      "wmts_url": "",
+      "api_key": "PLAK5e7ab0adf3764f498e389d45d40e7cac",
+      "mosaic_name": "global_monthly_2026_01_mosaic",
+      "layer_name": "🛰 global_monthly_2026_01_mosaic",
+      "opacity": 1.0,
+      "enabled": true,
+      "tools_collapsed": true
+    }
+  ],
+  "sentinel_preset": [],
+  "epicollect5_preset": [],
+  "layer_order": [
+    "Mẫu khóa ảnh thực địa",
+    "Ranh giới QH VQG Phú Quốc 2026"
+  ],
+  "layers": {
+    "Mẫu khóa ảnh thực địa": {
+      "checked": true,
+      "search_fields": [
+        "TT"
+      ],
+      "field_aliases": {
+        "MaMKA": "Mã mẫu khóa ảnh",
+        "Vitri": "Vị Trí MKA",
+        "HuongPhoi": "Hướng Phơi",
+        "Tinh": "Tỉnh",
+        "Xa": "Xã",
+        "TK": "Tiểu khu",
+        "NgayDT": "Ngày điều tra",
+        "NguoiDT": "Người điều tra",
+        "X_NB": "X-VN2000",
+        "Y_NB": "Y-VN2000",
+        "Docao": "Cao độ (m)",
+        "G": "G Trung bình (m2)",
+        "H": "Hvn Trung bình (m)",
+        "M": "Trữ lượng (m3)",
+        "Dotanche": "Độ tàn che",
+        "LoaiUT": "Loài ưu thế",
+        "HuongChup": "Hướng chụp ảnh",
+        "KCChup": "Khoản cách chụp",
+        "ten_hinh": "Tên Hình",
+        "TrangThai": "Trạng thái",
+        "TTThucDia": "Trạng thái tính nhanh",
+        "Note": "Ghi chú",
+        "MaVQG": "Mã VQG"
+      },
+      "label": {
+        "enabled": true,
+        "fields": [
+          "MaMKA"
+        ],
+        "label_expression": "\"MaMKA\"",
+        "is_expression": true,
+        "font_family": "Arial",
+        "font_size": 10,
+        "font_bold": true,
+        "font_italic": false,
+        "text_color": "#ffffff",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 2,
+        "buffer_color": "#ffffff",
+        "buffer_opacity": 0.85,
+        "placement": "around_point",
+        "min_scale": 100000,
+        "max_scale": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": true,
+        "layer_min_scale": null,
+        "layer_max_scale": null
+      },
+      "image_fields": [
+        "Hinh1",
+        "Hinh2"
+      ],
+      "style": {
+        "point_color": "#baf080",
+        "fill_color": "#baf080",
+        "stroke_color": "#ffffff",
+        "point_size": 6.0,
+        "point_shape": "circle",
+        "icon_url": "https://img.icons8.com/?size=100&id=20844&format=png&color=000000",
+        "icon_type": "url",
+        "icon_emoji": "",
+        "classify_field": "TrangThai",
+        "classify_colors": {
+          "TXK": "#e53935",
+          "RNP": "#8e24aa",
+          "DTK": "#1e88e5",
+          "TXN": "#00897b",
+          "TXB": "#43a047",
+          "TG": "#f4511e",
+          "RNM": "#6d4c41",
+          "TXG": "#039be5"
+        }
+      }
+    },
+    "Ranh giới QH VQG Phú Quốc 2026": {
+      "checked": true,
+      "search_fields": [],
+      "field_aliases": {},
+      "label": {
+        "enabled": false,
+        "fields": [],
+        "label_expression": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": false,
+        "layer_min_scale": null,
+        "layer_max_scale": null
+      },
+      "image_fields": [],
+      "style": {
+        "no_fill": true,
+        "fill_color": null,
+        "fill_opacity": 0.5,
+        "fill_pattern": "solid",
+        "stroke_color": "#1710ec",
+        "stroke_width": 0.86,
+        "stroke_dash": "solid",
+        "icon_url": "",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    }
+  }
+}

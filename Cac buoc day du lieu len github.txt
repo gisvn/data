@@ -1,0 +1,85 @@
+Mở cửa sổ Terminal (MINGW64) tại thư mục chứa dữ liệu của bạn và chạy lệnh:
+git init
+
+Bước 2: Thiết lập danh tính (Chỉ làm 1 lần đầu)
+git config --global user.email "9620205.22.014@ncs.hcmuaf.edu.vn"
+git config --global user.name "gisvn"
+
+
+Bước 3: Kết nối với GitHub (Chỉ làm 1 lần đầu)
+git remote add origin https://github.com/gisvn/data.git
+
+Bước 4: Chọn dữ liệu chuẩn bị gửi đi (Staging)
+Đưa tất cả tệp trong thư mục lên: git add .
+Hoặc chỉ đưa một tệp cụ thể: git add Index.html
+
+Bước 5: Đóng gói và ghi chú (Commit)
+git commit -m "Noi dung day len"
+
+
+Bước 6: Đẩy dữ liệu lên GitHub (Push)
+Trước khi push, hãy đảm bảo bạn đang ở nhánh main:
+
+git branch -M main
+
+Sau đó đẩy dữ liệu lên:
+git push -u origin main
+
+---------------------------------Thu muc moi
+echo "# hcm" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/gisvn/hcm.git
+git push -u origin main
+-----------------------------------------------
+
+Kiểm tra ở repository
+git remote -v
+
+Chuyển sang repository khác
+git remote set-url origin https://github.com/gisvn/hcm.git
+
+
+
+
+Quy trình hàng ngày của bạn sẽ chỉ còn là: 3 bước
+
+git add .
+
+git commit -m "Cập nhật dữ liệu mới"
+
+git push
+
+https://gisvn.github.io/data/
+
+
+
+
+
+#XU LY LOI
+# Bước 1: Tạo branch mới không có lịch sử cũ
+git checkout --orphan newmain
+
+# Bước 2: Stage tất cả file hiện tại
+git add -A
+
+# Bước 3: Commit sạch
+git commit -m "Initial commit"
+
+# Bước 4: Xóa branch main cũ
+git branch -D main
+
+# Bước 5: Đổi tên branch hiện tại thành main
+git branch -m main
+
+# Bước 6: Force push lên GitHub
+git push origin main --force
+
+Cuối cùng
+git push --set-upstream origin main
+
+
+
+

@@ -1,0 +1,268 @@
+{
+  "_meta": {
+    "version": 1,
+    "project": "Unnamed",
+    "saved_at": "2026-06-05T00:17:41",
+    "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export"
+  },
+  "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export",
+  "webgis_settings": {
+    "name": "WebGIS",
+    "subtitle": "Ứng dụng quản lý cơ sở dữ liệu bản đồ",
+    "icon_url": "",
+    "icon_local_path": "D:/DOWNLOAD/databasespeeddataserver-115837_115792.ico",
+    "name_font": "inherit",
+    "name_size": 16,
+    "name_bold": true,
+    "name_italic": false,
+    "name_color": "#ffffff",
+    "sub_font": "inherit",
+    "sub_size": 11,
+    "sub_bold": false,
+    "sub_italic": false,
+    "sub_color": "#e0f2fe",
+    "web_theme": "light"
+  },
+  "initial_view": {
+    "mode": "qgis_extent",
+    "lat": 9.805967,
+    "lng": 104.629585,
+    "zoom": 15,
+    "bounds": [
+      9.800433,
+      104.610502,
+      9.811499,
+      104.648668
+    ]
+  },
+  "planet_preset": [
+    {
+      "display_name": "global_monthly_2026_04_mosaic",
+      "first_acquired": "2026-04-01",
+      "tile_url": "",
+      "wmts_url": "",
+      "api_key": "PLAK5e7ab0adf3764f498e389d45d40e7cac",
+      "mosaic_name": "global_monthly_2026_04_mosaic",
+      "layer_name": "🛰 global_monthly_2026_04_mosaic",
+      "opacity": 1.0,
+      "enabled": true,
+      "tools_collapsed": true
+    }
+  ],
+  "sentinel_preset": [
+    {
+      "wms_url": "https://sh.dataspace.copernicus.eu/ogc/wms/3ef40253-5c1b-4b34-860e-115ea5e2d2b6",
+      "layer_id": "TRUE_COLOR",
+      "layer_name": "🛰 Natural color (true color)",
+      "format": "image/png",
+      "version": "1.3.0",
+      "crs": "EPSG:4326",
+      "opacity": 1.0,
+      "tools_collapsed": true
+    }
+  ],
+  "epicollect5_preset": [
+    {
+      "project_slug": "vqgpq2025",
+      "api_key": "",
+      "client_id": "",
+      "layer_name": "📋 VQG Phú Quốc",
+      "form_ref": "c4c9fd5375274917b1522637ebeac67c_6937559cc23c2",
+      "refresh_interval": 0,
+      "point_color": "#e65100",
+      "point_size": 8,
+      "opacity": 1.0,
+      "tools_collapsed": true,
+      "scale_min": 200000,
+      "scale_max": 0,
+      "enable_cluster": true
+    },
+    {
+      "project_slug": "giscangio",
+      "api_key": "",
+      "client_id": "",
+      "layer_name": "📋 Khu Vực Cần Giờ",
+      "form_ref": "b3eebd8fe68c466b881b788ec6e3511f_657a6af9e560c",
+      "refresh_interval": 0,
+      "point_color": "#e65100",
+      "point_size": 8,
+      "opacity": 1.0,
+      "tools_collapsed": true,
+      "scale_min": 200000,
+      "scale_max": 0,
+      "enable_cluster": true
+    }
+  ],
+  "layer_order": [
+    "Mốc ranh giới",
+    "Contor",
+    "Thửa giao khoán đất rừng"
+  ],
+  "layers": {
+    "Mốc ranh giới": {
+      "checked": true,
+      "search_fields": [
+        "STT"
+      ],
+      "field_aliases": {},
+      "label": {
+        "enabled": true,
+        "fields": [
+          "STT"
+        ],
+        "label_expression": null,
+        "is_expression": false,
+        "font_family": "Arial",
+        "font_size": 10,
+        "font_bold": false,
+        "font_italic": false,
+        "text_color": "#ffffff",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 2,
+        "buffer_color": "#ffffff",
+        "buffer_opacity": 0.85,
+        "placement": "around_point",
+        "min_scale": 10000,
+        "max_scale": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": true,
+        "layer_min_scale": 160000,
+        "layer_max_scale": null
+      },
+      "image_fields": [],
+      "style": {
+        "point_color": "#e65100",
+        "fill_color": "#e65100",
+        "stroke_color": "#0277bd",
+        "point_size": 9.0,
+        "point_shape": "circle",
+        "icon_url": "https://img.icons8.com/?size=100&id=21612&format=png&color=000000",
+        "icon_type": "url",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    },
+    "Contor": {
+      "checked": true,
+      "search_fields": [
+        "ELEVATION"
+      ],
+      "field_aliases": {},
+      "label": {
+        "enabled": true,
+        "fields": [
+          "ELEVATION"
+        ],
+        "label_expression": null,
+        "is_expression": false,
+        "font_family": "Arial",
+        "font_size": 11,
+        "font_bold": false,
+        "font_italic": false,
+        "text_color": "#ff7f00",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 1,
+        "buffer_color": "#fafafa",
+        "buffer_opacity": 0.85,
+        "placement": "line",
+        "min_scale": 15000,
+        "max_scale": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": false,
+        "layer_min_scale": 15000,
+        "layer_max_scale": null
+      },
+      "image_fields": [],
+      "style": {
+        "stroke_color": "#fdbf6f",
+        "stroke_width": 0.5,
+        "stroke_dash": "solid",
+        "stroke_linecap": "square",
+        "icon_url": "",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    },
+    "Thửa giao khoán đất rừng": {
+      "checked": true,
+      "search_fields": [
+        "Churung",
+        "CMND"
+      ],
+      "field_aliases": {},
+      "label": {
+        "enabled": true,
+        "fields": [
+          "Churung",
+          "Dtich"
+        ],
+        "label_expression": null,
+        "is_expression": false,
+        "font_family": "Arial",
+        "font_size": 10,
+        "font_bold": false,
+        "font_italic": false,
+        "text_color": "#ffffff",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 1,
+        "buffer_color": "#fafafa",
+        "buffer_opacity": 0.85,
+        "placement": "around_point",
+        "min_scale": 5000,
+        "max_scale": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": false,
+        "layer_min_scale": 10000,
+        "layer_max_scale": null
+      },
+      "image_fields": [
+        "Anh"
+      ],
+      "style": {
+        "no_fill": false,
+        "fill_color": "#a5cc32",
+        "fill_opacity": 1.0,
+        "fill_pattern": "solid",
+        "stroke_color": "#0000ff",
+        "stroke_width": 0.5,
+        "stroke_dash": "dash",
+        "icon_url": "",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    }
+  }
+}

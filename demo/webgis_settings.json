@@ -1,0 +1,269 @@
+{
+  "_meta": {
+    "version": 1,
+    "project": "Unnamed",
+    "saved_at": "2026-06-21T02:11:15",
+    "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export"
+  },
+  "output_dir": "C:\\Users\\DELL\\Desktop\\WebGIS_Export",
+  "webgis_settings": {
+    "name": "WEBGIS",
+    "subtitle": "Ứng dụng quản lý cơ sở dữ liệu bản đồ giao khoán rừng",
+    "icon_url": "https://img.icons8.com/?size=100&id=pHxZSUbcsphd&format=png&color=000000",
+    "icon_local_path": "",
+    "gemini_api_key": "AQ.Ab8RN6Ko2zaV4dGMJDOsELy71MhziqOK9INE8xbrfvpEszI0mw",
+    "name_font": "inherit",
+    "name_size": 19,
+    "name_bold": true,
+    "name_italic": false,
+    "name_color": "#ff5500",
+    "sub_font": "inherit",
+    "sub_size": 13,
+    "sub_bold": false,
+    "sub_italic": false,
+    "sub_color": "#000000",
+    "web_theme": "olive"
+  },
+  "initial_view": {
+    "mode": "qgis_extent",
+    "lat": 10.51191,
+    "lng": 106.824161,
+    "zoom": 14,
+    "bounds": [
+      10.483662,
+      106.762921,
+      10.540147,
+      106.885388
+    ]
+  },
+  "planet_preset": [
+    {
+      "display_name": "global_monthly_2026_02_mosaic",
+      "first_acquired": "2026-02-01",
+      "tile_url": "",
+      "wmts_url": "",
+      "api_key": "PLAK5e7ab0adf3764f498e389d45d40e7cac",
+      "mosaic_name": "global_monthly_2026_02_mosaic",
+      "layer_name": "Tháng 02/2026",
+      "opacity": 1.0,
+      "enabled": true,
+      "tools_collapsed": true
+    },
+    {
+      "display_name": "global_monthly_2020_01_mosaic",
+      "first_acquired": "2020-01-01",
+      "tile_url": "",
+      "wmts_url": "",
+      "api_key": "PLAK5e7ab0adf3764f498e389d45d40e7cac",
+      "mosaic_name": "global_monthly_2020_01_mosaic",
+      "layer_name": "Tháng 01/2020",
+      "opacity": 1.0,
+      "enabled": true,
+      "tools_collapsed": true
+    }
+  ],
+  "sentinel_preset": [
+    {
+      "wms_url": "https://sh.dataspace.copernicus.eu/ogc/wms/45b2bb3d-8de5-4a71-a7f7-03fd9f53d589",
+      "layer_id": "TRUE_COLOR",
+      "layer_name": "🛰 True color",
+      "format": "image/png",
+      "version": "1.3.0",
+      "crs": "EPSG:4326",
+      "opacity": 1.0,
+      "tools_collapsed": true
+    }
+  ],
+  "epicollect5_preset": [],
+  "cloudflare_settings": {
+    "autodeploy": true,
+    "api_token": "cfut_eIY9XUVhduIuvyREJITMebbhabnBk4tWQ7HQFGBV5b3b0716",
+    "account_id": "d0a50d89287ff76265adc0314f6ab033"
+  },
+  "layer_order": [
+    "MauKhoaAnh",
+    "HCMGiaoKhoan",
+    "RanhRPH"
+  ],
+  "layers": {
+    "MauKhoaAnh": {
+      "checked": true,
+      "search_fields": [
+        "MaMKA"
+      ],
+      "field_aliases": {
+        "TT": "Thứ tự",
+        "MaMKA": "Mã mẫu khóa ảnh",
+        "Vitri": "Ví trí",
+        "HuongPhoi": "Hướng",
+        "Tinh": "Tỉnh"
+      },
+      "label": {
+        "enabled": true,
+        "fields": [
+          "MaMKA"
+        ],
+        "label_expression": null,
+        "is_expression": false,
+        "font_family": "Arial",
+        "font_size": 11,
+        "font_bold": true,
+        "font_italic": false,
+        "text_color": "#ffffff",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 2,
+        "buffer_color": "#ffffff",
+        "buffer_opacity": 0.85,
+        "placement": "offset_from_point",
+        "offset_x": 3.0,
+        "offset_y": 3.5,
+        "quadrant": 2,
+        "min_scale": 80000,
+        "max_scale": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": true,
+        "webgis_name": "Mẫu khóa ảnh",
+        "layer_min_scale": null,
+        "layer_max_scale": null
+      },
+      "image_fields": [
+        "Hinh1",
+        "Hinh2"
+      ],
+      "style": {
+        "point_color": "#d5b43c",
+        "fill_color": "#d5b43c",
+        "stroke_color": "#232323",
+        "point_size": 11.0,
+        "point_shape": "circle",
+        "icon_url": "https://img.icons8.com/?size=100&id=20844&format=png&color=000000",
+        "icon_type": "url",
+        "icon_emoji": "",
+        "classify_field": "TrangThai",
+        "classify_colors": {
+          "TXK": "#e53935",
+          "RNP": "#8e24aa",
+          "DTK": "#1e88e5",
+          "TXN": "#00897b",
+          "TXB": "#43a047",
+          "TG": "#f4511e",
+          "RNM": "#6d4c41",
+          "TXG": "#039be5"
+        }
+      }
+    },
+    "HCMGiaoKhoan": {
+      "checked": true,
+      "search_fields": [
+        "Churung"
+      ],
+      "field_aliases": {
+        "Tinh": "Tỉnh",
+        "Xa": "Xã",
+        "TK": "Tiểu khu",
+        "Khoanh": "Khoảnh"
+      },
+      "label": {
+        "enabled": true,
+        "fields": [
+          "Churung",
+          "Dtich"
+        ],
+        "label_expression": null,
+        "is_expression": false,
+        "font_family": "Arial",
+        "font_size": 13,
+        "font_bold": false,
+        "font_italic": false,
+        "text_color": "#ffffff",
+        "text_opacity": 1.0,
+        "buffer_enabled": false,
+        "buffer_size": 2,
+        "buffer_color": "#ffffff",
+        "buffer_opacity": 0.85,
+        "placement": "offset_from_point",
+        "offset_x": 0.0,
+        "offset_y": 0.0,
+        "quadrant": 1,
+        "min_scale": 35000,
+        "max_scale": 3000
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": false,
+        "webgis_name": "Hồ sơ giao khoán",
+        "layer_min_scale": 80000,
+        "layer_max_scale": null
+      },
+      "image_fields": [],
+      "style": {
+        "no_fill": true,
+        "fill_color": null,
+        "fill_opacity": 0.5,
+        "fill_pattern": "solid",
+        "stroke_color": "#ff7f00",
+        "stroke_width": 0.66,
+        "stroke_dash": "solid",
+        "icon_url": "",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    },
+    "RanhRPH": {
+      "checked": true,
+      "search_fields": [],
+      "field_aliases": {},
+      "label": {
+        "enabled": false,
+        "fields": [],
+        "label_expression": null
+      },
+      "display": {
+        "show_btn_zoom": true,
+        "show_btn_attr": true,
+        "show_btn_label": true,
+        "show_btn_color": true,
+        "show_btn_shape": true,
+        "show_btn_edit": true,
+        "tools_collapsed": true,
+        "layer_hidden": false,
+        "enable_cluster": false,
+        "webgis_name": "Ranh QH3LR",
+        "layer_min_scale": null,
+        "layer_max_scale": null
+      },
+      "image_fields": [],
+      "style": {
+        "no_fill": true,
+        "fill_color": null,
+        "fill_opacity": 0.6,
+        "fill_pattern": "solid",
+        "stroke_color": "#1710ec",
+        "stroke_width": 2.06,
+        "stroke_dash": "solid",
+        "icon_url": "",
+        "icon_emoji": "",
+        "classify_field": "",
+        "classify_colors": {}
+      }
+    }
+  }
+}
