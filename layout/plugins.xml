@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.0.9.3" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.0.9.4" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.0.9.3</version>
+    <version>1.0.9.4</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.0.9.3.zip</file_name>
+    <file_name>RS_GIS_Forest.1.0.9.4.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.0.9.3.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.0.9.4.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-10-25T11:24:05Z</create_date>
-    <update_date>2026-10-25T11:24:05Z</update_date>
+    <create_date>2026-10-25T11:46:37Z</create_date>
+    <update_date>2026-10-25T11:46:37Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Cập nhập tính năng gộp bản đồ]]></changelog>
-    <sha256>d4822488e858f984c697adb2eadb6c4c49db2ddf2fa33de8d834c8a531e489e6</sha256>
+    <changelog><![CDATA[Thêm tính năng hệ tọa độ bản đồ]]></changelog>
+    <sha256>221495df8f95c6d66f0ffed3eaeab9cf47de70c17f475646230ce596bee02490</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
