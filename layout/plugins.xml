@@ -13,8 +13,8 @@
     <author_name><![CDATA[RS GIS]]></author_name>
     <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.0.9.3.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-10-25T11:20:07Z</create_date>
-    <update_date>2026-10-25T11:20:07Z</update_date>
+    <create_date>2026-10-25T11:24:05Z</create_date>
+    <update_date>2026-10-25T11:24:05Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Thêm tính năng gộp bản đồ]]></changelog>
-    <sha256>d2347598e591dfd26aa69f5b99a72e1a2b7bc0070fdd26571d043365e4d8837d</sha256>
+    <changelog><![CDATA[Cập nhập tính năng gộp bản đồ]]></changelog>
+    <sha256>d4822488e858f984c697adb2eadb6c4c49db2ddf2fa33de8d834c8a531e489e6</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
