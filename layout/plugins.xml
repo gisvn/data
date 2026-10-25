@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugins>
+  <pyqgis_plugin name="RS GIS Forest" version="1.0.9.3" plugin_id="2664306">
+    <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
+    <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
+    <version>1.0.9.3</version>
+    <trusted>False</trusted>
+    <qgis_minimum_version>3.22</qgis_minimum_version>
+    <qgis_maximum_version>3.99</qgis_maximum_version>
+    <homepage>https://gisvn.github.io/data/layout</homepage>
+    <file_name>RS_GIS_Forest.1.0.9.3.zip</file_name>
+    <icon>https://gisvn.github.io/data/layout/icon.png</icon>
+    <author_name><![CDATA[RS GIS]]></author_name>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.0.9.3.zip</download_url>
+    <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
+    <create_date>2026-10-25T11:20:07Z</create_date>
+    <update_date>2026-10-25T11:20:07Z</update_date>
+    <experimental>False</experimental>
+    <deprecated>False</deprecated>
+    <tracker>https://gisvn.github.io/data/layout</tracker>
+    <repository>https://gisvn.github.io/data/layout</repository>
+    <tags><![CDATA[forest,lâm nghiệp,digitize,mapinfo,vn2000,tcvn3,eudr]]></tags>
+    <downloads>0</downloads>
+    <average_vote>0</average_vote>
+    <rating_votes>0</rating_votes>
+    <external_dependencies></external_dependencies>
+    <server>False</server>
+    <changelog><![CDATA[Thêm tính năng gộp bản đồ]]></changelog>
+    <sha256>d2347598e591dfd26aa69f5b99a72e1a2b7bc0070fdd26571d043365e4d8837d</sha256>
+    <python_tags>cp311,cp312</python_tags>
+  </pyqgis_plugin>
+</plugins>
