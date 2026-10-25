@@ -1,14 +1,14 @@
 {
-  "versionCode": 50,
-  "versionName": "1.5.3",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=50",
+  "versionCode": 51,
+  "versionName": "1.5.4",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=51",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-10-22",
+  "releaseDate": "2026-10-25",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " ***HOT *** Cập nhập chức năng EUDR hỗ trợ ngành gỗ, cao su và cà phê chứng minh sản phẩm không gây mất rừng"
+    " Cập nhập tính năng mở bảng thuộc tính cho lớp bản đồ và sửa trực tiếp thuộc tính và xuất ngược lại file đã sửa ngoài thực địa"
 	
   ]
 }
