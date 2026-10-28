@@ -1,14 +1,14 @@
 {
   "packageName": "com.rsgis.fieldmap.survey",
-  "versionCode": 11,
-  "versionName": "1.1.6",
-  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=11",
+  "versionCode": 12,
+  "versionName": "1.1.7",
+  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=12",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-28",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/datdai/",
   "changelog": [
-    "Cập nhập tính năng chuyển dữ liệu DGN sang CAD"
+    "Fix lỗi dữ liệu hiển thị *DNG và *CAD"
   ]
 }
