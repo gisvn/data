@@ -1,7 +1,7 @@
 {
-  "versionCode": 55,
-  "versionName": "1.5.8",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=55",
+  "versionCode": 56,
+  "versionName": "1.5.9",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=56",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-28",
@@ -9,7 +9,8 @@
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
     "1. Cập nhập tính năng chuyển dữ liệu DGN và CAD sang dữ liệu SHP có thuộc tính bên trong",
-	"2. Cập nhập tính năng chuyển dữ liệu DGN sang CAD"
+	"2. Cập nhập tính năng chuyển dữ liệu DGN sang CAD",
+	"3. Fix lỗi hiển thị pupop chậm trong DGN và CAD"
 	
   ]
 }
