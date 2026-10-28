@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Quản lý key · LField Maps</title>
+<title>Quản lý key · LField Maps / Quản lý dữ liệu đất đai</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -60,6 +60,13 @@ header.top{position:sticky;top:0;z-index:20;background:oklch(0.975 0.008 165 / 0
 .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .chip.demo{background:var(--warn-wash);color:oklch(0.45 0.1 70)}
 .chip.demo .dot{background:var(--warn)}
+/* Chọn app (LField Maps / Quản lý dữ liệu đất đai) */
+.app-switch{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--sunken);font-size:12px;color:var(--ink-2)}
+.app-switch select{border:0;background:var(--surface,#fff);border-radius:999px;padding:5px 10px;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}
+body.app-qldd .mark{background:oklch(0.45 0.13 150);color:#fff}
+body.app-qldd .app-switch{background:oklch(0.93 0.05 150);color:oklch(0.35 0.1 150)}
+.app-banner{max-width:1180px;margin:10px auto 0;padding:9px 16px;border-radius:12px;background:oklch(0.95 0.04 150);color:oklch(0.33 0.09 150);font-size:13px;border:1px solid oklch(0.85 0.07 150)}
+.app-banner b{font-weight:700}
 
 /* ---------- buttons ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer;transition:background .15s var(--ease),border-color .15s var(--ease),transform .1s var(--ease);white-space:nowrap}
@@ -341,16 +348,25 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
 <header class="top">
   <div class="top-inner">
     <div class="brand">
-      <div class="mark" aria-hidden="true">LF</div>
-      <div><b>Quản lý key</b><small>LField Maps · bản quyền thiết bị</small></div>
+      <div class="mark" aria-hidden="true" id="brandMark">LF</div>
+      <div><b>Quản lý key</b><small id="brandSub">LField Maps · bản quyền thiết bị</small></div>
     </div>
     <div class="top-right">
+      <label class="app-switch" title="Chọn app cần quản lý key. Mỗi app có khoá ký, collection Firestore và tiền tố key RIÊNG.">
+        <span>App</span>
+        <select id="appSwitch">
+          <option value="lfield">LField Maps / RSGIS Field Map</option>
+          <option value="qldd">Quản lý dữ liệu đất đai</option>
+        </select>
+      </label>
       <span id="envChip" class="chip hidden"><span class="dot"></span><span id="envText"></span></span>
       <span class="who" id="whoText"></span>
       <button class="btn sm quiet hidden" id="btnLogout">Đăng xuất</button>
     </div>
   </div>
 </header>
+
+<div class="app-banner hidden" id="appBanner"></div>
 
 <!-- ===================== THIẾT LẬP / ĐĂNG NHẬP ===================== -->
 <section class="setup hidden" id="setup">
@@ -697,25 +713,64 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
 // =====================================================================
 // CẤU HÌNH GÓI - khớp PlanCatalog.java
 // =====================================================================
-const PLANS = [
-  { code: 'STARTER',  name: 'STARTER',  label: '7 ngày',    days: 7,   price: 0,      orig: 0,       color: 'var(--p-starter)' },
-  { code: 'PRO',      name: 'PRO',      label: '1 tháng',   days: 30,  price: 150000, orig: 299000,  color: 'var(--p-pro)' },
-  { code: 'ULTIMATE', name: 'ULTIMATE', label: 'Vĩnh viễn', days: 0,   price: 750000, orig: 2490000, color: 'var(--p-ultimate)' },
-  { code: 'ULTIMATE_FOREST', name: 'ULTIMATE FOREST', label: 'Vĩnh viễn', days: 0, price: 1900000, orig: 4990000, color: 'var(--p-forest)', transfers: 0, gift: 'Hồ sơ lâm nghiệp' },
-  { code: 'PREMIUM',  name: 'PREMIUM',  label: '1 năm',     days: 365, price: 980000, orig: 1790000, color: 'var(--p-premium)', transfers: 1 },
-  // Gói VIP: vĩnh viễn, chuyển thiết bị TRỌN ĐỜI (không giới hạn lượt), tặng tài khoản ảnh SKY 3 m.
-  { code: 'DIAMOND',  name: 'DIAMOND',  label: 'Vĩnh viễn', days: 0,   price: 5000000, orig: 9990000, color: 'var(--p-diamond)', transfers: Infinity, gift: 'Tài khoản ảnh SKY 3m x 3m' },
-];
-const TRIAL_DAYS = 7;
-const APP_NAME = 'LField Maps';
+// =====================================================================
+// HAI APP DÙNG CHUNG TRANG NÀY (chọn ở ô "App" góc trên). Mỗi app RIÊNG:
+//   khoá ký (localStorage), collection Firestore, tiền tố key, chuỗi ký, bảng giá.
+//   -> key cấp cho app này dán vào app kia đều bị từ chối.
+// Cấu hình Firebase + đăng nhập quản trị dùng chung (cùng project Firebase).
+// =====================================================================
+const LS_APP = 'lic_admin_app';
+const APPS = {
+  lfield: {
+    id: 'lfield', name: 'LField Maps', title: 'LField Maps / RSGIS Field Map', mark: 'LF',
+    pkg: 'com.rsgis.fieldmap', canon: 'RSGIS1', keyPrefix: 'RSG', trialDays: 7,
+    col: { licenses: 'licenses', customers: 'customers', trials: 'trials', broadcasts: 'broadcasts' },
+    lsKey: 'rsgis_admin_signing_jwk', file: 'rsgis', team: true,
+    // Khoá CÔNG KHAI đang build trong app RSGIS (LicenseConfig.PUBLIC_KEY / KHOA_CONG_KHAI.txt).
+    pub: 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1BojruGOCF7SHx5oGOhQgmektVzXX/rmQFwhJ8VMZrm5w5jRL9oENFYa0b/GDucVOjI/z2355pcAvCoPPwFHqg==',
+    plans: [
+      { code: 'STARTER',  name: 'STARTER',  label: '7 ngày',    days: 7,   price: 0,      orig: 0,       color: 'var(--p-starter)' },
+      { code: 'PRO',      name: 'PRO',      label: '1 tháng',   days: 30,  price: 150000, orig: 299000,  color: 'var(--p-pro)' },
+      { code: 'ULTIMATE', name: 'ULTIMATE', label: 'Vĩnh viễn', days: 0,   price: 750000, orig: 2490000, color: 'var(--p-ultimate)' },
+      { code: 'ULTIMATE_FOREST', name: 'ULTIMATE FOREST', label: 'Vĩnh viễn', days: 0, price: 1900000, orig: 4990000, color: 'var(--p-forest)', transfers: 0, gift: 'Hồ sơ lâm nghiệp' },
+      { code: 'PREMIUM',  name: 'PREMIUM',  label: '1 năm',     days: 365, price: 980000, orig: 1790000, color: 'var(--p-premium)', transfers: 1 },
+      // Gói VIP: vĩnh viễn, chuyển thiết bị TRỌN ĐỜI (không giới hạn lượt), tặng tài khoản ảnh SKY 3 m.
+      { code: 'DIAMOND',  name: 'DIAMOND',  label: 'Vĩnh viễn', days: 0,   price: 5000000, orig: 9990000, color: 'var(--p-diamond)', transfers: Infinity, gift: 'Tài khoản ảnh SKY 3m x 3m' },
+    ]
+  },
+  qldd: {
+    id: 'qldd', name: 'Quản lý dữ liệu đất đai', title: 'Quản lý dữ liệu đất đai', mark: 'ĐĐ',
+    pkg: 'com.rsgis.fieldmap.survey', canon: 'QLDD1', keyPrefix: 'QLD', trialDays: 3,
+    col: { licenses: 'qldd_licenses', customers: 'qldd_customers', trials: 'qldd_trials', broadcasts: 'qldd_broadcasts' },
+    lsKey: 'qldd_admin_signing_jwk', file: 'qldd', team: false,
+    // Sau khi "Tạo cặp khoá mới" ở chế độ này: dán khoá công khai vào ĐÂY và vào
+    // LicenseConfig.PUBLIC_KEY của app Quản lý dữ liệu đất đai (để trang kiểm tra khớp khoá). '' = bỏ kiểm tra.
+    pub: '',
+    // Khớp PlanCatalog.java của app Quản lý dữ liệu đất đai.
+    plans: [
+      { code: 'STARTER',  name: 'DÙNG THỬ', label: '3 ngày',    days: 3,  price: 0,      orig: 0,       color: 'var(--p-starter)' },
+      { code: 'PRO',      name: '1 THÁNG',  label: '1 tháng',   days: 30, price: 200000, orig: 500000,  color: 'var(--p-pro)' },
+      { code: 'ULTIMATE', name: 'TRỌN ĐỜI', label: 'Vĩnh viễn', days: 0,  price: 500000, orig: 1500000, color: 'var(--p-ultimate)' },
+    ]
+  }
+};
+const APP = (() => {
+  const q = new URLSearchParams(location.search).get('app');
+  if (q && APPS[q]) localStorage.setItem(LS_APP, q);
+  return APPS[q] || APPS[localStorage.getItem(LS_APP)] || APPS.lfield;
+})();
+const COL = APP.col;
+const PLANS = APP.plans;
+const TRIAL_DAYS = APP.trialDays;
+const APP_NAME = APP.name;
 const DAY = 86400000;
 const FB_VER = '10.12.2';
-const LS_CFG = 'rsgis_admin_fbcfg', LS_KEY = 'rsgis_admin_signing_jwk', LS_TARGET = 'rsgis_admin_target_url';
+const LS_CFG = 'rsgis_admin_fbcfg', LS_KEY = APP.lsKey, LS_TARGET = 'rsgis_admin_target_url';
 // Khoá CÔNG KHAI đang build trong app (LicenseConfig.PUBLIC_KEY / KHOA_CONG_KHAI.txt).
 // Trang dùng để kiểm tra khoá ký trong trình duyệt có đúng khoá của app không
 // (tránh tạo nhầm khoá mới khi mở trang ở địa chỉ mới như GitHub Pages).
 // Đổi khoá thì sửa CẢ 2 nơi. Để '' = bỏ kiểm tra.
-const APP_PUBLIC_KEY = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1BojruGOCF7SHx5oGOhQgmektVzXX/rmQFwhJ8VMZrm5w5jRL9oENFYa0b/GDucVOjI/z2355pcAvCoPPwFHqg==';
+const APP_PUBLIC_KEY = APP.pub;
 const BUNDLE_TYPE = 'rsgis-admin-bundle', RECV_HASH = '#nhan-du-lieu';
 const IS_LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
 const UA = navigator.userAgent || '';
@@ -726,6 +781,27 @@ const SS_REDIRECT = 'rsgis_admin_redirecting';
 const CROCK = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const $ = (s, r = document) => r.querySelector(s);
+// --- giao diện theo app đang chọn ---
+(() => {
+  const sw = document.getElementById('appSwitch');
+  if (sw) {
+    sw.value = APP.id;
+    sw.addEventListener('change', () => {
+      localStorage.setItem(LS_APP, sw.value);
+      const u = new URL(location.href); u.searchParams.delete('app'); location.href = u.href;
+    });
+  }
+  document.body.classList.add('app-' + APP.id);
+  document.getElementById('brandMark').textContent = APP.mark;
+  document.getElementById('brandSub').textContent = APP.title + ' · bản quyền thiết bị';
+  document.title = 'Quản lý key · ' + APP.title;
+  const bn = document.getElementById('appBanner');
+  if (APP.id !== 'lfield' && bn) {
+    bn.classList.remove('hidden');
+    bn.innerHTML = `Đang quản lý key của <b>${APP.title}</b> (<code>${APP.pkg}</code>) · key <b>${APP.keyPrefix}-…</b> · Firestore <code>${APP.col.licenses}</code> · khoá ký riêng. Đổi app ở ô <b>App</b> góc trên.`;
+  }
+  if (!APP.team) document.querySelectorAll('[data-tab="deletions"]').forEach(t => t.classList.add('hidden'));
+})();
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const planOf = c => PLANS.find(p => p.code === c) || { code: c, name: c || '?', label: '', days: 30, price: 0, color: 'var(--off)' };
 const money = v => (v || 0).toLocaleString('vi-VN') + 'đ';
@@ -755,7 +831,10 @@ async function copyText(s, msg = 'Đã chép') {
 function normalizeCode(s) {
   let c = String(s || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
   let prefix = '';
-  if (c.startsWith('RSG')) { prefix = 'RSG'; c = c.slice(3); }
+  const kp = APP.keyPrefix;
+  if (c.startsWith(kp)) { prefix = kp; c = c.slice(kp.length); }
+  else if (c.startsWith('RSG')) { prefix = 'RSG'; c = c.slice(3); }
+  else if (c.startsWith('QLD')) { prefix = 'QLD'; c = c.slice(3); }
   c = c.replace(/O/g, '0').replace(/[IL]/g, '1').split('').filter(ch => CROCK.includes(ch)).join('');
   let out = prefix;
   for (let i = 0; i < c.length; i++) { if (out.length && i % 4 === 0) out += '-'; out += c[i]; }
@@ -764,11 +843,11 @@ function normalizeCode(s) {
 const MID_RE = /^[0-9A-Z]{4}(-[0-9A-Z]{4}){3}$/;
 function newKey() {
   const b = crypto.getRandomValues(new Uint8Array(16));
-  let s = 'RSG';
+  let s = APP.keyPrefix;
   for (let i = 0; i < 16; i++) { if (i % 4 === 0) s += '-'; s += CROCK[b[i] & 31]; }
   return s;
 }
-const canonical = (mid, key, plan, exp, status) => `RSGIS1|${mid}|${key}|${plan}|${Math.round(exp)}|${status}`;
+const canonical = (mid, key, plan, exp, status) => `${APP.canon}|${mid}|${key}|${plan}|${Math.round(exp)}|${status}`;
 const b64 = buf => { let s = ''; new Uint8Array(buf).forEach(x => s += String.fromCharCode(x)); return btoa(s); };
 
 const Signer = {
@@ -819,24 +898,24 @@ const Store = {
     }
     const { fs, db } = FB;
     const batch = fs.writeBatch(db);
-    batch.set(fs.doc(db, 'licenses', mid), lic);
+    batch.set(fs.doc(db, COL.licenses, mid), lic);
     const cd = { ...cust };
     if (histEntry) cd.history = fs.arrayUnion(histEntry);
-    batch.set(fs.doc(db, 'customers', mid), cd, { merge: true });
+    batch.set(fs.doc(db, COL.customers, mid), cd, { merge: true });
     await batch.commit();
   },
   async remove(mid) {
     if (S.demo) { delete S.licenses[mid]; delete S.customers[mid]; render(); return; }
     const { fs, db } = FB;
     const batch = fs.writeBatch(db);
-    batch.delete(fs.doc(db, 'licenses', mid));
-    batch.delete(fs.doc(db, 'customers', mid));
+    batch.delete(fs.doc(db, COL.licenses, mid));
+    batch.delete(fs.doc(db, COL.customers, mid));
     await batch.commit();
   },
   async resetTrial(mid) {
     if (S.demo) { S.trials[mid].startAt = Date.now(); render(); return; }
     const { fs, db } = FB;
-    await fs.updateDoc(fs.doc(db, 'trials', mid), { startAt: fs.serverTimestamp() });
+    await fs.updateDoc(fs.doc(db, COL.trials, mid), { startAt: fs.serverTimestamp() });
   }
 };
 
@@ -869,14 +948,14 @@ function subscribe() {
       : u && !u.emailVerified ? 'tài khoản này CHƯA xác minh email. Bấm "Gửi email xác minh" ở khung vàng phía trên.'
       : 'email chưa có trong luật Firestore'), true);
   };
-  const bind = (name, err = onErr) => unsub.push(fs.onSnapshot(fs.collection(db, name), snap => {
+  const bind = (name, err = onErr) => unsub.push(fs.onSnapshot(fs.collection(db, COL[name] || name), snap => {
     const m = {}; snap.forEach(d => m[d.id] = d.data()); S[name] = m; S.loaded = true; render();
   }, err));
   ['licenses', 'customers', 'trials'].forEach(n => bind(n));
   // Yêu cầu xoá tài khoản: luật cũ chưa có collection này thì chỉ báo nhẹ ở tab, không làm phiền.
   // Thông báo toàn bộ người dùng: luật cũ chưa có "broadcasts" thì chỉ báo ở tab Thông báo.
   bind('broadcasts', e => { S.bcErr = e.code === 'permission-denied' ? 'Chưa dán luật Firestore mới (có broadcasts) nên chưa đọc / gửi được thông báo.' : e.message; renderBroadcasts(); });
-  bind('deletionRequests', e => { S.delErr = e.code === 'permission-denied' ? 'Chưa dán firestore.rules mới (có deletionRequests) nên chưa đọc được yêu cầu xoá.' : e.message; renderDeletions(); });
+  if (APP.team) bind('deletionRequests', e => { S.delErr = e.code === 'permission-denied' ? 'Chưa dán firestore.rules mới (có deletionRequests) nên chưa đọc được yêu cầu xoá.' : e.message; renderDeletions(); });
   const pid = FB.app.options.projectId;
   if (pid) $('#lnkAuth').href = `https://console.firebase.google.com/project/${pid}/authentication/users`;
 }
@@ -1126,7 +1205,7 @@ async function runSweep() {
         }
         for (const mid of c.mids) {
           if (S.demo) S.trials[mid].teamWipedAt = Date.now();
-          else await FB.fs.updateDoc(FB.fs.doc(FB.db, 'trials', mid), { teamWipedAt: FB.fs.serverTimestamp() });
+          else await FB.fs.updateDoc(FB.fs.doc(FB.db, COL.trials, mid), { teamWipedAt: FB.fs.serverTimestamp() });
         }
         toast(`Đã dọn ${c.email || c.uid}`);
       } catch (x) { fails++; console.error(c, x); toast(`Lỗi khi dọn ${c.email || c.uid}: ${x.code === 'permission-denied' ? 'chưa dán firestore.rules mới' : x.message}`, true); }
@@ -1211,7 +1290,7 @@ async function runDeletion(id) {
       const invited = await fs.getDocs(fs.query(fs.collection(db, 'teams'), fs.where('invitedEmails', 'array-contains', email)));
       for (const d of invited.docs) { await fs.updateDoc(d.ref, { invitedEmails: fs.arrayRemove(email) }); inv++; }
     }
-    for (const [mid, t] of Object.entries(S.trials)) if (t.teamUid === uid) await fs.updateDoc(fs.doc(db, 'trials', mid), { teamUid: '', teamEmail: '' });
+    for (const [mid, t] of Object.entries(S.trials)) if (t.teamUid === uid) await fs.updateDoc(fs.doc(db, COL.trials, mid), { teamUid: '', teamEmail: '' });
     await fs.deleteDoc(fs.doc(db, 'users', uid));
     const result = `Đã xoá ${teams} nhóm, rời ${left} nhóm, ${inv} lời mời, ${docs} tài liệu · ${new Date().toLocaleString('vi-VN')}`;
     await fs.updateDoc(fs.doc(db, 'deletionRequests', id), { status: 'cleaned', cleanedAt: fs.serverTimestamp(), resolvedUid: uid, result });
@@ -1529,27 +1608,27 @@ async function bcSave(id, data) {
     render(); return;
   }
   const { fs, db } = FB;
-  if (id) await fs.updateDoc(fs.doc(db, 'broadcasts', id), { ...data, updatedAt: fs.serverTimestamp() });
+  if (id) await fs.updateDoc(fs.doc(db, COL.broadcasts, id), { ...data, updatedAt: fs.serverTimestamp() });
   else {
-    const ref = await fs.addDoc(fs.collection(db, 'broadcasts'), { ...data, rev: 1, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp(), createdBy: FB.auth.currentUser?.email || '' });
+    const ref = await fs.addDoc(fs.collection(db, COL.broadcasts), { ...data, rev: 1, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp(), createdBy: FB.auth.currentUser?.email || '' });
     S.bcViews[ref.id] = 0;
   }
 }
 async function bcPatch(id, patch) {
   if (S.demo) { Object.assign(S.broadcasts[id], patch, { updatedAt: Date.now() }); render(); return; }
-  await FB.fs.updateDoc(FB.fs.doc(FB.db, 'broadcasts', id), { ...patch, updatedAt: FB.fs.serverTimestamp() });
+  await FB.fs.updateDoc(FB.fs.doc(FB.db, COL.broadcasts, id), { ...patch, updatedAt: FB.fs.serverTimestamp() });
 }
 async function bcRemove(id) {
   if (S.demo) { delete S.broadcasts[id]; render(); return; }
   const { fs, db } = FB;
-  await delQuery(fs.collection(db, 'broadcasts', id, 'views'));
-  await fs.deleteDoc(fs.doc(db, 'broadcasts', id));
+  await delQuery(fs.collection(db, COL.broadcasts, id, 'views'));
+  await fs.deleteDoc(fs.doc(db, COL.broadcasts, id));
 }
 async function bcLoadViews(ids = Object.keys(S.broadcasts)) {
   if (S.demo || !FB) return;
   const { fs, db } = FB;
   await Promise.all(ids.map(async id => {
-    try { const c = await fs.getCountFromServer(fs.collection(db, 'broadcasts', id, 'views')); S.bcViews[id] = c.data().count; }
+    try { const c = await fs.getCountFromServer(fs.collection(db, COL.broadcasts, id, 'views')); S.bcViews[id] = c.data().count; }
     catch (x) { if (!(id in S.bcViews)) S.bcViews[id] = null; }
   }));
   renderBroadcasts();
@@ -1934,7 +2013,7 @@ async function exportBundle() {
     const pass = $('#bxPass').value;
     if (!pass && !confirm('Chưa đặt mật khẩu: file sẽ chứa khoá BÍ MẬT ở dạng đọc được. Vẫn tải?')) return;
     const b = await makeBundle(pass);
-    download(JSON.stringify(b, null, 1), `rsgis-chuyen-du-lieu-${toDateInput(Date.now())}.json`);
+    download(JSON.stringify(b, null, 1), `${APP.file}-chuyen-du-lieu-${toDateInput(Date.now())}.json`);
     toast(pass ? 'Đã tải gói (có mật khẩu)' : 'Đã tải gói. Xoá file sau khi nhập xong!');
   } catch (x) { toast(x.message, true); }
 }
@@ -2203,7 +2282,7 @@ function wire2() {
     const raw = localStorage.getItem(LS_KEY); if (!raw) { toast('Chưa có khoá', true); return; }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([raw], { type: 'application/json' }));
-    a.download = `rsgis-khoa-ky-BI-MAT-${toDateInput(Date.now())}.json`; a.click();
+    a.download = `${APP.file}-khoa-ky-BI-MAT-${toDateInput(Date.now())}.json`; a.click();
   };
   $('#importFile').onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
