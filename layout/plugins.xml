@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.0.5" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.0.6" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.0.5</version>
+    <version>1.1.0.6</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.0.5.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.0.6.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.0.5.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.0.6.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-10-28T07:45:21Z</create_date>
-    <update_date>2026-10-28T07:45:21Z</update_date>
+    <create_date>2026-10-28T07:53:02Z</create_date>
+    <update_date>2026-10-28T07:53:02Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -26,7 +26,7 @@
     <external_dependencies></external_dependencies>
     <server>False</server>
     <changelog><![CDATA[Tích hợp tính năng sửa lỗi Topology và Gộp lô có diện tích nhỏ]]></changelog>
-    <sha256>a29ab32bc246d1e129e16acf2a0fed8b2b12fb1afb9d7f56e713eaa089c81197</sha256>
+    <sha256>0dc86cdaf980b6fbface02df412d593303736b0beb204d01a16bff3589f23ef6</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
