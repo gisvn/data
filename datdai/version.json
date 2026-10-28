@@ -1,14 +1,14 @@
 {
   "packageName": "com.rsgis.fieldmap.survey",
-  "versionCode": 12,
-  "versionName": "1.1.7",
-  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=12",
+  "versionCode": 13,
+  "versionName": "1.1.8",
+  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=13",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-10-28",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/datdai/",
   "changelog": [
-    "Fix lỗi dữ liệu hiển thị *DNG và *CAD"
+    "Cập nhập tính năng mở *DNG và *CAD theo Level"
   ]
 }
