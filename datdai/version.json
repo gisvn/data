@@ -1,0 +1,16 @@
+{
+  "packageName": "com.rsgis.fieldmap.survey",
+  "versionCode": 6,
+  "versionName": "1.1.1",
+  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=6",
+  "apkSize": 0,
+  "sha256": "",
+  "releaseDate": "2026-10-28",
+  "minVersionCode": 0,
+  "pageUrl": "https://gisvn.github.io/data/datdai/",
+  "changelog": [
+    "Đổi tên ứng dụng thành Quản lý dữ liệu đất đai, logo mới",
+    "Thêm Giới thiệu, Cập nhật phiên bản, Kích hoạt bản quyền riêng",
+    "Bảng giá: dùng thử 3 ngày, 1 tháng 200.000đ, trọn đời 500.000đ"
+  ]
+}
