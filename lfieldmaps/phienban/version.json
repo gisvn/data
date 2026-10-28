@@ -1,14 +1,14 @@
 {
-  "versionCode": 54,
-  "versionName": "1.5.7",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=54",
+  "versionCode": 55,
+  "versionName": "1.5.8",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=55",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-10-25",
+  "releaseDate": "2026-10-28",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    "1. Cập nhập tính năng nhấn trên màn hình 3S sẽ Goto đến điểm đó và chia sẻ điểm đó qua google map",
+    "1. Cập nhập tính năng chuyển dữ liệu DGN và CAD sang dữ liệu SHP có thuộc tính bên trong",
 	"2. Cập nhập tính năng chuyển dữ liệu DGN sang CAD"
 	
   ]
