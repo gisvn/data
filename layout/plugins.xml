@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.1" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.2" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.1.1</version>
+    <version>1.1.1.2</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.1.1.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.1.2.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.1.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.2.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-10-29T08:59:06Z</create_date>
-    <update_date>2026-10-29T08:59:06Z</update_date>
+    <create_date>2026-10-29T09:15:31Z</create_date>
+    <update_date>2026-10-29T09:15:31Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Cập nhập tính năng chuẩn hóa dữ liệu từ TT33/2018 sang TT16/2025 của bộ NN&MT]]></changelog>
-    <sha256>2b5b31acc3b218cabcc2aa98e005b20b65c5782213695369ec0b55ad0cf0ed34</sha256>
+    <changelog><![CDATA[Cập nhập tính năng tạo vùng đệm buffer cho ranh giới]]></changelog>
+    <sha256>1fe93f72c21b23600211b18015e5662e778ae23fd09cad9c85d50e477b6bb21a</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
