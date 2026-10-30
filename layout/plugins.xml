@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.3" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.4" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.1.3</version>
+    <version>1.1.1.4</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.1.3.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.1.4.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.3.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.4.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-10-29T09:31:41Z</create_date>
-    <update_date>2026-10-29T09:31:41Z</update_date>
+    <create_date>2026-10-30T14:45:15Z</create_date>
+    <update_date>2026-10-30T14:45:15Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Cập nhập tính năng tạo vùng đệm buffer cho layout]]></changelog>
-    <sha256>884e48a4fdecb6f091c4438da8d67514418c80363cf92bbc673c4f8a565741cd</sha256>
+    <changelog><![CDATA[Tích hợp tính năng xuất dữ liệu *.gpkg phục vụ app LField Maps trên điện thoại đi thực địa]]></changelog>
+    <sha256>c040893174e7be8d8cecbc87bf0fd67436caf15cb0f80a652748465acca3fc3b</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
