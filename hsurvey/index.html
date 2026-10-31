@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quản lý dữ liệu đất đai | Quản lý và làm sạch dữ liệu đất đai trên Android</title>
+<meta name="description" content="Quản lý dữ liệu đất đai: mở bản vẽ DGN, DWG, DXF, Shapefile ngay trên điện thoại; đo vẽ, sửa ranh thửa có bắt dính, truy vấn thuộc tính, quét bảng toạ độ sổ đỏ, GNSS và VN-2000 đủ 63 tỉnh. Tác giả Lê Minh Hiền.">
+<meta name="author" content="Lê Minh Hiền">
+<meta name="theme-color" content="#0b3a2a">
+<link rel="canonical" href="https://gisvn.github.io/data/hsurvey/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quản lý dữ liệu đất đai · Lê Minh Hiền">
+<meta property="og:description" content="Quản lý và làm sạch dữ liệu đất đai ngay trên điện thoại Android: DGN, CAD, SHP, đo vẽ, sửa ranh, VN-2000.">
+<meta property="og:url" content="https://gisvn.github.io/data/hsurvey/">
+<meta property="og:image" content="https://gisvn.github.io/data/hsurvey/Hinh/ban-do-dia-chinh.jpg">
+<link rel="icon" type="image/png" href="Hinh/logo.png">
+<link rel="apple-touch-icon" href="Hinh/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   QUẢN LÝ DỮ LIỆU ĐẤT ĐAI · trang giới thiệu
+   Ý tưởng: tờ bản đồ địa chính sống. Nền xanh đêm của app,
+   nét ranh thửa màu magenta kiểu MicroStation, tâm ngắm đỏ
+   đi qua từng đỉnh và đo diện tích như thước đo trong app.
+   Gói TRỌN ĐỜI mặc áo sổ đỏ: mua một lần, giữ mãi.
+   ========================================================= */
+:root{
+  --night: oklch(0.22 0.045 165);
+  --night-2: oklch(0.28 0.06 163);
+  --night-line: oklch(0.42 0.05 165 / .35);
+  --paper: oklch(0.975 0.008 150);
+  --card: oklch(0.995 0.004 150);
+  --sunk: oklch(0.95 0.012 150);
+  --ink: oklch(0.24 0.03 165);
+  --ink-2: oklch(0.43 0.025 165);
+  --muted: oklch(0.58 0.02 165);
+  --line: oklch(0.9 0.012 160);
+  --field: oklch(0.56 0.15 152);
+  --field-hover: oklch(0.5 0.14 152);
+  --field-deep: oklch(0.4 0.1 160);
+  --field-wash: oklch(0.94 0.045 152);
+  --cad: oklch(0.66 0.24 335);
+  --label: oklch(0.88 0.17 118);
+  --redbook: oklch(0.46 0.17 25);
+  --redbook-deep: oklch(0.34 0.13 22);
+  --gold: oklch(0.85 0.13 85);
+  --gold-ink: oklch(0.3 0.06 70);
+  --reticle: oklch(0.65 0.23 28);
+  --vertex: oklch(0.7 0.19 48);
+  --zalo: oklch(0.58 0.19 258);
+  --on-night: oklch(0.96 0.015 160);
+  --on-night-2: oklch(0.8 0.03 160);
+  --radius: 18px;
+  --ease: cubic-bezier(.22,1,.36,1);
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --wrap: 1200px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{margin:0;line-height:1.12;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;border:0;font-weight:700;font-size:16px;text-decoration:none;transition:transform .25s var(--ease),background .25s,box-shadow .25s;white-space:nowrap}
+.btn svg{width:20px;height:20px;flex:none}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:var(--gold);color:var(--gold-ink);box-shadow:0 10px 30px -10px oklch(0.85 0.13 85 / .7)}
+.btn-gold:hover{background:oklch(0.89 0.12 88);transform:translateY(-2px)}
+.btn-ghost{background:oklch(1 0 0 / .08);color:var(--on-night);box-shadow:inset 0 0 0 1.5px oklch(1 0 0 / .22)}
+.btn-ghost:hover{background:oklch(1 0 0 / .14)}
+.btn-field{background:var(--field);color:oklch(0.99 0.01 150)}
+.btn-field:hover{background:var(--field-hover);transform:translateY(-2px)}
+.btn-zalo{background:var(--zalo);color:#fff}
+.btn-zalo:hover{background:oklch(0.52 0.19 258);transform:translateY(-2px)}
+.btn-line{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-line:hover{box-shadow:inset 0 0 0 1.5px var(--field)}
+
+/* ---------- top bar ---------- */
+.top{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,box-shadow .3s,backdrop-filter .3s}
+.top.solid{background:oklch(0.22 0.045 165 / .86);backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 1px 0 oklch(1 0 0 / .08)}
+.top-in{max-width:var(--wrap);margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px;color:var(--on-night)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand img{width:40px;height:40px;border-radius:50%;box-shadow:0 0 0 2px oklch(1 0 0 / .15)}
+.brand b{display:block;font-size:16px;line-height:1.2}
+.brand small{display:block;font-size:14px;color:var(--on-night-2);line-height:1.2}
+.nav{margin-left:auto;display:flex;gap:4px}
+.nav a{padding:8px 14px;border-radius:999px;text-decoration:none;font-size:15px;font-weight:500;color:var(--on-night-2);transition:color .2s,background .2s}
+.nav a:hover{color:var(--on-night);background:oklch(1 0 0 / .08)}
+.top .btn{min-height:44px;padding:0 18px;font-size:15px}
+.menu-btn{display:none;width:44px;height:44px;border-radius:50%;border:0;background:oklch(1 0 0 / .1);color:var(--on-night)}
+@media (max-width:900px){
+  .nav{position:absolute;top:64px;left:12px;right:12px;flex-direction:column;background:var(--night-2);border-radius:20px;padding:10px;box-shadow:0 20px 50px -10px oklch(0 0 0 / .5);opacity:0;pointer-events:none;transform:translateY(-8px);transition:.25s var(--ease)}
+  .nav.open{opacity:1;pointer-events:auto;transform:none}
+  .nav a{padding:14px 16px;font-size:17px}
+  .menu-btn{display:grid;place-items:center;margin-left:auto}
+  .top .btn{display:none}
+}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100svh;background:radial-gradient(120% 90% at 75% 20%,var(--night-2),var(--night) 60%);color:var(--on-night);overflow:hidden;display:flex;align-items:center}
+#sheet{position:absolute;inset:0;width:100%;height:100%}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:160px;background:linear-gradient(transparent,var(--night));pointer-events:none}
+.hero-in{position:relative;z-index:2;width:100%;max-width:var(--wrap);margin:0 auto;padding:110px 24px 80px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:40px;align-items:center}
+.ver{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 10px;border-radius:999px;background:oklch(1 0 0 / .08);box-shadow:inset 0 0 0 1px oklch(1 0 0 / .14);font-size:14px;font-weight:600;color:var(--on-night-2)}
+.ver i{width:8px;height:8px;border-radius:50%;background:oklch(0.8 0.2 145);box-shadow:0 0 0 0 oklch(0.8 0.2 145 / .6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px oklch(0.8 0.2 145 / 0)}100%{box-shadow:0 0 0 0 oklch(0.8 0.2 145 / 0)}}
+.hero h1{margin-top:22px;font-size:clamp(44px,6vw,80px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .lead{margin-top:22px;font-size:clamp(17px,1.6vw,20px);color:var(--on-night-2);max-width:520px}
+.hero .lead b{color:var(--on-night);font-weight:600}
+.cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px}
+.chips{margin-top:34px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:14px;font-weight:700;padding:5px 12px;border-radius:8px;letter-spacing:.04em}
+.c-dgn{background:oklch(0.6 0.15 250);color:#fff}
+.c-dwg{background:oklch(0.6 0.19 25);color:#fff}
+.c-shp{background:oklch(0.6 0.2 18 / .9);color:#fff}
+.c-xls{background:oklch(0.55 0.13 150);color:#fff}
+.c-vn{background:oklch(1 0 0 / .1);color:var(--on-night);box-shadow:inset 0 0 0 1px oklch(1 0 0 / .2)}
+
+/* visual: điện thoại + vùng đo */
+.veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(55% 75% at 24% 52%,oklch(0.22 0.045 165 / .88),oklch(0.22 0.045 165 / .5) 55%,transparent 80%)}
+.visual{position:relative;height:min(76svh,640px);min-height:560px}
+.zone{position:absolute;left:0;top:4%;width:calc(100% - 320px);height:64%;pointer-events:none}
+.phones{position:absolute;right:0;top:0;width:290px;height:100%}
+.phone{position:absolute;width:100%;aspect-ratio:720/1490;border-radius:38px;padding:10px;background:oklch(0.16 0.02 165);box-shadow:0 0 0 1.5px oklch(1 0 0 / .1),0 40px 80px -20px oklch(0 0 0 / .6)}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:29px}
+.phone.front{right:0;top:0;z-index:2;animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.tag{position:absolute;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:oklch(0.99 0.005 150 / .96);color:var(--ink);box-shadow:0 18px 40px -14px oklch(0 0 0 / .55);font-size:14px;line-height:1.3;white-space:nowrap}
+.tag b{display:block;font-size:15px}
+.tag .chip{padding:3px 8px}
+.tag.t1{right:62%;top:6%;animation:float 8s ease-in-out infinite .6s}
+.tag.t2{right:-18px;bottom:2%;animation:float 6s ease-in-out infinite 1.2s}
+.hud{position:absolute;z-index:4;left:0;bottom:4%;display:grid;grid-template-columns:auto auto;gap:10px 22px;padding:14px 18px 16px;border-radius:18px;background:oklch(0.17 0.03 165 / .9);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px oklch(1 0 0 / .12),0 24px 50px -20px #000;color:var(--on-night-2)}
+.hud-h{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--on-night);letter-spacing:.02em}
+.hud-h i{width:8px;height:8px;border-radius:50%;background:var(--reticle);animation:pulse 1.6s infinite}
+.hud .k{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:oklch(0.7 0.03 160)}
+.hud .v{display:block;font-family:var(--mono);font-size:15px;color:var(--on-night);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hud .v.area{color:var(--gold);font-weight:700}
+@media (max-width:900px){
+  .hero-in{grid-template-columns:1fr;padding-top:110px;padding-bottom:70px;gap:10px}
+  .veil{background:linear-gradient(oklch(0.22 0.045 165 / .9),oklch(0.22 0.045 165 / .75) 32%,transparent 46%)}
+  .visual{height:auto;min-height:0;display:flex;flex-direction:column;align-items:center}
+  .zone{position:relative;width:100%;height:300px;top:0}
+  .hud{position:relative;bottom:auto;margin-top:-96px;width:100%;max-width:420px}
+  .phones{position:relative;width:250px;height:540px;margin-top:40px}
+  .tag.t1{right:auto;left:-70px;top:12%}
+  .tag.t2{right:-50px}
+}
+@media (max-width:420px){.tag.t1{left:-40px}.tag.t2{right:-30px}.hud{gap:8px 14px;padding:12px 14px}.hud .v{font-size:14px}}
+@keyframes pulse{70%{box-shadow:0 0 0 10px oklch(0.8 0.2 145 / 0)}100%{box-shadow:0 0 0 0 oklch(0.8 0.2 145 / 0)}}
+
+/* ---------- sections ---------- */
+section{position:relative}
+.sec{padding:110px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--field-deep)}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--cad)}
+.h2{margin-top:14px;font-size:clamp(34px,4.4vw,56px);font-weight:800;letter-spacing:-.03em}
+.sub{margin-top:14px;font-size:18px;color:var(--ink-2);max-width:620px}
+.head-row{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:20px}
+
+/* formats ribbon */
+.formats{background:var(--night);color:var(--on-night);padding:0 0 90px}
+.fmt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.fmt{position:relative;padding:22px;border-radius:var(--radius);background:oklch(1 0 0 / .05);box-shadow:inset 0 0 0 1px oklch(1 0 0 / .1);transition:transform .35s var(--ease),background .3s}
+.fmt:hover{transform:translateY(-4px);background:oklch(1 0 0 / .08)}
+.fmt .chip{display:inline-block}
+.fmt h3{margin-top:16px;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.fmt p{margin-top:6px;font-size:15px;color:var(--on-night-2);line-height:1.5}
+.formats .eyebrow{color:var(--label)}
+.formats .sub{color:var(--on-night-2)}
+@media (max-width:900px){.fmt-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.fmt-grid{grid-template-columns:1fr}}
+
+/* showcase */
+.show{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:64px;align-items:center;margin-top:56px}
+.feat-list{display:flex;flex-direction:column;gap:4px}
+.feat{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;text-align:left;width:100%;padding:16px 18px;border:0;border-radius:16px;background:transparent;position:relative;overflow:hidden;transition:background .3s}
+.feat:hover{background:var(--sunk)}
+.feat .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--field-wash);color:var(--field-deep);transition:.3s}
+.feat .ic svg{width:22px;height:22px}
+.feat h3{font-size:18px;font-weight:700;letter-spacing:-.01em;padding-top:2px}
+.feat p{font-size:15px;color:var(--ink-2);line-height:1.5;max-height:0;opacity:0;overflow:hidden;transition:max-height .45s var(--ease),opacity .3s,margin .3s}
+.feat.on{background:var(--card);box-shadow:0 12px 34px -18px oklch(0.3 0.05 160 / .35),inset 0 0 0 1px var(--line)}
+.feat.on .ic{background:var(--field);color:#fff}
+.feat.on p{max-height:120px;opacity:1;margin-top:6px}
+.feat .bar{position:absolute;left:18px;right:18px;bottom:0;height:3px;border-radius:3px;background:var(--line);opacity:0}
+.feat.on .bar{opacity:1}
+.feat .bar i{display:block;height:100%;width:0;background:var(--cad);border-radius:3px}
+.feat.on .bar i{animation:fill var(--dur,6s) linear forwards}
+.paused .feat.on .bar i{animation-play-state:paused}
+@keyframes fill{to{width:100%}}
+.stage{position:relative;justify-self:center;width:100%;max-width:340px}
+.stage::before{content:"";position:absolute;inset:-40px -50px;background:radial-gradient(closest-side,oklch(0.85 0.1 152 / .5),transparent);z-index:-1}
+.stage .phone{position:relative;width:100%;animation:none}
+.stage .phone img{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);opacity:0;transform:scale(1.03);transition:opacity .5s,transform .7s var(--ease)}
+.stage .phone img.on{opacity:1;transform:none}
+@media (max-width:900px){.show{grid-template-columns:1fr;gap:28px}.stage{max-width:230px;order:-1}.stage::before{inset:-20px}}
+
+/* gallery */
+.gallery{background:var(--sunk)}
+.rail{margin-top:44px;display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px max(24px,calc((100vw - var(--wrap))/2 + 24px)) 26px;scrollbar-width:thin}
+.shot{flex:none;width:220px;scroll-snap-align:start;border:0;padding:0;background:none;text-align:left}
+.shot .f{border-radius:24px;overflow:hidden;background:var(--night);padding:6px;box-shadow:0 14px 30px -16px oklch(0.3 0.05 160 / .5);transition:transform .35s var(--ease)}
+.shot img{border-radius:19px;aspect-ratio:720/1490;object-fit:cover;width:100%}
+.shot:hover .f{transform:translateY(-6px) rotate(-1deg)}
+.shot span{display:block;margin-top:12px;font-size:15px;font-weight:600;color:var(--ink)}
+.rail-nav{display:flex;gap:8px}
+.rail-nav button{width:48px;height:48px;border-radius:50%;border:0;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;transition:.2s}
+.rail-nav button:hover{box-shadow:inset 0 0 0 1.5px var(--field);color:var(--field-deep)}
+.rail-nav svg{width:20px;height:20px}
+
+/* lightbox */
+dialog.lb{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100vw;height:100svh;overflow:hidden}
+dialog.lb::backdrop{background:oklch(0.14 0.03 165 / .92);backdrop-filter:blur(6px)}
+.lb-in{height:100%;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;justify-items:center;color:var(--on-night)}
+.lb figure{margin:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 0}
+.lb img{max-height:calc(100svh - 110px);width:auto;border-radius:26px;box-shadow:0 30px 80px -20px #000}
+.lb figcaption{margin-top:14px;font-weight:600}
+.lb button{width:52px;height:52px;border-radius:50%;border:0;background:oklch(1 0 0 / .1);color:#fff;display:grid;place-items:center}
+.lb button:hover{background:oklch(1 0 0 / .2)}
+.lb .x{position:absolute;top:16px;right:16px}
+.lb svg{width:22px;height:22px}
+@media (max-width:600px){.lb-in{grid-template-columns:1fr}.lb .pv,.lb .nx{position:absolute;bottom:20px}.lb .pv{left:24px}.lb .nx{right:24px}.lb img{max-height:calc(100svh - 150px);max-width:92vw}}
+
+/* video */
+.vids{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
+.vid{border-radius:24px;overflow:hidden;background:var(--night);color:var(--on-night);box-shadow:0 20px 40px -24px oklch(0.2 0.05 160 / .7)}
+.vid .box{position:relative;aspect-ratio:9/16;max-height:560px;width:100%}
+.vid .box img{width:100%;height:100%;object-fit:cover;opacity:.55}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.play{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:var(--gold);color:var(--gold-ink);display:grid;place-items:center;box-shadow:0 0 0 12px oklch(0.85 0.13 85 / .2);transition:transform .3s var(--ease)}
+.play:hover{transform:scale(1.08)}
+.play svg{width:34px;height:34px;margin-left:5px}
+.vid .meta{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vid .meta b{font-size:16px}
+.vid .meta a{font-size:14px;color:var(--label);text-decoration:none;white-space:nowrap}
+.vid .meta a:hover{text-decoration:underline}
+.vid-note{display:flex;flex-direction:column;justify-content:center;gap:16px;padding:32px;border-radius:24px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.vid-note h3{font-size:24px;font-weight:800}
+.vid-note p{color:var(--ink-2)}
+
+/* pricing */
+.pricing{background:linear-gradient(var(--paper),var(--sunk))}
+.trial{display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:8px 16px;border-radius:999px;background:var(--field-wash);color:var(--field-deep);font-weight:600;font-size:15px}
+.plans{margin-top:48px;display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:960px}
+.plan{position:relative;border-radius:28px;padding:34px;background:var(--card);box-shadow:0 24px 50px -30px oklch(0.3 0.05 160 / .45),inset 0 0 0 1px var(--line);display:flex;flex-direction:column}
+.plan .top-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.plan h3{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.pill{font-size:13px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:8px;background:var(--field-wash);color:var(--field-deep)}
+.off{margin-left:auto;font-weight:800;font-size:15px;padding:5px 12px;border-radius:999px;background:oklch(0.6 0.21 25);color:#fff}
+.plan .desc{margin-top:8px;color:var(--ink-2)}
+.was{margin-top:26px;font-size:16px;color:var(--muted);text-decoration:line-through}
+.price{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+.price b{font-size:clamp(46px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1}
+.price span{color:var(--muted)}
+.plan ul{list-style:none;padding:24px 0 0;margin:24px 0 30px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.plan li{display:flex;gap:12px;align-items:flex-start}
+.plan li svg{flex:none;width:24px;height:24px;margin-top:1px}
+.plan li.no{color:var(--muted)}
+.plan .btn{margin-top:auto;width:100%}
+.plan.month li svg{color:var(--field)}
+/* sổ đỏ */
+.plan.life{background:radial-gradient(130% 90% at 20% 0%,oklch(0.52 0.18 27),var(--redbook) 45%,var(--redbook-deep));color:oklch(0.97 0.02 80);box-shadow:0 34px 60px -28px oklch(0.4 0.17 25 / .75)}
+.plan.life::before{content:"";position:absolute;inset:12px;border-radius:20px;border:1.5px solid oklch(0.85 0.13 85 / .55);pointer-events:none}
+.plan.life::after{content:"";position:absolute;inset:18px;border-radius:15px;border:1px solid oklch(0.85 0.13 85 / .25);pointer-events:none}
+.plan.life h3{color:var(--gold)}
+.plan.life .pill{background:oklch(0.85 0.13 85 / .18);color:var(--gold)}
+.plan.life .off{background:var(--gold);color:var(--gold-ink)}
+.plan.life .desc,.plan.life .price span{color:oklch(0.88 0.04 60)}
+.plan.life .was{color:oklch(0.8 0.05 40)}
+.plan.life ul{border-color:oklch(0.85 0.13 85 / .3)}
+.plan.life li svg{color:var(--gold)}
+.ribbon{position:absolute;top:-15px;left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:999px;background:var(--gold);color:var(--gold-ink);font-size:13px;font-weight:800;letter-spacing:.14em;white-space:nowrap;box-shadow:0 10px 24px -8px oklch(0.3 0.1 40 / .6)}
+.seal{position:absolute;right:30px;top:74px;width:74px;height:74px;opacity:.22;color:var(--gold)}
+.plan.life .btn{position:relative;z-index:1}
+@media (max-width:820px){.plans{grid-template-columns:1fr}.plan{padding:28px}}
+
+/* steps */
+.steps{margin-top:64px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:s;position:relative}
+.step{position:relative;padding:0 28px 0 0}
+.step .n{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--cad);display:flex;align-items:center;gap:12px}
+.step .n::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--cad) 0 8px,transparent 8px 14px);opacity:.5}
+.step:last-child .n::after{display:none}
+.step .dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--vertex);color:#fff;font-size:15px;box-shadow:0 0 0 5px oklch(0.7 0.19 48 / .18)}
+.step h3{margin-top:18px;font-size:21px;font-weight:700;letter-spacing:-.01em}
+.step p{margin-top:8px;color:var(--ink-2);font-size:16px}
+@media (max-width:820px){.steps{grid-template-columns:1fr;gap:30px}.step .n::after{display:none}}
+
+/* download */
+.dl{background:var(--night);color:var(--on-night);overflow:hidden}
+.dl-in{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:56px;align-items:center}
+.dl .eyebrow{color:var(--label)}
+.dl .sub{color:var(--on-night-2)}
+.dl ol{list-style:none;padding:0;margin:32px 0 0;display:flex;flex-direction:column;gap:16px;counter-reset:d}
+.dl li{counter-increment:d;display:grid;grid-template-columns:36px 1fr;gap:14px;align-items:start;color:var(--on-night-2)}
+.dl li::before{content:counter(d);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:14px;font-weight:700;background:oklch(1 0 0 / .1);color:var(--on-night)}
+.dl li b{color:var(--on-night);font-weight:600}
+.dl .cta{margin-top:34px}
+.file{margin-top:16px;font-size:14px;color:oklch(0.7 0.03 160)}
+.qr{justify-self:center;text-align:center}
+.qr .card{width:280px;padding:22px;border-radius:28px;background:oklch(0.99 0.005 150);box-shadow:0 30px 60px -24px #000;position:relative}
+.qr .card svg{width:100%;height:auto;display:block}
+.qr .card img{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;box-shadow:0 0 0 5px oklch(0.99 0.005 150)}
+.qr p{margin-top:16px;font-size:15px;color:var(--on-night-2)}
+@media (max-width:820px){.dl-in{grid-template-columns:1fr}.qr{order:-1}.qr .card{width:220px}}
+
+/* contact */
+.contact-grid{margin-top:48px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px}
+.author{border-radius:28px;padding:34px;background:radial-gradient(110% 100% at 0% 0%,var(--night-2),var(--night));color:var(--on-night);display:flex;flex-direction:column;gap:22px;position:relative;overflow:hidden}
+.author .av{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;font-size:30px;font-weight:700;color:oklch(0.3 0.08 60);background:linear-gradient(135deg,oklch(0.86 0.15 85),oklch(0.72 0.18 55));box-shadow:0 0 0 4px oklch(1 0 0 / .12)}
+.author small{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:oklch(0.72 0.03 160)}
+.author h3{font-size:34px;font-weight:800;margin-top:4px}
+.author p{color:var(--on-night-2)}
+.author .orbit{position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;border:1px solid oklch(1 0 0 / .1)}
+.author .orbit::after{content:"";position:absolute;inset:40px;border-radius:50%;border:1px solid oklch(1 0 0 / .08)}
+.ways{display:flex;flex-direction:column;gap:14px}
+.way{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 24px;border-radius:22px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.way .wi{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;flex:none;color:#fff}
+.way .wi svg{width:26px;height:26px}
+.way .wt{flex:1;min-width:180px}
+.way .wt small{display:block;font-size:14px;color:var(--muted)}
+.way .wt b{display:block;font-size:20px;font-weight:700;letter-spacing:-.01em;word-break:break-word}
+.way .acts{display:flex;gap:8px;flex-wrap:wrap}
+.way .btn{min-height:44px;padding:0 16px;font-size:15px}
+@media (max-width:860px){.contact-grid{grid-template-columns:1fr}}
+
+footer{background:var(--night);color:oklch(0.72 0.03 160);padding:34px 0;font-size:15px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+footer a{color:var(--on-night);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+/* floating zalo */
+.fab{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;align-items:center;gap:10px;height:56px;padding:0 20px 0 8px;border-radius:999px;background:var(--zalo);color:#fff;text-decoration:none;font-weight:700;box-shadow:0 14px 34px -10px oklch(0.45 0.19 258 / .7);transform:translateY(120px);transition:transform .45s var(--ease)}
+.fab.show{transform:none}
+.fab .z{width:40px;height:40px;border-radius:50%;background:#fff;color:var(--zalo);display:grid;place-items:center;font-weight:800;font-size:13px}
+.toast{position:fixed;left:50%;bottom:90px;z-index:60;transform:translate(-50%,20px);opacity:0;padding:12px 20px;border-radius:999px;background:var(--ink);color:#fff;font-weight:600;font-size:15px;transition:.3s var(--ease);pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .rv{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".15" stroke="none"/><path d="m7.5 12.5 3 3 6-6.5"/></symbol>
+  <symbol id="i-no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".12" stroke="none"/><path d="m9 9 6 6m0-6-6 6"/></symbol>
+  <symbol id="i-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="i-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V6.8c0-.8.2-1.3 1.4-1.3H17V2.3c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2H7.5V12h2.8v9.8H14V12h2.8l.4-3.5z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></symbol>
+  <!-- feature icons -->
+  <symbol id="f-dgn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+  <symbol id="f-snap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v8a6 6 0 0 0 12 0V4"/><path d="M6 8h4M14 8h4"/></symbol>
+  <symbol id="f-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="f-q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16l-6 7v6l-4 2v-8L4 5z"/></symbol>
+  <symbol id="f-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
+  <symbol id="f-gps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+  <symbol id="f-3d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 18 5-8 4 5 3-4 6 7H3z"/><circle cx="17" cy="6" r="2"/></symbol>
+  <symbol id="f-cad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3"/></symbol>
+</svg>
+
+<header class="top" id="top">
+  <div class="top-in">
+    <a class="brand" href="#">
+      <img src="Hinh/logo.png" alt="" width="40" height="40">
+      <span><b>Quản lý dữ liệu đất đai</b><small>Lê Minh Hiền</small></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Mở menu" aria-expanded="false"><svg width="22" height="22"><use href="#i-menu"/></svg></button>
+    <nav class="nav" id="nav">
+      <a href="#tinh-nang">Tính năng</a>
+      <a href="#hinh-anh">Hình ảnh</a>
+      <a href="#video">Video</a>
+      <a href="#bang-gia">Bảng giá</a>
+      <a href="#tai-app">Tải app</a>
+      <a href="#lien-he">Liên hệ</a>
+    </nav>
+    <a class="btn btn-gold" data-apk href="#"><svg><use href="#i-dl"/></svg>Tải APK</a>
+  </div>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" aria-label="Giới thiệu">
+  <svg id="sheet" aria-hidden="true"></svg>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="hero-in">
+    <div>
+      <span class="ver rv"><i></i>Android · phiên bản <span data-ver>1.2.4</span></span>
+      <h1 class="rv">Dữ liệu đất đai,<br><em>sạch</em> ngay từ thực địa.</h1>
+      <p class="lead rv">Mở bản vẽ <b>DGN, DWG, Shapefile</b> ngay trên điện thoại. Đo, vẽ, sửa ranh thửa, đối soát toạ độ <b>VN-2000</b> rồi xuất lại dữ liệu sạch.</p>
+      <div class="cta rv">
+        <a class="btn btn-gold" data-apk href="#"><svg><use href="#i-dl"/></svg>Tải APK miễn phí</a>
+        <a class="btn btn-ghost" href="#video"><svg><use href="#i-play"/></svg>Xem video hướng dẫn</a>
+      </div>
+      <div class="chips rv" aria-label="Định dạng hỗ trợ">
+        <span class="chip c-dgn">DGN</span><span class="chip c-dwg">DWG · DXF</span><span class="chip c-shp">SHP</span><span class="chip c-xls">EXCEL</span><span class="chip c-vn">VN-2000 · 63 TỈNH</span>
+      </div>
+    </div>
+    <div class="visual rv" aria-hidden="true">
+      <div class="zone" id="zone"></div>
+      <div class="hud" id="hud">
+        <span class="hud-h"><i></i>Thước đo đạc · Vùng</span>
+        <span><span class="k">X (E)</span><span class="v" id="hx">611 676.965</span></span>
+        <span><span class="k">Y (N)</span><span class="v" id="hy">1 214 831.326</span></span>
+        <span><span class="k">Diện tích</span><span class="v area" id="ha">0.00 m²</span></span>
+        <span><span class="k">Quy đổi</span><span class="v" id="hs">0.0000 ha</span></span>
+      </div>
+      <div class="phones">
+        <div class="phone front"><img src="Hinh/man-hinh-chinh.jpg" alt=""></div>
+        <div class="tag t1"><span class="chip c-dgn">DGN</span><span><b>100-341</b>329 đường · 56 vùng</span></div>
+        <div class="tag t2"><span class="chip c-shp">SHP</span><span><b>Thua</b>1.590 vùng thửa</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FORMATS ================= -->
+<section class="formats" aria-labelledby="fmtT">
+  <div class="wrap">
+    <span class="eyebrow rv">Thêm dữ liệu</span>
+    <h2 class="h2 rv" id="fmtT">Mở thẳng mọi bản vẽ.</h2>
+    <p class="sub rv">Không cần máy tính, không cần đổi định dạng. Chạm vào tệp là lên bản đồ.</p>
+    <div class="fmt-grid">
+      <div class="fmt rv"><span class="chip c-dgn">DGN · FC1 · POS</span><h3>MicroStation</h3><p>DGN V7 và V8 (XM, V8i, CONNECT). Giữ màu, nét, vùng tô và chữ của bản vẽ.</p></div>
+      <div class="fmt rv"><span class="chip c-dwg">DWG · DXF</span><h3>AutoCAD</h3><p>DXF R12 đến 2018+, DWG 2000 đến 2018+. Giữ layer, hatch, block, chữ TCVN3/VNI.</p></div>
+      <div class="fmt rv"><span class="chip c-shp">SHP · ZIP · RAR</span><h3>Shapefile</h3><p>Chọn tệp .shp hoặc cả bộ nén .zip/.rar. Sửa thuộc tính, vẽ thêm thửa trực tiếp.</p></div>
+      <div class="fmt rv"><span class="chip c-xls">TXT · CSV · XLSX</span><h3>Bảng toạ độ</h3><p>Nhập một hay nhiều toạ độ thủ công, hoặc từ tệp văn bản và Excel.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOWCASE ================= -->
+<section class="sec" id="tinh-nang" aria-labelledby="featT">
+  <div class="wrap">
+    <span class="eyebrow rv">Tính năng</span>
+    <h2 class="h2 rv" id="featT">Đủ công cụ cho cả bộ hồ sơ thửa đất.</h2>
+    <div class="show" id="show">
+      <div class="feat-list" id="featList" role="tablist" aria-label="Tính năng"></div>
+      <div class="stage rv"><div class="phone" id="stage"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section class="sec gallery" id="hinh-anh" aria-labelledby="galT">
+  <div class="wrap head-row">
+    <div>
+      <span class="eyebrow rv">Hình ảnh</span>
+      <h2 class="h2 rv" id="galT">Xem tận mắt từng màn hình.</h2>
+      <p class="sub rv">Ảnh chụp thật trên máy Android. Chạm vào ảnh để phóng to.</p>
+    </div>
+    <div class="rail-nav rv">
+      <button type="button" id="railL" aria-label="Ảnh trước"><svg><use href="#i-l"/></svg></button>
+      <button type="button" id="railR" aria-label="Ảnh sau"><svg><use href="#i-r"/></svg></button>
+    </div>
+  </div>
+  <div class="rail" id="rail"></div>
+</section>
+
+<dialog class="lb" id="lb" aria-label="Xem ảnh">
+  <div class="lb-in">
+    <button class="pv" type="button" aria-label="Ảnh trước"><svg><use href="#i-l"/></svg></button>
+    <figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure>
+    <button class="nx" type="button" aria-label="Ảnh sau"><svg><use href="#i-r"/></svg></button>
+    <button class="x" type="button" aria-label="Đóng"><svg><use href="#i-x"/></svg></button>
+  </div>
+</dialog>
+
+<!-- ================= VIDEO ================= -->
+<section class="sec" id="video" aria-labelledby="vidT">
+  <div class="wrap">
+    <span class="eyebrow rv">Video hướng dẫn</span>
+    <h2 class="h2 rv" id="vidT">Xem một lần, ra thực địa làm ngay.</h2>
+    <div class="vids" id="vids"></div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="sec pricing" id="bang-gia" aria-labelledby="priceT">
+  <div class="wrap">
+    <span class="eyebrow rv">Bảng giá dịch vụ</span>
+    <h2 class="h2 rv" id="priceT">Hai gói. Giá rõ ràng.</h2>
+    <span class="trial rv"><svg width="20" height="20"><use href="#i-ok"/></svg>Dùng thử miễn phí 3 ngày ngay khi cài app</span>
+    <div class="plans">
+      <article class="plan month rv">
+        <div class="top-row"><h3>1 THÁNG</h3><span class="pill">1 THÁNG</span><span class="off">-60%</span></div>
+        <p class="desc">Gọn nhẹ cho đợt khảo sát ngắn</p>
+        <p class="was">Giá gốc 500.000đ</p>
+        <p class="price"><b>200.000đ</b><span>/ 30 ngày</span></p>
+        <ul>
+          <li><svg><use href="#i-ok"/></svg>Sử dụng đầy đủ các tính năng</li>
+          <li><svg><use href="#i-ok"/></svg>1 thiết bị sử dụng</li>
+          <li><svg><use href="#i-ok"/></svg>Gia hạn nhanh qua Zalo</li>
+          <li class="no"><svg><use href="#i-no"/></svg>Không hỗ trợ chuyển thiết bị</li>
+        </ul>
+        <a class="btn btn-field" data-zalo href="#" target="_blank" rel="noopener">Mua 1 THÁNG · 200.000đ</a>
+      </article>
+      <article class="plan life rv">
+        <span class="ribbon">★ ĐÁNG GIÁ NHẤT</span>
+        <svg class="seal" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1.5"/><path fill="currentColor" d="m50 22 7.6 19.4 20.8 1.2-16.1 13.2 5.3 20.2L50 64.7 32.4 76l5.3-20.2-16.1-13.2 20.8-1.2z"/></svg>
+        <div class="top-row"><h3>TRỌN ĐỜI</h3><span class="pill">VĨNH VIỄN</span><span class="off">-67%</span></div>
+        <p class="desc">Mua một lần, dùng mãi mãi</p>
+        <p class="was">Giá gốc 1.500.000đ</p>
+        <p class="price"><b>500.000đ</b><span>/ trọn đời</span></p>
+        <ul>
+          <li><svg><use href="#i-ok"/></svg>Sử dụng đầy đủ các tính năng</li>
+          <li><svg><use href="#i-ok"/></svg>1 KEY không giới hạn thời gian</li>
+          <li><svg><use href="#i-ok"/></svg>1 thiết bị sử dụng</li>
+          <li><svg><use href="#i-ok"/></svg>Cập nhật tính năng mới miễn phí</li>
+        </ul>
+        <a class="btn btn-gold" data-zalo href="#" target="_blank" rel="noopener">Mua TRỌN ĐỜI · 500.000đ</a>
+      </article>
+    </div>
+
+    <div class="steps">
+      <div class="step rv"><div class="n"><span class="dot">1</span></div><h3>Gửi Mã máy qua Zalo</h3><p>Mở menu › <b>Kích hoạt bản quyền</b>, sao chép Mã máy và nhắn cho tác giả kèm gói muốn mua.</p></div>
+      <div class="step rv"><div class="n"><span class="dot">2</span></div><h3>Chuyển khoản</h3><p>Làm theo hướng dẫn thanh toán được gửi lại qua Zalo.</p></div>
+      <div class="step rv"><div class="n"><span class="dot">3</span></div><h3>Nhận key, dùng ngay</h3><p>Dán key vào ô kích hoạt trong app. Không cần cài lại, dữ liệu giữ nguyên.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOWNLOAD ================= -->
+<section class="sec dl" id="tai-app" aria-labelledby="dlT">
+  <div class="wrap dl-in">
+    <div>
+      <span class="eyebrow rv">Tải ứng dụng</span>
+      <h2 class="h2 rv" id="dlT">Cài đặt trong một phút.</h2>
+      <ol class="rv">
+        <li><span><b>Tải tệp Hdatdai.apk</b> bằng nút bên dưới hoặc quét mã QR.</span></li>
+        <li><span>Mở tệp, cho phép <b>"Cài ứng dụng không rõ nguồn"</b> khi máy hỏi.</span></li>
+        <li><span>Mở app, cấp quyền vị trí và bộ nhớ. <b>Dùng thử 3 ngày</b> tự kích hoạt.</span></li>
+      </ol>
+      <div class="cta rv">
+        <a class="btn btn-gold" data-apk href="#"><svg><use href="#i-dl"/></svg>Tải APK cho Android</a>
+        <a class="btn btn-ghost" data-zalo href="#" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>Cần hỗ trợ cài đặt</a>
+      </div>
+      <p class="file mono rv">Android 7.0 trở lên · gói com.rsgis.fieldmap.survey</p>
+    </div>
+    <div class="qr rv">
+      <div class="card"><svg role="img" aria-label="Mã QR tải APK" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 35 35"><path stroke="#123" d="M0 0.5h7m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m1 0h7m-33 1h1m5 0h1m1 0h2m6 0h2m1 0h2m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m4 0h2m1 0h2m1 0h1m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m2 0h1m1 0h1m3 0h1m3 0h1m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m2 0h1m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h4m1 0h1m2 0h2m1 0h2m1 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m3 0h2m4 0h2m2 0h1m-24 1h1m2 0h6m1 0h1m3 0h4m1 0h1m3 0h3m2 0h1m1 0h3m-32 1h4m2 0h1m1 0h3m2 0h3m1 0h3m1 0h2m4 0h3m-29 1h2m2 0h1m1 0h1m2 0h2m1 0h5m1 0h2m1 0h2m1 0h1m1 0h5m-32 1h1m1 0h1m4 0h1m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m2 0h1m1 0h1m2 0h1m-31 1h1m2 0h2m1 0h1m1 0h3m2 0h8m2 0h2m1 0h2m4 0h1m-33 1h1m1 0h1m1 0h2m1 0h1m1 0h2m5 0h2m1 0h1m3 0h2m2 0h1m2 0h1m-27 1h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h2m8 0h5m-29 1h2m1 0h1m7 0h3m3 0h1m4 0h2m1 0h4m1 0h1m-32 1h1m2 0h1m1 0h2m1 0h4m1 0h1m3 0h3m1 0h1m2 0h5m-30 1h3m2 0h1m1 0h4m1 0h4m2 0h5m3 0h1m1 0h1m1 0h1m1 0h1m-32 1h2m2 0h3m5 0h4m2 0h1m2 0h2m2 0h2m1 0h2m1 0h1m-33 1h1m4 0h1m3 0h1m1 0h3m2 0h4m2 0h5m1 0h5m-33 1h3m2 0h2m1 0h1m2 0h1m3 0h1m3 0h4m1 0h1m2 0h1m1 0h1m-30 1h4m1 0h1m1 0h2m1 0h1m2 0h2m1 0h3m1 0h4m3 0h2m-29 1h1m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h2m4 0h1m1 0h1m1 0h3m2 0h3m-33 1h1m3 0h2m1 0h1m1 0h1m1 0h4m1 0h2m5 0h4m2 0h4m-33 1h3m3 0h6m1 0h1m1 0h1m3 0h1m3 0h7m-22 1h1m5 0h3m1 0h1m3 0h3m3 0h1m1 0h1m-31 1h7m1 0h1m1 0h1m3 0h2m2 0h2m1 0h4m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h1m1 0h1m2 0h2m1 0h1m3 0h1m1 0h3m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h2m1 0h5m1 0h6m3 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m2 0h1m1 0h1m1 0h2m1 0h1m4 0h1m-33 1h1m1 0h3m1 0h1m2 0h1m1 0h2m1 0h1m1 0h2m2 0h2m1 0h1m1 0h1m1 0h2m2 0h2m-33 1h1m5 0h1m3 0h2m2 0h3m1 0h1m7 0h7m-33 1h7m1 0h3m1 0h2m2 0h2m5 0h3m1 0h2m1 0h1"/></svg>
+<img src="Hinh/logo.png" alt=""></div>
+      <p>Quét bằng camera điện thoại để tải</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="sec" id="lien-he" aria-labelledby="ctT">
+  <div class="wrap">
+    <span class="eyebrow rv">Liên hệ</span>
+    <h2 class="h2 rv" id="ctT">Nói chuyện thẳng với người làm ra app.</h2>
+    <p class="sub rv">Hỏi về key, báo lỗi hay góp ý tính năng, bạn nhắn trực tiếp cho tác giả.</p>
+    <div class="contact-grid">
+      <div class="author rv">
+        <span class="orbit"></span>
+        <div class="av">LH</div>
+        <div><small>Tác giả</small><h3>Lê Minh Hiền</h3><p>Phát triển &amp; thiết kế ứng dụng</p></div>
+        <p>Quản lý dữ liệu đất đai · Quản lý và làm sạch dữ liệu đất đai</p>
+      </div>
+      <div class="ways">
+        <div class="way rv">
+          <span class="wi" style="background:var(--zalo)"><svg><use href="#i-chat"/></svg></span>
+          <span class="wt"><small>Zalo / Điện thoại</small><b class="mono" data-phone-text>0989 300 018</b></span>
+          <span class="acts">
+            <a class="btn btn-zalo" data-zalo href="#" target="_blank" rel="noopener">Nhắn Zalo</a>
+            <a class="btn btn-line" data-tel href="#"><svg><use href="#i-phone"/></svg>Gọi</a>
+            <button class="btn btn-line" type="button" data-copy="0989300018" aria-label="Sao chép số điện thoại"><svg><use href="#i-copy"/></svg></button>
+          </span>
+        </div>
+        <div class="way rv">
+          <span class="wi" style="background:oklch(0.55 0.18 260)"><svg><use href="#i-fb"/></svg></span>
+          <span class="wt"><small>Facebook</small><b>facebook.com/vitinhhieuhien</b></span>
+          <span class="acts">
+            <a class="btn btn-line" data-fb href="#" target="_blank" rel="noopener">Mở trang</a>
+            <button class="btn btn-line" type="button" data-copy="https://www.facebook.com/vitinhhieuhien" aria-label="Sao chép link Facebook"><svg><use href="#i-copy"/></svg></button>
+          </span>
+        </div>
+        <div class="way rv">
+          <span class="wi" style="background:var(--field)"><svg><use href="#i-dl"/></svg></span>
+          <span class="wt"><small>Trang chủ</small><b>gisvn.github.io/data/hsurvey</b></span>
+          <span class="acts">
+            <button class="btn btn-line" type="button" data-copy="https://gisvn.github.io/data/hsurvey/" aria-label="Sao chép link trang chủ"><svg><use href="#i-copy"/></svg>Sao chép link</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Lê Minh Hiền · Quản lý dữ liệu đất đai</span>
+    <span><a data-zalo href="#" target="_blank" rel="noopener">Zalo 0989 300 018</a> · <a data-fb href="#" target="_blank" rel="noopener">Facebook ↗</a></span>
+  </div>
+</footer>
+
+<a class="fab" id="fab" data-zalo href="#" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho tác giả"><span class="z">Zalo</span>Hỏi tác giả</a>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{
+/* ==== CẤU HÌNH: sửa thông tin ở đây ==== */
+const CFG = {
+  version: "1.2.4",
+  apk: "https://gisvn.github.io/data/datdai/Hdatdai.apk",
+  phone: "0989300018",
+  zalo: "https://zalo.me/0989300018",
+  facebook: "https://www.facebook.com/vitinhhieuhien",
+};
+/* Thêm video: chép thêm 1 dòng { url, title, poster } */
+const VIDEOS = [
+  { url: "https://www.facebook.com/reel/1649676476613218", title: "Hướng dẫn sử dụng Quản lý dữ liệu đất đai", poster: "Hinh/ban-do-dia-chinh.jpg" },
+];
+const FEATURES = [
+  { ic: "f-dgn", t: "Bản vẽ địa chính DGN & CAD", d: "Đọc DGN, DWG, DXF giữ nguyên màu, level, chữ. Bật tắt từng level, chạm giữ để chỉ hiện level đó.", img: "level-dgn.jpg" },
+  { ic: "f-snap", t: "Đo vẽ, sửa ranh có bắt dính", d: "Bắt đỉnh, giao điểm, trung điểm, cạnh. Diện tích tự quy đổi ha, sào Bắc Bộ, sào Trung Bộ.", img: "thuoc-do-dac.jpg" },
+  { ic: "f-pen", t: "Vẽ thửa mới vào lớp SHP", d: "Chạm thêm đỉnh, lấy đỉnh bằng GPS tại vị trí máy, giữ kéo để chỉnh từng điểm.", img: "ve-doi-tuong.jpg" },
+  { ic: "f-q", t: "Truy vấn & bảng thuộc tính", d: "Lọc nhiều điều kiện, tìm nhanh không phân biệt dấu, lưu mẫu truy vấn để dùng lại.", img: "truy-van.jpg" },
+  { ic: "f-book", t: "Quét bảng toạ độ sổ đỏ", d: "Chụp bảng kê toạ độ góc ranh: app tự dựng thửa, đánh số đỉnh, tính cạnh, diện tích và định vị ngoài thực địa.", img: "quet-so-do.jpg" },
+  { ic: "f-gps", t: "GNSS & VN-2000 đủ 63 tỉnh", d: "Định vị đa vệ tinh, toạ độ VN-2000 theo kinh tuyến trục từng tỉnh, độ cao MSL, sai số trực tiếp.", img: "toa-do-vn2000.jpg" },
+  { ic: "f-3d", t: "Nền vệ tinh, đồng mức & 3D", d: "Sentinel-2, PlanetScope, ảnh lịch sử, đường đồng mức, bản đồ 3D và nền ngoại tuyến khi mất sóng.", img: "ban-do-3d.jpg" },
+  { ic: "f-cad", t: "Chuyển DGN sang AutoCAD", d: "Xuất bản vẽ MicroStation ra .dxf ngay trên máy, giữ level, màu, chữ, toạ độ đúng từng milimét.", img: "dgn-sang-cad.jpg" },
+];
+const SHOTS = [
+  ["man-hinh-chinh.jpg", "Màn hình chính"],
+  ["ban-do-dia-chinh.jpg", "Chồng bản đồ địa chính lên ảnh vệ tinh"],
+  ["them-du-lieu.jpg", "Thêm dữ liệu"],
+  ["dinh-dang-cad.jpg", "Shapefile, MicroStation, AutoCAD"],
+  ["lop-du-lieu.jpg", "Quản lý lớp dữ liệu"],
+  ["level-dgn.jpg", "Bật tắt level DGN"],
+  ["thuoc-do-dac.jpg", "Thước đo đạc vùng"],
+  ["ve-doi-tuong.jpg", "Vẽ đối tượng mới vào lớp"],
+  ["truy-van.jpg", "Truy vấn dữ liệu"],
+  ["quet-so-do.jpg", "Quét bảng toạ độ sổ đỏ"],
+  ["dgn-sang-cad.jpg", "Chuyển DGN sang CAD"],
+  ["toa-do-vn2000.jpg", "Toạ độ VN-2000"],
+  ["ve-tinh-gnss.jpg", "Vệ tinh GNSS"],
+  ["sai-so-gnss.jpg", "Sai số và độ cao MSL"],
+  ["la-ban.jpg", "La bàn bắc thật"],
+  ["nen-ban-do.jpg", "Chọn nền bản đồ"],
+  ["lam-mo-nen.jpg", "Làm mờ nền, nổi dữ liệu"],
+  ["ban-do-3d.jpg", "Bản đồ 3D, đồng mức"],
+  ["ban-do-ve-tinh.jpg", "Nền ảnh vệ tinh"],
+  ["menu.jpg", "Menu ứng dụng"],
+  ["bang-gia.jpg", "Bảng giá trong app"],
+  ["gioi-thieu.jpg", "Thông tin tác giả"],
+];
+
+/* ==== tiện ích ==== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmt = (n, d = 2) => n.toFixed(d);
+const sp = (n, d = 3) => { const [a, b] = n.toFixed(d).split("."); return a.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "." + b; };
+
+/* ==== liên kết ==== */
+$$("[data-apk]").forEach(a => a.href = CFG.apk);
+$$("[data-zalo]").forEach(a => a.href = CFG.zalo);
+$$("[data-fb]").forEach(a => a.href = CFG.facebook);
+$$("[data-tel]").forEach(a => a.href = "tel:" + CFG.phone);
+$$("[data-ver]").forEach(s => s.textContent = CFG.version);
+
+const toast = $("#toast"); let tt;
+function say(msg) { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 1800); }
+$$("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+  const v = b.dataset.copy;
+  try { await navigator.clipboard.writeText(v); }
+  catch { const t = document.createElement("textarea"); t.value = v; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+  say("Đã sao chép: " + v.replace(/^https?:\/\//, ""));
+}));
+
+/* ==== thanh trên + menu + nút zalo ==== */
+const topBar = $("#top"), fab = $("#fab"), nav = $("#nav"), mb = $("#menuBtn");
+const onScroll = () => { const y = scrollY; topBar.classList.toggle("solid", y > 30); fab.classList.toggle("show", y > innerHeight * .7); };
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+mb.addEventListener("click", () => { const o = nav.classList.toggle("open"); mb.setAttribute("aria-expanded", o); });
+$$("a", nav).forEach(a => a.addEventListener("click", () => { nav.classList.remove("open"); mb.setAttribute("aria-expanded", false); }));
+
+/* ==== hiện dần khi cuộn ==== */
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12, rootMargin: "0px 0px -40px 0px" });
+function watch(root = document) { $$(".rv:not(.in)", root).forEach((n, i) => { n.style.transitionDelay = Math.min(i % 6, 5) * 70 + "ms"; io.observe(n); }); }
+
+/* ==== HERO: tờ bản đồ địa chính sống ==== */
+const sheet = $("#sheet"), hero = $(".hero");
+const M_PER_PX = 0.25, X0 = 611500, Y0 = 1215000;
+let parcels = [], W = 0, H = 0, runId = 0, heroVisible = true;
+
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function rot(p, c, a) { const s = Math.sin(a), k = Math.cos(a), x = p[0] - c[0], y = p[1] - c[1]; return [c[0] + x * k - y * s, c[1] + x * s + y * k]; }
+function areaPx(q) { let a = 0; for (let i = 0; i < q.length; i++) { const [x1, y1] = q[i], [x2, y2] = q[(i + 1) % q.length]; a += x1 * y2 - x2 * y1; } return Math.abs(a / 2); }
+function cen(q) { return [q.reduce((s, p) => s + p[0], 0) / q.length, q.reduce((s, p) => s + p[1], 0) / q.length]; }
+
+function buildSheet() {
+  const r = hero.getBoundingClientRect(); W = Math.round(r.width); H = Math.round(r.height);
+  sheet.setAttribute("viewBox", `0 0 ${W} ${H}`); sheet.innerHTML = "";
+  const R = rng(341);
+  // lưới km
+  const grid = el("g", { stroke: "oklch(0.6 0.05 160 / .13)", "stroke-width": 1 }, sheet);
+  const step = 160;
+  for (let x = step / 2; x < W; x += step) el("line", { x1: x, y1: 0, x2: x, y2: H }, grid);
+  for (let y = step / 2; y < H; y += step) el("line", { x1: 0, y1: y, x2: W, y2: y }, grid);
+  const ticks = el("g", { fill: "oklch(0.75 0.05 160 / .32)", "font-family": "JetBrains Mono, monospace", "font-size": 14 }, sheet);
+  for (let x = step / 2; x < W - 60; x += step) { const t = el("text", { x: x + 6, y: H - 14 }, ticks); t.textContent = Math.round(X0 + x * M_PER_PX); }
+  for (let y = step / 2 + step; y < H - 40; y += step) { const t = el("text", { x: 10, y: y - 6 }, ticks); t.textContent = Math.round(Y0 - y * M_PER_PX); }
+
+  // thửa đất dọc hai bên đường
+  const c = [W / 2, H / 2], ang = -9 * Math.PI / 180;
+  const zr0 = $("#zone").getBoundingClientRect(), hr0 = hero.getBoundingClientRect();
+  const roadY = W < 900 ? (zr0.top - hr0.top) + 40 : H * 0.6;
+  const rows = [
+    { y1: roadY - 26, y0: roadY - 26 - 250 }, { y1: roadY - 276 - 4, y0: roadY - 276 - 4 - 230 }, { y1: roadY - 510 - 4, y0: roadY - 510 - 4 - 240 },
+    { y1: roadY + 26, y0: roadY + 26 + 240 }, { y1: roadY + 266 + 4, y0: roadY + 266 + 4 + 230 },
+  ];
+  parcels = [];
+  const lines = el("g", { fill: "none", stroke: "oklch(0.66 0.24 335 / .5)", "stroke-width": 1.4, "stroke-linejoin": "round" }, sheet);
+  const labels = el("g", { "font-family": "JetBrains Mono, monospace", "text-anchor": "middle" }, sheet);
+  rows.forEach((row, ri) => {
+    let x = -260 + R() * 60;
+    let prevTop = x, prevBot = x;
+    while (x < W + 260) {
+      const w = 70 + R() * 90, nx = x + w;
+      const topX = nx + (R() - .5) * 26, botX = nx;
+      const q = [[prevBot, row.y1], [botX, row.y1], [topX, row.y0], [prevTop, row.y0]].map(p => rot(p, c, ang));
+      prevTop = topX; prevBot = botX; x = nx;
+      const ce = cen(q);
+      if (ce[0] < -120 || ce[0] > W + 120 || ce[1] < -140 || ce[1] > H + 140) continue;
+      const id = 100 + Math.floor(R() * 700);
+      const m2 = areaPx(q) * M_PER_PX * M_PER_PX;
+      const d = "M" + q.map(p => p.map(v => v.toFixed(1)).join(" ")).join("L") + "Z";
+      const path = el("path", { d, pathLength: 1, "stroke-dasharray": 1, "stroke-dashoffset": reduce ? 0 : 1 }, lines);
+      path.style.transition = `stroke-dashoffset 1.6s cubic-bezier(.22,1,.36,1) ${(ce[0] / W) * 1.2 + ri * .12}s`;
+      const g = el("g", { opacity: reduce ? 1 : 0 }, labels);
+      g.style.transition = `opacity .8s ${(ce[0] / W) * 1.2 + ri * .12 + .8}s`;
+      const t1 = el("text", { x: ce[0], y: ce[1] - 2, "font-size": 16, "font-weight": 700, fill: "oklch(0.88 0.17 118 / .42)" }, g); t1.textContent = id;
+      const t2 = el("text", { x: ce[0], y: ce[1] + 17, "font-size": 14, fill: "oklch(0.88 0.17 118 / .28)" }, g); t2.textContent = fmt(m2, 1);
+      parcels.push({ q, ce, m2, path, g });
+    }
+  });
+  // đường nhựa
+  const road = [[-300, roadY - 22], [W + 300, roadY - 22], [W + 300, roadY + 22], [-300, roadY + 22]].map(p => rot(p, c, ang));
+  el("path", { d: "M" + road.map(p => p.join(" ")).join("L") + "Z", fill: "oklch(0.3 0.03 165 / .55)", stroke: "oklch(0.75 0.04 160 / .25)", "stroke-dasharray": "10 8" }, sheet);
+  const rl = rot([W * .78, roadY + 6], c, ang);
+  const rt = el("text", { x: rl[0], y: rl[1], fill: "oklch(0.85 0.03 160 / .45)", "font-size": 14, "font-family": "Be Vietnam Pro, sans-serif", "letter-spacing": "3", transform: `rotate(-9 ${rl[0]} ${rl[1]})`, "text-anchor": "middle" }, sheet);
+  rt.textContent = "ĐƯỜNG NHỰA";
+
+  requestAnimationFrame(() => requestAnimationFrame(() => { parcels.forEach(p => { p.path.setAttribute("stroke-dashoffset", 0); p.g.setAttribute("opacity", 1); }); }));
+  layer = el("g", {}, sheet);
+  startMeasure();
+}
+
+let layer;
+const hx = $("#hx"), hy = $("#hy"), ha = $("#ha"), hs = $("#hs");
+function hud(p) { hx.textContent = sp(X0 + p[0] * M_PER_PX); hy.textContent = sp(Y0 - p[1] * M_PER_PX); }
+function hudArea(m2) { ha.textContent = fmt(m2, 2) + " m²"; hs.textContent = (m2 / 1e4).toFixed(4) + " ha · " + (m2 / 360).toFixed(2) + " sào"; }
+const wait = (ms, id) => new Promise((res, rej) => setTimeout(() => (id === runId ? res() : rej()), ms));
+function tween(ms, fn, id) {
+  return new Promise((res, rej) => {
+    const t0 = performance.now();
+    const f = now => {
+      if (id !== runId) return rej();
+      if (!heroVisible) { requestAnimationFrame(f); return; }
+      let k = Math.min(1, (now - t0) / ms); const e = 1 - Math.pow(1 - k, 3); fn(e);
+      k < 1 ? requestAnimationFrame(f) : res();
+    };
+    requestAnimationFrame(f);
+  });
+}
+
+function pickParcel(last) {
+  const hr = hero.getBoundingClientRect(), zr = $("#zone").getBoundingClientRect();
+  const z = { l: zr.left - hr.left, t: zr.top - hr.top, r: zr.right - hr.left, b: zr.bottom - hr.top };
+  const inside = (p, m) => p.q.every(v => v[0] > z.l - m && v[0] < z.r + m && v[1] > z.t - m && v[1] < z.b + m);
+  let c = parcels.filter(p => p !== last && inside(p, 0));
+  if (!c.length) c = parcels.filter(p => p !== last && inside(p, 40));
+  if (!c.length) c = parcels.filter(p => p !== last && p.ce[0] > z.l && p.ce[0] < z.r && p.ce[1] > z.t && p.ce[1] < z.b);
+  if (!c.length) c = parcels.filter(p => p !== last && p.ce[0] > 60 && p.ce[0] < W - 60 && p.ce[1] > 80 && p.ce[1] < H - 80);
+  return c[Math.floor(Math.random() * c.length)];
+}
+
+function reticle(parent) {
+  const g = el("g", { stroke: "oklch(0.65 0.23 28)", "stroke-width": 3, fill: "none", "stroke-linecap": "round" }, parent);
+  const s = 15, l = 7;
+  [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([a, b]) => el("path", { d: `M${a * s} ${b * (s - l)}V${b * s}H${a * (s - l)}` }, g));
+  el("path", { d: "M-6 0H6M0 -6V6", "stroke-width": 2.5 }, g);
+  return g;
+}
+
+async function startMeasure() {
+  const id = ++runId; let last = null; let pos = [W * .6, H * .5];
+  try {
+    await wait(reduce ? 0 : 1900, id);
+    while (true) {
+      const p = pickParcel(last); if (!p) return; last = p;
+      layer.innerHTML = ""; layer.setAttribute("opacity", 1); layer.style.transition = "opacity .6s";
+      const fill = el("path", { d: "M" + p.q.map(v => v.join(" ")).join("L") + "Z", fill: "oklch(0.85 0.13 85 / .0)", stroke: "none" }, layer);
+      const edges = el("g", { stroke: "oklch(0.78 0.17 70)", "stroke-width": 3.5, "stroke-linecap": "round" }, layer);
+      const pills = el("g", {}, layer), nodes = el("g", {}, layer);
+      const ret = reticle(layer);
+      p.path.style.transition = "stroke .4s"; p.path.setAttribute("stroke", "oklch(0.85 0.13 85 / .9)"); p.g.style.transition = "opacity .4s"; p.g.setAttribute("opacity", 0);
+      hudArea(0);
+      const vs = [...p.q, p.q[0]];
+      for (let i = 0; i < vs.length; i++) {
+        const from = pos.slice(), to = vs[i];
+        let line = null;
+        if (i > 0) line = el("line", { x1: vs[i - 1][0], y1: vs[i - 1][1], x2: vs[i - 1][0], y2: vs[i - 1][1] }, edges);
+        await tween(i === 0 ? 900 : 750, e => {
+          pos = [from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e];
+          ret.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`); hud(pos);
+          if (line) { line.setAttribute("x2", pos[0]); line.setAttribute("y2", pos[1]); }
+        }, id);
+        if (i > 0) {
+          const a = vs[i - 1], b = vs[i], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+          const len = Math.hypot(b[0] - a[0], b[1] - a[1]) * M_PER_PX;
+          const pg = el("g", { transform: `translate(${mx} ${my})`, opacity: 0 }, pills); pg.style.transition = "opacity .3s";
+          el("rect", { x: -40, y: -14, width: 80, height: 28, rx: 14, fill: "oklch(0.18 0.02 165 / .92)" }, pg);
+          const t = el("text", { y: 5, "text-anchor": "middle", fill: "#fff", "font-size": 14, "font-family": "JetBrains Mono, monospace", "font-weight": 700 }, pg); t.textContent = len.toFixed(2) + " m";
+          requestAnimationFrame(() => pg.setAttribute("opacity", 1));
+        }
+        if (i < vs.length - 1) {
+          const n = el("g", { transform: `translate(${to[0]} ${to[1]}) scale(0)` }, nodes);
+          n.style.transition = "transform .35s cubic-bezier(.34,1.56,.64,1)";
+          el("circle", { r: 13, fill: i === 0 ? "oklch(0.55 0.15 152)" : "oklch(0.7 0.19 48)", stroke: "#fff", "stroke-width": 2.5 }, n);
+          const t = el("text", { y: 5, "text-anchor": "middle", fill: "#fff", "font-size": 14, "font-weight": 700, "font-family": "Be Vietnam Pro, sans-serif" }, n); t.textContent = i + 1;
+          requestAnimationFrame(() => n.setAttribute("transform", `translate(${to[0]} ${to[1]}) scale(1)`));
+        }
+        await wait(160, id);
+      }
+      // khép vùng: tô và đếm diện tích
+      await tween(1100, e => { fill.setAttribute("fill", `oklch(0.85 0.13 85 / ${(.2 * e).toFixed(3)})`); hudArea(p.m2 * e); }, id);
+      const c = p.ce;
+      const big = el("g", { opacity: 0 }, layer); big.style.transition = "opacity .5s";
+      const bt = el("text", { x: c[0], y: c[1] + 6, "text-anchor": "middle", fill: "oklch(0.95 0.06 85)", "font-size": 18, "font-weight": 800, "font-family": "JetBrains Mono, monospace", stroke: "oklch(0.2 0.03 165 / .8)", "stroke-width": 4, "paint-order": "stroke" }, big);
+      bt.textContent = fmt(p.m2, 1) + " m²";
+      requestAnimationFrame(() => big.setAttribute("opacity", 1));
+      await wait(3200, id);
+      layer.setAttribute("opacity", 0); p.path.setAttribute("stroke", "oklch(0.66 0.24 335 / .5)"); p.g.setAttribute("opacity", 1);
+      await wait(700, id);
+    }
+  } catch (e) { /* bị huỷ do resize */ }
+}
+
+let rz; let lastW = 0;
+function rebuild() { const w = hero.clientWidth; if (Math.abs(w - lastW) < 40 && lastW) return; lastW = w; runId++; buildSheet(); }
+addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(rebuild, 250); });
+new IntersectionObserver(es => { heroVisible = es[0].isIntersecting; }).observe(hero);
+
+/* ==== TÍNH NĂNG: danh sách + điện thoại đổi màn ==== */
+const list = $("#featList"), stage = $("#stage"), show = $("#show");
+FEATURES.forEach((f, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "feat rv"; b.setAttribute("role", "tab"); b.id = "ft" + i;
+  b.innerHTML = `<span class="ic"><svg><use href="#${f.ic}"/></svg></span><span><h3>${f.t}</h3><p>${f.d}</p></span><span class="bar"><i></i></span>`;
+  b.addEventListener("click", () => { pick(i); });
+  list.appendChild(b);
+  const im = new Image(); im.src = "Hinh/" + f.img; im.alt = f.t; im.loading = i ? "lazy" : "eager"; stage.appendChild(im);
+});
+let cur = -1, ft;
+const DUR = 6000;
+function pick(i) {
+  cur = i;
+  $$(".feat", list).forEach((b, k) => { b.classList.toggle("on", k === i); b.setAttribute("aria-selected", k === i); const bar = $(".bar i", b); bar.style.animation = "none"; bar.offsetWidth; bar.style.animation = ""; });
+  $$("img", stage).forEach((m, k) => m.classList.toggle("on", k === i));
+  clearTimeout(ft);
+  if (!reduce) ft = setTimeout(next, DUR);
+}
+function next() { if (show.classList.contains("paused")) { ft = setTimeout(next, 800); return; } pick((cur + 1) % FEATURES.length); }
+list.style.setProperty("--dur", DUR + "ms");
+show.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") show.classList.add("paused"); });
+show.addEventListener("pointerleave", () => show.classList.remove("paused"));
+pick(0);
+
+/* ==== THƯ VIỆN ẢNH + LIGHTBOX ==== */
+const rail = $("#rail");
+SHOTS.forEach(([f, cap], i) => {
+  const b = document.createElement("button"); b.type = "button"; b.className = "shot rv";
+  b.innerHTML = `<span class="f"><img src="Hinh/${f}" alt="${cap}" loading="lazy" width="720" height="1490"></span><span>${cap}</span>`;
+  b.addEventListener("click", () => openLb(i)); rail.appendChild(b);
+});
+const scrollBy = d => rail.scrollBy({ left: d * Math.min(rail.clientWidth * .8, 720), behavior: reduce ? "auto" : "smooth" });
+$("#railL").onclick = () => scrollBy(-1); $("#railR").onclick = () => scrollBy(1);
+const lb = $("#lb"), lbImg = $("#lbImg"), lbCap = $("#lbCap"); let li = 0;
+function setLb(i) { li = (i + SHOTS.length) % SHOTS.length; lbImg.src = "Hinh/" + SHOTS[li][0]; lbImg.alt = SHOTS[li][1]; lbCap.textContent = `${li + 1}/${SHOTS.length} · ${SHOTS[li][1]}`; }
+function openLb(i) { setLb(i); lb.showModal(); }
+$(".pv", lb).onclick = () => setLb(li - 1); $(".nx", lb).onclick = () => setLb(li + 1); $(".x", lb).onclick = () => lb.close();
+lb.addEventListener("click", e => { if (e.target === lb || e.target.classList.contains("lb-in") || e.target.tagName === "FIGURE") lb.close(); });
+lb.addEventListener("keydown", e => { if (e.key === "ArrowLeft") setLb(li - 1); if (e.key === "ArrowRight") setLb(li + 1); });
+let sx = null; lb.addEventListener("touchstart", e => sx = e.touches[0].clientX, { passive: true });
+lb.addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) setLb(li + (dx < 0 ? 1 : -1)); sx = null; });
+
+/* ==== VIDEO ==== */
+const vids = $("#vids");
+VIDEOS.forEach(v => {
+  const c = document.createElement("div"); c.className = "vid rv";
+  c.innerHTML = `<div class="box"><img src="${v.poster}" alt="" loading="lazy"><button class="play" type="button" aria-label="Phát video: ${v.title}"><svg><use href="#i-play"/></svg></button></div>
+  <div class="meta"><b>${v.title}</b><a href="${v.url}" target="_blank" rel="noopener">Mở Facebook ↗</a></div>`;
+  $(".play", c).addEventListener("click", () => {
+    const f = document.createElement("iframe");
+    f.src = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(v.url) + "&show_text=false&autoplay=true&width=360&height=640";
+    f.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"; f.allowFullscreen = true; f.title = v.title;
+    const box = $(".box", c); box.innerHTML = ""; box.appendChild(f);
+  });
+  vids.appendChild(c);
+});
+const note = document.createElement("div"); note.className = "vid-note rv";
+note.innerHTML = `<h3>Chưa rõ thao tác nào?</h3><p>Nhắn Zalo cho tác giả, bạn được hướng dẫn đúng việc mình đang làm: mở tệp DGN, sửa ranh, xuất SHP hay kích hoạt key.</p><a class="btn btn-zalo" href="${CFG.zalo}" target="_blank" rel="noopener">Nhắn Zalo 0989 300 018</a>`;
+vids.appendChild(note);
+
+/* ==== khởi động ==== */
+watch();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(rebuild); else rebuild();
+setTimeout(() => { if (!lastW) rebuild(); }, 600);
+
+})();
+</script>
+</body>
+</html>
