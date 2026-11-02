@@ -1,14 +1,14 @@
 {
-  "versionCode": 71,
-  "versionName": "1.7.4",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=71",
+  "versionCode": 72,
+  "versionName": "1.7.5",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=72",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-11-02",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " Tích hợp tính năng báo cáo biến động rừng, điều tra và tuần tra rừng "
+    " Tích hợp tính năng tìm thửa (text) cho dữ liệu *DGN và CAD "
 	
   ]
 }
