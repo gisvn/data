@@ -10,4 +10,5 @@
   "pageUrl": "https://gisvn.github.io/data/datdai/",
   "changelog": [
     "Cập nhập tính năng tính diện tích và cắt thửa cho dữ liệu *DGN, *CAD và *SHP"
+	]
 }
