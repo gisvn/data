@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.7" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.1.8" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.1.7</version>
+    <version>1.1.1.8</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.1.7.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.1.8.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.7.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.1.8.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-11-02T07:54:33Z</create_date>
-    <update_date>2026-11-02T07:54:33Z</update_date>
+    <create_date>2026-11-03T08:52:12Z</create_date>
+    <update_date>2026-11-03T08:52:12Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Cập nhập tính năng tạo vùng đệm cho ranh giới]]></changelog>
-    <sha256>e64c064ee80950611d9da0e4c2b19d792e78104843bb8b1b5285f77202e9af81</sha256>
+    <changelog><![CDATA[Cập nhập tính năng đánh nhãn thửa]]></changelog>
+    <sha256>0a9f77ad861203b17e0eff4d89a77733fa0a42a670942e855d5b94a0f492f872</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
