@@ -1,14 +1,14 @@
 {
-  "versionCode": 73,
-  "versionName": "1.7.6",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=73",
+  "versionCode": 74,
+  "versionName": "1.7.7",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=74",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-11-02",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " Tích hợp tính năng tìm thửa (text) cho dữ liệu *DGN và CAD "
+    " Tích hợp tính năng Quét (scan) tọa độ và chia sẻ hình ảnh thực địa "
 	
   ]
 }
