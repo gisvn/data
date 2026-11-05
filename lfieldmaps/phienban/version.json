@@ -1,14 +1,14 @@
 {
-  "versionCode": 74,
-  "versionName": "1.7.7",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=74",
+  "versionCode": 75,
+  "versionName": "1.7.8",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=75",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-11-02",
+  "releaseDate": "2026-11-05",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " Tích hợp tính năng Quét (scan) tọa độ và chia sẻ hình ảnh thực địa "
+    " Tích hợp tính năng xác định độ đốc và hướng phơi ngoài thực địa"
 	
   ]
 }
