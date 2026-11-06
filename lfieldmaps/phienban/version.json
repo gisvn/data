@@ -1,14 +1,14 @@
 {
-  "versionCode": 78,
-  "versionName": "1.8.1",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=78",
+  "versionCode": 79,
+  "versionName": "1.8.2",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=79",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-11-06",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " Cập nhập tính năng hỗ trợ GNSS RTK bắt trạm cors ổn định và tốt"
+    " Cập nhập tính năng Tra cứu tên loại đất loại rừng theo TT16-2025 của Bộ NN&MT"
 	
   ]
 }
