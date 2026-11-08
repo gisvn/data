@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chuyển đổi tọa độ VN2000 ⇄ WGS84 · UTM</title>
+<meta name="description" content="Chuyển đổi tọa độ VN2000 (34 tỉnh mới, 63 tỉnh cũ) sang WGS84 kinh vĩ độ, UTM và ngược lại. Nhập tay, dán từ Excel hoặc tải file Excel, xem trên ảnh vệ tinh, xuất Excel/KML.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink: oklch(0.255 0.035 165);
+  --ink-2: oklch(0.34 0.04 165);
+  --paper: oklch(0.975 0.007 105);
+  --card: oklch(0.995 0.003 105);
+  --line: oklch(0.895 0.013 130);
+  --line-2: oklch(0.93 0.01 130);
+  --muted: oklch(0.5 0.025 160);
+  --stake: oklch(0.665 0.19 42);
+  --stake-deep: oklch(0.58 0.18 40);
+  --stake-soft: oklch(0.95 0.035 55);
+  --on-stake: oklch(0.99 0.01 60);
+  --ok: oklch(0.56 0.12 155);
+  --warn: oklch(0.62 0.14 75);
+  --warn-soft: oklch(0.96 0.04 85);
+  --err: oklch(0.56 0.2 25);
+  --err-soft: oklch(0.96 0.03 25);
+  --r: 10px;
+  --sans: "Be Vietnam Pro", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh}
+header{background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:16px;padding:10px 18px;min-height:56px}
+.mark{width:30px;height:30px;flex:none}
+header h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+header h1 b{color:var(--stake);font-weight:800}
+header .sub{font-size:12.5px;opacity:.72;margin-top:2px}
+header .spacer{flex:1}
+header .tag{font-family:var(--sans);font-weight:500;font-size:12px;border:1px solid oklch(1 0 0 / .22);padding:4px 9px;border-radius:99px;opacity:.85;white-space:nowrap}
+.main{display:grid;grid-template-columns:410px minmax(0,1fr);min-height:0}
+aside,.stage{min-width:0}
+aside{overflow:auto;border-right:1px solid var(--line);background:var(--paper);padding:16px 16px 28px}
+.sect{margin-bottom:18px}
+.sect-h{display:flex;align-items:baseline;gap:8px;margin:0 0 9px}
+.sect-h h2{margin:0;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+.sect-h .hint{font-size:12.5px;color:var(--muted)}
+/* CRS route */
+.route{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 0}
+.crs{padding:12px 14px 12px 40px;position:relative}
+.crs+.crs{border-top:1px dashed var(--line)}
+.crs .dot{position:absolute;left:15px;top:17px;width:12px;height:12px;border-radius:50%;border:3px solid var(--ink);background:var(--card)}
+.crs.dst .dot{background:var(--stake);border-color:var(--stake)}
+.route::before{content:"";position:absolute;left:20px;top:30px;bottom:30px;width:2px;background:repeating-linear-gradient(var(--ink) 0 6px,transparent 6px 10px);opacity:.35}
+.crs-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.crs-top .role{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:44px}
+.crs-top select{flex:1}
+.crs .row2{display:grid;grid-template-columns:1fr;gap:6px}
+.crs .two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;background:var(--line-2);border-radius:6px;padding:3px 8px;margin-top:7px;color:var(--ink-2)}
+.chip b{font-weight:600;color:var(--ink)}
+.swap{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(45deg);width:34px;height:34px;border-radius:7px;border:0;background:var(--stake);color:var(--on-stake);cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 0 var(--stake-deep);transition:transform .25s cubic-bezier(.3,1.4,.5,1),background .15s;z-index:2}
+.swap svg{transform:rotate(-45deg)}
+.swap:hover{background:var(--stake-deep)}
+.swap.spin{transform:translateY(-50%) rotate(225deg)}
+.crs .crs-top{padding-right:40px}
+select,input[type=text],input[type=number],textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 10px;outline:none;min-height:36px;transition:border-color .15s,box-shadow .15s}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23455' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
+select:focus,input:focus,textarea:focus{border-color:var(--stake);box-shadow:0 0 0 3px oklch(0.665 0.19 42 / .18)}
+label.f{display:block;font-size:12.5px;color:var(--muted);margin:0 0 4px;font-weight:500}
+.mono{font-family:var(--mono)}
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--line-2);border-radius:10px;padding:3px;gap:3px;margin-bottom:10px}
+.tabs button{border:0;background:transparent;border-radius:8px;padding:7px 4px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--muted)}
+.tabs button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px oklch(0 0 0 / .08)}
+.pane{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.pane.on{display:block}
+.grid3{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3 .full{grid-column:1/-1}
+textarea{min-height:150px;font-family:var(--mono);font-size:13px;line-height:1.55;resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 13px;cursor:pointer;font-weight:600;font-size:13.5px;min-height:36px;white-space:nowrap;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{border-color:var(--ink-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary:hover{background:var(--ink-2)}
+.btn.stake{background:var(--stake);border-color:var(--stake);color:var(--on-stake);box-shadow:0 2px 0 var(--stake-deep)}
+.btn.stake:hover{background:var(--stake-deep)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--line-2)}
+.btn.wide{width:100%;margin-top:12px;min-height:42px;font-size:14.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px;flex:none}
+.row-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--stake);background:var(--stake-soft)}
+.drop strong{display:block;font-size:14.5px;margin-bottom:3px}
+.drop span{color:var(--muted);font-size:13px}
+.fileinfo{margin-top:12px;display:none}
+.fileinfo.on{display:block}
+.fname{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:10px;word-break:break-all}
+.fname small{font-weight:400;color:var(--muted)}
+.map-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.preview{margin-top:10px;overflow:auto;border:1px solid var(--line-2);border-radius:8px;max-height:150px}
+.preview table{border-collapse:collapse;font-size:12.5px;font-family:var(--mono);width:100%}
+.preview td,.preview th{padding:4px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap;text-align:left}
+.preview th{background:var(--line-2);font-family:var(--sans);font-weight:600;position:sticky;top:0}
+.preview td.m{background:var(--stake-soft)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
+.note b{color:var(--ink-2)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;user-select:none;margin-top:10px}
+.toggle input{accent-color:var(--stake);width:16px;height:16px}
+.alert{display:none;margin-top:10px;padding:9px 11px;border-radius:9px;font-size:13px;line-height:1.45}
+.alert.on{display:block}
+.alert.warn{background:var(--warn-soft);color:oklch(0.4 0.08 70)}
+.alert.err{background:var(--err-soft);color:var(--err)}
+.alert .btn{margin-top:6px;min-height:30px;padding:4px 10px;font-size:12.5px}
+.params{font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:12px}
+.params code{font-family:var(--mono);font-size:12px;color:var(--ink-2);word-break:break-all}
+/* map side */
+.stage{position:relative;display:grid;grid-template-rows:1fr auto;min-height:0;min-width:0}
+#map{min-height:0;background:oklch(0.3 0.02 160)}
+.nomap{position:absolute;inset:0;display:none;place-items:center;color:var(--paper);text-align:center;padding:30px;font-size:15px}
+.readout{position:absolute;left:12px;bottom:calc(var(--drawer-h, 52px) + 12px);z-index:500;background:oklch(0.22 0.03 165 / .88);backdrop-filter:blur(6px);color:var(--paper);border-radius:10px;padding:8px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.6;pointer-events:none;min-width:250px;transition:opacity .2s}
+.readout .k{color:var(--stake);font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-right:6px}
+.readout .idle{opacity:.6;font-family:var(--sans)}
+.maptools{position:absolute;right:12px;top:58px;z-index:500;display:flex;flex-direction:column;gap:6px}
+.mtool{width:38px;height:38px;border-radius:9px;border:0;background:var(--card);box-shadow:0 1px 4px oklch(0 0 0 / .3);cursor:pointer;display:grid;place-items:center;color:var(--ink)}
+.mtool svg{width:19px;height:19px}
+.mtool.on{background:var(--stake);color:var(--on-stake)}
+.mtool[data-tip]:hover::after{content:attr(data-tip);position:absolute;right:46px;background:var(--ink);color:var(--paper);font-size:12.5px;padding:5px 9px;border-radius:6px;white-space:nowrap;font-family:var(--sans)}
+.mtool{position:relative}
+.picking #map{cursor:crosshair}
+.pickbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:600;background:var(--stake);color:var(--on-stake);padding:7px 14px;border-radius:99px;font-weight:600;font-size:13.5px;display:none;box-shadow:0 2px 8px oklch(0 0 0 / .3)}
+.picking .pickbar{display:block}
+.picking .area{top:56px}
+/* markers */
+.pt{position:relative}
+.pt i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;background:var(--stake);border:2.5px solid white;box-shadow:0 0 0 1.5px oklch(0.2 0.03 165 / .6),0 2px 5px oklch(0 0 0 / .4)}
+.pt span{position:absolute;left:10px;top:-11px;white-space:nowrap;font:600 12.5px/1 var(--sans);color:white;text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;padding:2px 0}
+.pt.sel i{background:white;border-color:var(--stake);transform:scale(1.35)}
+.pt.map i{background:oklch(0.75 0.15 200)}
+.leaflet-popup-content{font-family:var(--sans);font-size:13px;margin:12px 14px;line-height:1.5}
+.pop h4{margin:0 0 6px;font-size:14.5px}
+.pop table{border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+.pop td{padding:1px 8px 1px 0;vertical-align:top}
+.pop td:first-child{font-family:var(--sans);color:var(--muted);font-size:12px}
+.pop a{color:var(--stake-deep);font-weight:600}
+/* drawer */
+.drawer{background:var(--card);border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:0;max-height:52px;transition:max-height .3s cubic-bezier(.3,.9,.4,1)}
+.drawer.open{max-height:42vh}
+.dhead{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 16px;min-height:52px;flex:none;overflow-x:auto}
+.dhead .meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.dhead .ttl{font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:8px;cursor:pointer;border:0;background:none;padding:4px 0}
+.dhead .ttl svg{width:16px;height:16px;transition:transform .25s}
+.drawer.open .dhead .ttl svg{transform:rotate(180deg)}
+.count{font-family:var(--mono);background:var(--ink);color:var(--paper);border-radius:99px;padding:1px 9px;font-size:12.5px}
+.dhead .meta{font-size:12.5px;color:var(--muted)}
+.dhead .sp{flex:1}
+.area{position:absolute;top:12px;left:56px;z-index:500;font-family:var(--mono);font-size:13px;font-weight:500;background:var(--stake);color:var(--on-stake);padding:7px 12px;border-radius:9px;display:none;box-shadow:0 2px 8px oklch(0 0 0 / .3);max-width:calc(100% - 120px)}
+.area.on{display:inline-block}
+.tbl-wrap{overflow:auto;flex:1;border-top:1px solid var(--line-2)}
+table.res{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+table.res th{position:sticky;top:0;background:var(--paper);text-align:left;font-weight:600;font-size:12px;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:1}
+table.res th.grp-dst{color:var(--stake-deep)}
+table.res td{padding:6px 10px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+table.res td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+table.res td.d{background:oklch(0.97 0.02 55 / .55)}
+table.res td.arrow{color:var(--stake);padding:0 2px;text-align:center}
+table.res tr{cursor:pointer}
+table.res tbody tr:hover td{background:var(--line-2)}
+table.res tr.sel td{background:var(--stake-soft)}
+table.res tr.bad td{color:var(--err)}
+.st{font-size:12px;border-radius:5px;padding:1px 7px;display:inline-block}
+.st.warn{background:var(--warn-soft);color:oklch(0.42 0.09 70)}
+.st.err{background:var(--err-soft);color:var(--err)}
+.del{border:0;background:none;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:5px;font-size:15px;line-height:1}
+.del:hover{background:var(--err-soft);color:var(--err)}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:13.5px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,30px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-weight:500;opacity:0;transition:all .3s cubic-bezier(.3,1.3,.5,1);z-index:2000;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width: 900px){
+  .app{height:auto;min-height:100vh}
+  .main{grid-template-columns:minmax(0,1fr)}
+  header .sub{display:none}
+  header h1{font-size:15.5px}
+  aside{border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  .stage{height:88vh}
+  header .tag{display:none}
+  .drawer.open{max-height:55%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <circle cx="16" cy="16" r="13" stroke="oklch(0.975 0.007 105)" stroke-width="2" opacity=".35"/>
+    <path d="M16 1v8M16 23v8M1 16h8M23 16h8" stroke="oklch(0.975 0.007 105)" stroke-width="2" stroke-linecap="round"/>
+    <rect x="11.5" y="11.5" width="9" height="9" rx="1.5" transform="rotate(45 16 16)" fill="oklch(0.665 0.19 42)"/>
+  </svg>
+  <div>
+    <h1>Chuyển đổi tọa độ <b>VN2000</b> ⇄ WGS84 · UTM</h1>
+    <div class="sub">34 tỉnh mới (TT 23 &amp; 24/2025) · 63 tỉnh cũ (TT 973/2001) · xem trực tiếp trên ảnh vệ tinh</div>
+  </div>
+  <div class="spacer"></div>
+  <span class="tag">7 tham số · TM Krüger · sai số &lt; 1 mm</span>
+</header>
+
+<div class="main">
+<aside>
+  <section class="sect">
+    <div class="sect-h"><h2>Hệ tọa độ</h2><span class="hint">nguồn → đích</span></div>
+    <div class="route">
+      <div class="crs src" id="crs-src"></div>
+      <button class="swap" id="swapBtn" title="Đảo chiều chuyển đổi" aria-label="Đảo chiều chuyển đổi">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>
+      </button>
+      <div class="crs dst" id="crs-dst"></div>
+    </div>
+  </section>
+
+  <section class="sect">
+    <div class="sect-h"><h2>Dữ liệu đầu vào</h2></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="one" aria-selected="true">Một điểm</button>
+      <button role="tab" data-tab="many" aria-selected="false">Dán nhiều</button>
+      <button role="tab" data-tab="xls" aria-selected="false">File Excel</button>
+    </div>
+
+    <div class="pane on" id="pane-one">
+      <div class="grid3">
+        <div class="full"><label class="f" for="oneName">Tên điểm</label><input type="text" id="oneName" placeholder="VD: M1"></div>
+        <div><label class="f" for="oneA" id="oneALbl">X</label><input type="text" id="oneA" class="mono" inputmode="decimal"></div>
+        <div><label class="f" for="oneB" id="oneBLbl">Y</label><input type="text" id="oneB" class="mono" inputmode="decimal"></div>
+      </div>
+      <div class="note" id="oneHint"></div>
+      <button class="btn stake wide" id="oneGo" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Thêm &amp; chuyển đổi</button>
+      <div class="alert err" id="oneErr"></div>
+    </div>
+
+    <div class="pane" id="pane-many">
+      <label class="f" for="manyTxt">Mỗi dòng một điểm: <b>Tên &nbsp;Tọa độ 1 &nbsp;Tọa độ 2 &nbsp;[H]</b> — dán thẳng từ Excel được</label>
+      <textarea id="manyTxt" spellcheck="false"></textarea>
+      <div class="note">Phân cách bằng Tab, khoảng trắng, dấu phẩy hoặc chấm phẩy. Chấp nhận dấu phẩy thập phân (2326149,465) và độ-phút-giây (105°51'08.0").</div>
+      <button class="btn stake wide" id="manyGo" type="button">Chuyển đổi danh sách</button>
+      <div class="alert err" id="manyErr"></div>
+    </div>
+
+    <div class="pane" id="pane-xls">
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Chọn file Excel">
+        <strong>Kéo thả file vào đây</strong>
+        <span>hoặc bấm để chọn · .xlsx · .xls · .csv</span>
+        <input type="file" id="fileIn" accept=".xlsx,.xls,.csv,.ods" hidden>
+      </div>
+      <div class="row-actions">
+        <button class="btn" id="tplBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Tải file Excel mẫu</button>
+      </div>
+      <div class="fileinfo" id="fileInfo">
+        <div class="fname"><span id="fName"></span><small id="fRows"></small></div>
+        <label class="f" for="sheetSel">Sheet</label>
+        <select id="sheetSel"></select>
+        <div class="map-cols">
+          <div><label class="f" for="colName">Tên / STT</label><select id="colName"></select></div>
+          <div><label class="f" for="colH">Độ cao H (tùy chọn)</label><select id="colH"></select></div>
+          <div><label class="f" for="colA" id="colALbl">X</label><select id="colA"></select></div>
+          <div><label class="f" for="colB" id="colBLbl">Y</label><select id="colB"></select></div>
+        </div>
+        <div class="alert warn" id="xlsHint"></div>
+        <div class="preview" id="preview"></div>
+        <button class="btn stake wide" id="xlsGo" type="button">Chuyển đổi file</button>
+      </div>
+      <div class="alert err" id="xlsErr"></div>
+    </div>
+
+    <label class="toggle"><input type="checkbox" id="autoSwap" checked> Tự nhận biết khi nhập ngược thứ tự X↔Y / Vĩ↔Kinh</label>
+  </section>
+
+  <section class="sect params">
+    <div><b>Tham số VN2000 → WGS84</b> (TT 973/2001/TT-TCĐC, position vector):</div>
+    <code>ΔX −191.90441429 · ΔY −39.30318279 · ΔZ −111.45032835 m · ωX −0.00928836″ · ωY +0.01975479″ · ωZ −0.00427372″ · k +0.252906278 ppm</code>
+    <div style="margin-top:6px">Ellipsoid WGS84 · TM múi 3° k₀ 0,9999 · múi 6° k₀ 0,9996 · E₀ 500 000 m. Bản đồ địa chính lập trước 01/7/2025 giữ nguyên KTT cũ (TT 23/2025, Đ.27).</div>
+  </section>
+</aside>
+
+<div class="stage" id="stage">
+  <div id="map"></div>
+  <div class="nomap" id="nomap">Không tải được thư viện bản đồ. Kiểm tra kết nối Internet rồi tải lại trang.</div>
+  <div class="pickbar">Bấm lên bản đồ để lấy điểm · Esc để thoát</div>
+  <div class="maptools">
+    <button class="mtool" id="pickBtn" data-tip="Lấy điểm trên bản đồ" aria-label="Lấy điểm trên bản đồ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></button>
+    <button class="mtool" id="gpsBtn" data-tip="Vị trí của tôi" aria-label="Vị trí của tôi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg></button>
+    <button class="mtool" id="polyBtn" data-tip="Nối điểm thành vùng · tính diện tích" aria-label="Nối điểm thành vùng">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 7l9-3 6 8-5 8-10-3z"/><circle cx="5" cy="7" r="1.6" fill="currentColor"/><circle cx="14" cy="4" r="1.6" fill="currentColor"/><circle cx="20" cy="12" r="1.6" fill="currentColor"/><circle cx="15" cy="20" r="1.6" fill="currentColor"/><circle cx="5" cy="17" r="1.6" fill="currentColor"/></svg></button>
+    <button class="mtool" id="fitBtn" data-tip="Thu phóng vừa các điểm" aria-label="Thu phóng vừa các điểm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  </div>
+  <span class="area" id="area"></span>
+  <div class="readout" id="readout"><span class="idle">Di chuột trên bản đồ để đọc tọa độ</span></div>
+
+  <div class="drawer" id="drawer">
+    <div class="dhead">
+      <button class="ttl" id="drawerToggle" type="button">Kết quả <span class="count" id="count">0</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 15 6-6 6 6"/></svg></button>
+      <span class="meta" id="dmeta"></span>
+      <span class="sp"></span>
+      <label class="meta" style="display:flex;align-items:center;gap:6px;overflow:visible">Số lẻ
+        <select id="decSel" style="width:auto;min-height:30px;padding:3px 26px 3px 8px">
+          <option value="2">0,01 m</option><option value="3" selected>0,001 m</option><option value="4">0,0001 m</option>
+        </select></label>
+      <button class="btn" id="xlsxOut" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Xuất Excel</button>
+      <button class="btn ghost" id="kmlOut" type="button" disabled>KML</button>
+      <button class="btn ghost" id="clearBtn" type="button" disabled>Xóa hết</button>
+    </div>
+    <div class="tbl-wrap" id="tblWrap"><div class="empty">Chưa có điểm nào. Nhập tọa độ bên trái hoặc bấm ⌖ để lấy điểm trên bản đồ.</div></div>
+  </div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ===== GEODESY CORE (WGS84 ellipsoid, VN2000 7-param, Krüger TM order 6) ===== */
+const Geo = (() => {
+  const a = 6378137.0, f = 1 / 298.257223563, e2 = f * (2 - f), e = Math.sqrt(e2);
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI, AS2R = Math.PI / 648000;
+  // VN2000 -> WGS84, Position Vector (proj4 +towgs84), TT 973/2001/TT-TCĐC
+  const TOWGS = { dx: -191.90441429, dy: -39.30318279, dz: -111.45032835,
+                  rx: -0.00928836, ry: 0.01975479, rz: -0.00427372, ds: 0.252906278 };
+  const n = f / (2 - f), n2 = n*n, n3 = n2*n, n4 = n3*n, n5 = n4*n, n6 = n5*n;
+  const A = a / (1 + n) * (1 + n2/4 + n4/64 + n6/256);
+  const alpha = [0,
+    n/2 - 2*n2/3 + 5*n3/16 + 41*n4/180 - 127*n5/288 + 7891*n6/37800,
+    13*n2/48 - 3*n3/5 + 557*n4/1440 + 281*n5/630 - 1983433*n6/1935360,
+    61*n3/240 - 103*n4/140 + 15061*n5/26880 + 167603*n6/181440,
+    49561*n4/161280 - 179*n5/168 + 6601661*n6/7257600,
+    34729*n5/80640 - 3418889*n6/1995840,
+    212378941*n6/319334400];
+  const beta = [0,
+    n/2 - 2*n2/3 + 37*n3/96 - n4/360 - 81*n5/512 + 96199*n6/604800,
+    n2/48 + n3/15 - 437*n4/1440 + 46*n5/105 - 1118711*n6/3870720,
+    17*n3/480 - 37*n4/840 - 209*n5/4480 + 5569*n6/90720,
+    4397*n4/161280 - 11*n5/504 - 830251*n6/7257600,
+    4583*n5/161280 - 108847*n6/3991680,
+    20648693*n6/638668800];
+
+  function tmForward(latDeg, lonDeg, lon0Deg, k0, FE, FN) {
+    const phi = latDeg * D2R, lam = (lonDeg - lon0Deg) * D2R;
+    const tau = Math.tan(phi);
+    const sigma = Math.sinh(e * Math.atanh(e * tau / Math.sqrt(1 + tau*tau)));
+    const taup = tau * Math.sqrt(1 + sigma*sigma) - sigma * Math.sqrt(1 + tau*tau);
+    const xip = Math.atan2(taup, Math.cos(lam));
+    const etap = Math.asinh(Math.sin(lam) / Math.sqrt(taup*taup + Math.cos(lam)**2));
+    let xi = xip, eta = etap;
+    for (let j = 1; j <= 6; j++) {
+      xi += alpha[j] * Math.sin(2*j*xip) * Math.cosh(2*j*etap);
+      eta += alpha[j] * Math.cos(2*j*xip) * Math.sinh(2*j*etap);
+    }
+    return { E: FE + k0 * A * eta, N: FN + k0 * A * xi };
+  }
+  function tmInverse(E, N, lon0Deg, k0, FE, FN) {
+    const xi = (N - FN) / (k0 * A), eta = (E - FE) / (k0 * A);
+    let xip = xi, etap = eta;
+    for (let j = 1; j <= 6; j++) {
+      xip -= beta[j] * Math.sin(2*j*xi) * Math.cosh(2*j*eta);
+      etap -= beta[j] * Math.cos(2*j*xi) * Math.sinh(2*j*eta);
+    }
+    const sh = Math.sinh(etap), sx = Math.sin(xip), cx = Math.cos(xip);
+    const taup = sx / Math.sqrt(sh*sh + cx*cx);
+    let tau = taup;
+    for (let i = 0; i < 20; i++) {
+      const s = Math.sinh(e * Math.atanh(e * tau / Math.sqrt(1 + tau*tau)));
+      const ti = tau * Math.sqrt(1 + s*s) - s * Math.sqrt(1 + tau*tau);
+      const d = (taup - ti) / Math.sqrt(1 + ti*ti) * (1 + (1 - e2) * tau*tau) / ((1 - e2) * Math.sqrt(1 + tau*tau));
+      tau += d;
+      if (Math.abs(d) < 1e-14) break;
+    }
+    return { lat: Math.atan(tau) * R2D, lon: lon0Deg + Math.atan2(sh, cx) * R2D };
+  }
+  function toECEF(lat, lon, h) {
+    const p = lat*D2R, l = lon*D2R, sp = Math.sin(p);
+    const Nn = a / Math.sqrt(1 - e2*sp*sp);
+    return [(Nn + h) * Math.cos(p) * Math.cos(l), (Nn + h) * Math.cos(p) * Math.sin(l), (Nn*(1 - e2) + h) * sp];
+  }
+  function fromECEF(X, Y, Z) {
+    const lon = Math.atan2(Y, X), p = Math.hypot(X, Y);
+    let lat = Math.atan2(Z, p * (1 - e2)), h = 0;
+    for (let i = 0; i < 10; i++) {
+      const sp = Math.sin(lat), Nn = a / Math.sqrt(1 - e2*sp*sp);
+      h = p / Math.cos(lat) - Nn;
+      const nl = Math.atan2(Z, p * (1 - e2 * Nn / (Nn + h)));
+      if (Math.abs(nl - lat) < 1e-13) { lat = nl; break; }
+      lat = nl;
+    }
+    return { lat: lat*R2D, lon: lon*R2D, h };
+  }
+  function helmert([X, Y, Z], inv) {
+    const t = TOWGS, rx = t.rx*AS2R, ry = t.ry*AS2R, rz = t.rz*AS2R, s = t.ds*1e-6;
+    if (!inv) return [t.dx + (1+s)*(X - rz*Y + ry*Z), t.dy + (1+s)*(rz*X + Y - rx*Z), t.dz + (1+s)*(-ry*X + rx*Y + Z)];
+    const x = (X - t.dx)/(1+s), y = (Y - t.dy)/(1+s), z = (Z - t.dz)/(1+s);
+    return [x + rz*y - ry*z, -rz*x + y + rx*z, ry*x - rx*y + z]; // R^T
+  }
+  const vnToWgs = (lat, lon, h=0) => fromECEF(...helmert(toECEF(lat, lon, h), false));
+  const wgsToVn = (lat, lon, h=0) => fromECEF(...helmert(toECEF(lat, lon, h), true));
+  const utmZone = lon => Math.floor((lon + 180) / 6) + 1;
+
+  /* crs: {kind:'wgs84'|'vn2000geo'|'utm'|'vn2000tm', lon0, k0, zone}
+     input/output object: geographic {lat, lon, h}; projected {X (north), Y (east), h} */
+  function toWGS(crs, p) {
+    const h = p.h || 0;
+    switch (crs.kind) {
+      case 'wgs84': return { lat: p.lat, lon: p.lon, h };
+      case 'vn2000geo': return vnToWgs(p.lat, p.lon, h);
+      case 'utm': { const g = tmInverse(p.Y, p.X, crs.zone*6 - 183, 0.9996, 500000, 0); return { lat: g.lat, lon: g.lon, h }; }
+      case 'vn2000tm': { const g = tmInverse(p.Y, p.X, crs.lon0, crs.k0, 500000, 0); return vnToWgs(g.lat, g.lon, h); }
+    }
+  }
+  function fromWGS(crs, w) {
+    switch (crs.kind) {
+      case 'wgs84': return { lat: w.lat, lon: w.lon, h: w.h };
+      case 'vn2000geo': return wgsToVn(w.lat, w.lon, w.h);
+      case 'utm': { const z = crs.zone || utmZone(w.lon); const r = tmForward(w.lat, w.lon, z*6 - 183, 0.9996, 500000, 0); return { X: r.N, Y: r.E, h: w.h, zone: z }; }
+      case 'vn2000tm': { const g = wgsToVn(w.lat, w.lon, w.h); const r = tmForward(g.lat, g.lon, crs.lon0, crs.k0, 500000, 0); return { X: r.N, Y: r.E, h: g.h }; }
+    }
+  }
+  return { tmForward, tmInverse, vnToWgs, wgsToVn, toWGS, fromWGS, utmZone, TOWGS };
+})();
+
+
+/* ===== DATA: KINH TUYẾN TRỤC ===== */
+const KTT = {
+  tt23: { label: '34 tỉnh mới · BĐ địa chính (TT 23/2025)', items: [
+    ['An Giang', "104°30'", 'KV Kiên Giang cũ'], ['An Giang', "104°45'", 'KV An Giang cũ'],
+    ['Bắc Ninh', "105°30'", 'KV Bắc Ninh cũ'], ['Bắc Ninh', "107°00'", 'KV Bắc Giang cũ'],
+    ['Cà Mau', "104°30'", 'KV Cà Mau cũ'], ['Cà Mau', "105°00'", 'KV Bạc Liêu cũ'],
+    ['Cao Bằng', "105°45'"], ['Đắk Lắk', "108°30'"], ['Điện Biên', "103°00'"],
+    ['Đồng Nai', "106°15'", 'KV Bình Phước cũ'], ['Đồng Nai', "107°45'", 'KV Đồng Nai cũ'],
+    ['Đồng Tháp', "105°00'", 'KV Đồng Tháp cũ'], ['Đồng Tháp', "105°45'", 'KV Tiền Giang cũ'],
+    ['Gia Lai', "108°15'", 'KV Bình Định cũ'], ['Gia Lai', "108°30'", 'KV Gia Lai cũ'],
+    ['Hà Tĩnh', "105°30'"], ['Hưng Yên', "105°30'"], ['Khánh Hòa', "108°15'"], ['Lai Châu', "103°00'"],
+    ['Lạng Sơn', "107°15'"], ['Lào Cai', "104°45'"],
+    ['Lâm Đồng', "107°45'", 'KV Lâm Đồng cũ'], ['Lâm Đồng', "108°30'", 'KV Đắk Nông, Bình Thuận cũ'],
+    ['Nghệ An', "104°45'"],
+    ['Ninh Bình', "105°00'", 'KV Ninh Bình, Hà Nam cũ'], ['Ninh Bình', "105°30'", 'KV Nam Định cũ'],
+    ['Phú Thọ', "104°45'", 'KV Phú Thọ cũ'], ['Phú Thọ', "105°00'", 'KV Vĩnh Phúc cũ'], ['Phú Thọ', "106°00'", 'KV Hòa Bình cũ'],
+    ['Quảng Ngãi', "107°30'", 'KV Kon Tum cũ'], ['Quảng Ngãi', "108°00'", 'KV Quảng Ngãi cũ'],
+    ['Quảng Ninh', "107°45'"],
+    ['Quảng Trị', "106°00'", 'KV Quảng Bình cũ'], ['Quảng Trị', "106°15'", 'KV Quảng Trị cũ'],
+    ['Sơn La', "104°00'"],
+    ['Tây Ninh', "105°30'", 'KV Tây Ninh cũ'], ['Tây Ninh', "105°45'", 'KV Long An cũ'],
+    ['Thái Nguyên', "106°30'"], ['Thanh Hóa', "105°00'"],
+    ['TP. Cần Thơ', "105°00'", 'KV Cần Thơ, Hậu Giang cũ'], ['TP. Cần Thơ', "105°30'", 'KV Sóc Trăng cũ'],
+    ['TP. Đà Nẵng', "107°45'"], ['TP. Hà Nội', "105°00'"],
+    ['TP. Hải Phòng', "105°30'", 'KV Hải Dương cũ'], ['TP. Hải Phòng', "105°45'", 'KV Hải Phòng cũ'],
+    ['TP. Hồ Chí Minh', "105°45'", 'KV TP.HCM, Bình Dương cũ'], ['TP. Hồ Chí Minh', "107°45'", 'KV Bà Rịa – Vũng Tàu cũ'],
+    ['TP. Huế', "107°00'"],
+    ['Tuyên Quang', "105°30'", 'KV Hà Giang cũ'], ['Tuyên Quang', "106°00'", 'KV Tuyên Quang cũ'],
+    ['Vĩnh Long', "105°30'", 'KV Vĩnh Long, Trà Vinh cũ'], ['Vĩnh Long', "105°45'", 'KV Bến Tre cũ'] ] },
+  tt24: { label: '34 tỉnh mới · BĐ hành chính (TT 24/2025)', items: [
+    ['An Giang', "104°45'"], ['Bắc Ninh', "107°00'"], ['Cà Mau', "104°30'"], ['Cao Bằng', "105°45'"], ['Đắk Lắk', "108°30'"],
+    ['Điện Biên', "103°00'"], ['Đồng Nai', "107°45'"], ['Đồng Tháp', "105°00'"], ['Gia Lai', "108°15'"], ['Hà Tĩnh', "105°30'"],
+    ['Hưng Yên', "105°30'"], ['Khánh Hòa', "108°15'"], ['Lai Châu', "104°45'"], ['Lạng Sơn', "107°15'"], ['Lào Cai', "104°45'"],
+    ['Lâm Đồng', "107°45'"], ['Nghệ An', "104°45'"], ['Ninh Bình', "105°00'"], ['Phú Thọ', "104°45'"], ['Quảng Ngãi', "108°00'"],
+    ['Quảng Ninh', "107°45'"], ['Quảng Trị', "106°00'"], ['Sơn La', "104°00'"], ['Tây Ninh', "105°45'"], ['Thái Nguyên', "106°30'"],
+    ['Thanh Hóa', "105°00'"], ['TP. Cần Thơ', "105°00'"], ['TP. Đà Nẵng', "107°45'"], ['TP. Hà Nội', "105°00'"], ['TP. Hải Phòng', "105°45'"],
+    ['TP. Hồ Chí Minh', "105°45'"], ['TP. Huế', "107°00'"], ['Tuyên Quang', "106°00'"], ['Vĩnh Long', "105°30'"] ] },
+  tt973: { label: '63 tỉnh cũ (TT 973/2001)', items: [
+    ['An Giang', "104°45'"], ['Bà Rịa – Vũng Tàu', "107°45'"], ['Bạc Liêu', "105°00'"], ['Bắc Giang', "107°00'"], ['Bắc Kạn', "106°30'"],
+    ['Bắc Ninh', "105°30'"], ['Bến Tre', "105°45'"], ['Bình Dương', "105°45'"], ['Bình Định', "108°15'"], ['Bình Phước', "106°15'"],
+    ['Bình Thuận', "108°30'"], ['Cà Mau', "104°30'"], ['Cao Bằng', "105°45'"], ['Cần Thơ', "105°00'"], ['Đà Nẵng', "107°45'"],
+    ['Đắk Lắk', "108°30'"], ['Đắk Nông', "108°30'"], ['Điện Biên', "103°00'"], ['Đồng Nai', "107°45'"], ['Đồng Tháp', "105°00'"],
+    ['Gia Lai', "108°30'"], ['Hà Giang', "105°30'"], ['Hà Nam', "105°00'"], ['Hà Nội', "105°00'"], ['Hà Tĩnh', "105°30'"],
+    ['Hải Dương', "105°30'"], ['Hải Phòng', "105°45'"], ['Hậu Giang', "105°00'"], ['Hòa Bình', "106°00'"], ['Hưng Yên', "105°30'"],
+    ['Khánh Hòa', "108°15'"], ['Kiên Giang', "104°30'"], ['Kon Tum', "107°30'"], ['Lai Châu', "103°00'"], ['Lâm Đồng', "107°45'"],
+    ['Lạng Sơn', "107°15'"], ['Lào Cai', "104°45'"], ['Long An', "105°45'"], ['Nam Định', "105°30'"], ['Nghệ An', "104°45'"],
+    ['Ninh Bình', "105°00'"], ['Ninh Thuận', "108°15'"], ['Phú Thọ', "104°45'"], ['Phú Yên', "108°30'"], ['Quảng Bình', "106°00'"],
+    ['Quảng Nam', "107°45'"], ['Quảng Ngãi', "108°00'"], ['Quảng Ninh', "107°45'"], ['Quảng Trị', "106°15'"], ['Sóc Trăng', "105°30'"],
+    ['Sơn La', "104°00'"], ['Tây Ninh', "105°30'"], ['Thái Bình', "105°30'"], ['Thái Nguyên', "106°30'"], ['Thanh Hóa', "105°00'"],
+    ['Thừa Thiên Huế', "107°00'"], ['Tiền Giang', "105°45'"], ['TP. Hồ Chí Minh', "105°45'"], ['Trà Vinh', "105°30'"], ['Tuyên Quang', "106°00'"],
+    ['Vĩnh Long', "105°30'"], ['Vĩnh Phúc', "105°00'"], ['Yên Bái', "104°45'"] ] },
+  z6: { label: 'Múi 6° (k₀ 0,9996)', items: [['Múi 47', "99°00'", 'KTT 99°'], ['Múi 48', "105°00'", 'KTT 105°'], ['Múi 49', "111°00'", 'KTT 111°']] },
+  custom: { label: 'Tự nhập KTT / k₀', items: [] }
+};
+const KINDS = { vn2000tm: 'VN2000 · tọa độ phẳng X, Y', wgs84: 'WGS84 · Vĩ độ, Kinh độ', utm: 'UTM · WGS84 (N, E)', vn2000geo: 'VN2000 · Vĩ độ, Kinh độ' };
+
+/* ===== HELPERS ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function parseNum(v) {
+  if (typeof v === 'number') return v;
+  if (v == null) return NaN;
+  let s = String(v).trim().replace(/\s+/g, '').replace(/^\+/, '');
+  if (!s) return NaN;
+  const hasDot = s.includes('.'), hasCom = s.includes(',');
+  if (hasDot && hasCom) {
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.'); else s = s.replace(/,/g, '');
+  } else if (hasCom) { s = (s.match(/,/g).length > 1) ? s.replace(/,/g, '') : s.replace(',', '.'); }
+  else if (hasDot && s.match(/\./g).length > 1) s = s.replace(/\./g, '');
+  if (!/^-?\d*\.?\d+(e[-+]?\d+)?$/i.test(s)) return NaN;
+  return Number(s);
+}
+function parseAngle(v) {
+  if (typeof v === 'number') return v;
+  const s = String(v ?? '').trim();
+  if (!s) return NaN;
+  if (/[°º'′’"″dDhHmMsS:]/.test(s) || /^-?\d+(?:[.,]\d+)?\s+\d+(?:[.,]\d+)?(\s+\d+(?:[.,]\d+)?)?\s*[NSEWnsew]?$/.test(s)) {
+    const nums = s.match(/\d+(?:[.,]\d+)?/g);
+    if (!nums) return NaN;
+    const [d, m = 0, sec = 0] = nums.map(x => Number(x.replace(',', '.')));
+    if (m >= 60 || sec >= 60) return NaN;
+    const neg = /^\s*-/.test(s) || /[SWsw]\s*$/.test(s);
+    const val = d + m / 60 + sec / 3600;
+    return neg ? -val : val;
+  }
+  return parseNum(s);
+}
+const dmsToDeg = s => { const p = s.match(/(\d+)°(\d+)'/); return +p[1] + p[2] / 60; };
+function fmtDMS(deg, secDec = 4) {
+  const sg = deg < 0 ? '-' : ''; let a = Math.abs(deg);
+  let d = Math.floor(a), m = Math.floor((a - d) * 60), s = ((a - d) * 60 - m) * 60;
+  s = +s.toFixed(secDec); if (s >= 60) { s -= 60; m++; } if (m >= 60) { m -= 60; d++; }
+  return `${sg}${d}°${String(m).padStart(2, '0')}'${s.toFixed(secDec).padStart(secDec + 3, '0')}"`;
+}
+const fmtKTT = deg => { const d = Math.floor(deg + 1e-9), m = Math.round((deg - d) * 60 * 1e4) / 1e4; return `${d}°${String(m).padStart(2, '0')}'`; };
+let toastT; function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+
+/* ===== CRS STATE ===== */
+const defaults = {
+  src: { kind: 'vn2000tm', set: 'tt23', idx: KTT.tt23.items.findIndex(i => i[0] === 'TP. Hà Nội'), lon0: "105°00'", k0: '0.9999', zone: '48', fmt: 'dd' },
+  dst: { kind: 'wgs84', set: 'tt23', idx: KTT.tt23.items.findIndex(i => i[0] === 'TP. Hà Nội'), lon0: "105°00'", k0: '0.9999', zone: 'auto', fmt: 'dd' }
+};
+let S;
+try { S = JSON.parse(localStorage.getItem('vn2000conv.v1')) || null; } catch (e) { S = null; }
+if (!S || !S.src || !S.dst) S = JSON.parse(JSON.stringify(defaults));
+const save = () => { try { localStorage.setItem('vn2000conv.v1', JSON.stringify({ src: S.src, dst: S.dst })); } catch (e) {} };
+
+function resolve(c) {
+  if (c.kind === 'vn2000tm') {
+    if (c.set === 'custom') return { kind: 'vn2000tm', lon0: parseAngle(c.lon0), k0: parseNum(c.k0) || 0.9999 };
+    const it = KTT[c.set].items[c.idx] || KTT[c.set].items[0];
+    return { kind: 'vn2000tm', lon0: dmsToDeg(it[1]), k0: c.set === 'z6' ? 0.9996 : 0.9999, place: it };
+  }
+  if (c.kind === 'utm') return { kind: 'utm', zone: c.zone === 'auto' ? 0 : +c.zone };
+  return { kind: c.kind };
+}
+const isProj = c => c.kind === 'vn2000tm' || c.kind === 'utm';
+function crsLabel(c, short) {
+  const r = resolve(c);
+  if (r.kind === 'vn2000tm') {
+    const z = c.set === 'z6' ? '6°' : '3°';
+    if (short) return `VN2000 KTT ${fmtKTT(r.lon0)}`;
+    const pl = r.place ? `${r.place[0]}${r.place[2] ? ' (' + r.place[2] + ')' : ''} · ` : '';
+    return `VN2000 · ${pl}KTT ${fmtKTT(r.lon0)} · múi ${z} · k₀ ${r.k0}`;
+  }
+  if (r.kind === 'utm') return r.zone ? `UTM WGS84 múi ${r.zone}N` : 'UTM WGS84 (tự chọn múi)';
+  return r.kind === 'wgs84' ? 'WGS84 (độ)' : 'VN2000 (độ)';
+}
+function axisNames(c) {
+  if (c.kind === 'vn2000tm') return ['X (Bắc)', 'Y (Đông)'];
+  if (c.kind === 'utm') return ['N (Northing)', 'E (Easting)'];
+  return ['Vĩ độ (Lat)', 'Kinh độ (Lon)'];
+}
+
+/* ===== CRS CARD UI ===== */
+function renderCRS(role) {
+  const c = S[role], box = $('crs-' + role);
+  const kindOpts = Object.entries(KINDS).map(([k, v]) => `<option value="${k}" ${c.kind === k ? 'selected' : ''}>${v}</option>`).join('');
+  let body = '';
+  if (c.kind === 'vn2000tm') {
+    const setOpts = Object.entries(KTT).map(([k, v]) => `<option value="${k}" ${c.set === k ? 'selected' : ''}>${v.label}</option>`).join('');
+    body += `<div class="row2"><select data-k="set" aria-label="Bộ kinh tuyến trục">${setOpts}</select>`;
+    if (c.set === 'custom') {
+      body += `<div class="two"><div><label class="f">Kinh tuyến trục</label><input type="text" class="mono" data-k="lon0" value="${esc(c.lon0)}" placeholder="105°30' hoặc 105.5"></div>
+               <div><label class="f">Hệ số k₀</label><input type="text" class="mono" data-k="k0" value="${esc(c.k0)}"></div></div>`;
+    } else {
+      if (c.idx >= KTT[c.set].items.length) c.idx = 0;
+      const opts = KTT[c.set].items.map((it, i) => `<option value="${i}" ${+c.idx === i ? 'selected' : ''}>${it[0]} · ${it[1]}${it[2] ? ' — ' + it[2] : ''}</option>`).join('');
+      body += `<select data-k="idx" aria-label="Tỉnh / thành phố">${opts}</select>`;
+    }
+    body += `</div>`;
+  } else if (c.kind === 'utm') {
+    const zs = (role === 'dst' ? [['auto', 'Tự chọn múi theo kinh độ']] : []).concat([['47', 'Múi 47N (96°–102°E)'], ['48', 'Múi 48N (102°–108°E)'], ['49', 'Múi 49N (108°–114°E)']]);
+    if (role === 'src' && c.zone === 'auto') c.zone = '48';
+    body += `<select data-k="zone" aria-label="Múi UTM">${zs.map(([v, l]) => `<option value="${v}" ${c.zone === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  } else if (role === 'dst') {
+    body += `<select data-k="fmt" aria-label="Định dạng"><option value="dd" ${c.fmt === 'dd' ? 'selected' : ''}>Độ thập phân (21.0285110°)</option><option value="dms" ${c.fmt === 'dms' ? 'selected' : ''}>Độ-phút-giây (21°01'42.6396")</option></select>`;
+  }
+  const r = resolve(c);
+  let chip = '';
+  if (r.kind === 'vn2000tm') chip = `<span class="chip">KTT <b>${isFinite(r.lon0) ? fmtKTT(r.lon0) : '—'}</b> · k₀ <b>${r.k0}</b> · E₀ <b>500 000</b></span>`;
+  else if (r.kind === 'utm') chip = `<span class="chip">k₀ <b>0,9996</b> · E₀ <b>500 000</b> · ellipsoid <b>WGS84</b></span>`;
+  else chip = `<span class="chip">datum <b>${r.kind === 'wgs84' ? 'WGS84 · GPS, Google' : 'VN2000'}</b></span>`;
+  box.innerHTML = `<span class="dot"></span><div class="crs-top"><span class="role">${role === 'src' ? 'Từ' : 'Sang'}</span><select data-k="kind" aria-label="Loại hệ tọa độ">${kindOpts}</select></div>${body}${chip}`;
+  box.querySelectorAll('[data-k]').forEach(el => {
+    const ev = el.tagName === 'INPUT' ? 'change' : 'change';
+    el.addEventListener(ev, () => {
+      const k = el.dataset.k; c[k] = k === 'idx' ? +el.value : el.value;
+      if (k === 'set') c.idx = 0;
+      if (k === 'kind' && c.kind === 'utm') c.zone = role === 'src' ? (c.zone === 'auto' ? '48' : c.zone) : 'auto';
+      renderCRS(role); onCRSChange(role);
+    });
+  });
+}
+function onCRSChange(role) {
+  save(); updateInputLabels();
+  if (role === 'src') reinterpretAll(); else recomputeDst();
+  render();
+}
+function updateInputLabels() {
+  const [a, b] = axisNames(S.src);
+  $('oneALbl').textContent = a; $('oneBLbl').textContent = b;
+  $('colALbl').textContent = 'Cột ' + a; $('colBLbl').textContent = 'Cột ' + b;
+  const geo = !isProj(S.src);
+  $('oneA').placeholder = geo ? '21.028511 hoặc 21°01\'42.6"' : '2326149.465';
+  $('oneB').placeholder = geo ? '105.852214' : '536620.609';
+  $('oneHint').innerHTML = geo ? 'Dán nguyên cặp “21.028511, 105.852214” từ Google Maps vào ô đầu cũng được.' : 'Quy ước VN2000: <b>X là tọa độ Bắc</b> (7 chữ số), <b>Y là tọa độ Đông</b> (6 chữ số).';
+  $('manyTxt').placeholder = geo
+    ? 'M1\t21.028511\t105.852214\nM2\t21.036781\t105.834709\nM3  21°01\'27.6"  105°50\'28.3"'
+    : 'M1\t2326149.465\t536620.609\nM2\t2327066.110\t534801.300\nM3  2325732,7  535422,1';
+  if (xlsState.rows) fillColSelects(false);
+}
+
+/* ===== ROWS & CONVERSION ===== */
+let rows = [], uid = 0, selId = null;
+function makeRow(name, a, b, h, origin, attrs) {
+  return { id: ++uid, name: String(name ?? '').trim(), rawA: a, rawB: b, rawH: h, origin, attrs: attrs || null };
+}
+function interpret(r) {
+  r.err = ''; r.warn = ''; r.wgs = null; r.src = null; r.dst = null;
+  const sc = resolve(S.src);
+  if (r.origin === 'map' || r.origin === 'gps') {
+    r.src = Geo.fromWGS(sc, r.wgsFix); r.wgs = r.wgsFix; return recompute(r);
+  }
+  const proj = isProj(S.src);
+  let A = proj ? parseNum(r.rawA) : parseAngle(r.rawA), B = proj ? parseNum(r.rawB) : parseAngle(r.rawB);
+  let H = parseNum(r.rawH); if (!isFinite(H)) H = 0;
+  if (!isFinite(A) || !isFinite(B)) { r.err = 'Không đọc được tọa độ'; return r; }
+  if (sc.kind === 'vn2000tm' && !isFinite(sc.lon0)) { r.err = 'KTT không hợp lệ'; return r; }
+  if ($('autoSwap').checked) {
+    if (proj && A < B) { [A, B] = [B, A]; r.warn = 'Đã đảo X↔Y'; }
+    if (!proj && A > B && B < 30 && A > 90) { [A, B] = [B, A]; r.warn = 'Đã đảo Vĩ↔Kinh'; }
+  }
+  if (!proj && (Math.abs(A) > 90 || Math.abs(B) > 180)) { r.err = 'Độ vượt giới hạn'; return r; }
+  r.src = proj ? { X: A, Y: B, h: H } : { lat: A, lon: B, h: H };
+  r.wgs = Geo.toWGS(sc, r.src);
+  if (!r.wgs || !isFinite(r.wgs.lat) || !isFinite(r.wgs.lon)) { r.err = 'Tọa độ ngoài phạm vi phép chiếu'; r.wgs = null; return r; }
+  return recompute(r);
+}
+function recompute(r) {
+  if (!r.wgs) return r;
+  r.dst = Geo.fromWGS(resolve(S.dst), r.wgs);
+  const { lat, lon } = r.wgs;
+  if (!(lat > 6 && lat < 24.5 && lon > 101 && lon < 118)) r.warn = (r.warn ? r.warn + ' · ' : '') + 'Ngoài lãnh thổ VN?';
+  return r;
+}
+function reinterpretAll() { rows.forEach(interpret); }
+function recomputeDst() { rows.forEach(r => { if (r.wgs) { r.warn = (r.warn || '').replace(/ ?·? ?Ngoài lãnh thổ VN\?/, ''); recompute(r); } }); }
+
+function fmtVals(c, p) {
+  if (!p) return ['', ''];
+  const dec = +$('decSel').value;
+  if (isProj(c)) return [p.X.toFixed(dec), p.Y.toFixed(dec)];
+  if (c.fmt === 'dms') return [fmtDMS(p.lat), fmtDMS(p.lon)];
+  return [p.lat.toFixed(dec + 6), p.lon.toFixed(dec + 6)];
+}
+
+/* ===== RENDER TABLE ===== */
+function render() {
+  const n = rows.length, ok = rows.filter(r => r.wgs).length, bad = n - ok;
+  $('count').textContent = n;
+  ['xlsxOut', 'kmlOut', 'clearBtn'].forEach(id => $(id).disabled = !ok && id !== 'clearBtn' || !n);
+  $('dmeta').textContent = n ? `${crsLabel(S.src, true)} → ${crsLabel(S.dst, true)}${bad ? ` · ${bad} lỗi` : ''}` : '';
+  if (!n) { $('tblWrap').innerHTML = '<div class="empty">Chưa có điểm nào. Nhập tọa độ bên trái hoặc bấm ⌖ để lấy điểm trên bản đồ.</div>'; drawMap(); return; }
+  const [sa, sb] = axisNames(S.src), [da, db] = axisNames(S.dst);
+  const showW = S.src.kind !== 'wgs84' && S.dst.kind !== 'wgs84';
+  const showZone = S.dst.kind === 'utm';
+  let h = `<table class="res"><thead><tr><th>#</th><th>Tên điểm</th><th>${sa}</th><th>${sb}</th><th></th><th class="grp-dst">${da}</th><th class="grp-dst">${db}</th>${showZone ? '<th class="grp-dst">Múi</th>' : ''}${showW ? '<th>Vĩ độ WGS84</th><th>Kinh độ WGS84</th>' : ''}<th>Ghi chú</th><th></th></tr></thead><tbody>`;
+  rows.forEach((r, i) => {
+    const [s1, s2] = r.src ? fmtVals(S.src, r.src) : [esc(r.rawA), esc(r.rawB)];
+    const [d1, d2] = fmtVals(S.dst, r.dst);
+    const st = r.err ? `<span class="st err">${esc(r.err)}</span>` : r.warn ? `<span class="st warn">${esc(r.warn)}</span>` : (r.origin === 'map' ? '<span class="meta">từ bản đồ</span>' : r.origin === 'gps' ? '<span class="meta">GPS</span>' : '');
+    h += `<tr data-id="${r.id}" class="${r.err ? 'bad' : ''} ${selId === r.id ? 'sel' : ''}"><td class="n">${i + 1}</td><td>${esc(r.name)}</td><td class="n">${s1}</td><td class="n">${s2}</td><td class="arrow">→</td><td class="n d">${d1}</td><td class="n d">${d2}</td>${showZone ? `<td class="n d">${r.dst ? r.dst.zone + 'N' : ''}</td>` : ''}${showW ? `<td class="n">${r.wgs ? r.wgs.lat.toFixed(8) : ''}</td><td class="n">${r.wgs ? r.wgs.lon.toFixed(8) : ''}</td>` : ''}<td>${st}</td><td><button class="del" data-del="${r.id}" aria-label="Xóa điểm">×</button></td></tr>`;
+  });
+  $('tblWrap').innerHTML = h + '</tbody></table>';
+  drawMap();
+}
+$('tblWrap').addEventListener('click', e => {
+  const d = e.target.closest('[data-del]');
+  if (d) { rows = rows.filter(r => r.id !== +d.dataset.del); render(); return; }
+  const tr = e.target.closest('tr[data-id]'); if (!tr) return;
+  focusRow(+tr.dataset.id);
+});
+function focusRow(id) {
+  selId = id; const r = rows.find(x => x.id === id);
+  document.querySelectorAll('table.res tr.sel').forEach(t => t.classList.remove('sel'));
+  document.querySelector(`table.res tr[data-id="${id}"]`)?.classList.add('sel');
+  if (map && r && r.wgs) { map.setView([r.wgs.lat, r.wgs.lon], Math.max(map.getZoom(), 18)); markers[id]?.openPopup(); }
+  Object.entries(markers).forEach(([k, m]) => m.getElement()?.querySelector('.pt')?.classList.toggle('sel', +k === id));
+}
+$('decSel').addEventListener('change', render);
+$('clearBtn').addEventListener('click', () => { if (!rows.length) return; rows = []; selId = null; render(); toast('Đã xóa toàn bộ điểm'); });
+$('drawerToggle').addEventListener('click', () => setDrawer(!$('drawer').classList.contains('open')));
+function setDrawer(open) {
+  $('drawer').classList.toggle('open', open);
+  setTimeout(() => { document.documentElement.style.setProperty('--drawer-h', $('drawer').offsetHeight + 'px'); map?.invalidateSize(); }, 320);
+}
+function addRows(list, replace) {
+  if (replace) { rows = []; selId = null; }
+  list.forEach(r => rows.push(interpret(r)));
+  render(); setDrawer(true); fitAll();
+  const ok = list.filter(r => r.wgs).length, bad = list.length - ok;
+  toast(bad ? `Đã chuyển ${ok} điểm · ${bad} dòng lỗi` : `Đã chuyển ${ok} điểm`);
+}
+
+/* ===== INPUT: ONE ===== */
+function splitPair(s) {
+  const t = String(s).trim();
+  let m = t.match(/^(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)$/);
+  return m ? [m[1], m[2]] : null;
+}
+$('oneA').addEventListener('input', () => { const p = splitPair($('oneA').value); if (p && !$('oneB').value) { $('oneA').value = p[0]; $('oneB').value = p[1]; } });
+$('oneGo').addEventListener('click', () => {
+  $('oneErr').classList.remove('on');
+  const name = $('oneName').value.trim() || ('P' + (rows.length + 1));
+  const r = interpret(makeRow(name, $('oneA').value, $('oneB').value, '', 'manual'));
+  if (r.err) { $('oneErr').textContent = r.err + '. Kiểm tra lại số và hệ nguồn.'; $('oneErr').classList.add('on'); return; }
+  rows.push(r); render(); setDrawer(true); focusRow(r.id);
+  $('oneName').value = ''; $('oneA').value = ''; $('oneB').value = ''; $('oneA').focus();
+  toast(`${r.name}: ${fmtVals(S.dst, r.dst).join('  ·  ')}`);
+});
+['oneA', 'oneB', 'oneName'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('oneGo').click(); } }));
+
+/* ===== INPUT: PASTE ===== */
+function parseLines(txt) {
+  const out = [], proj = isProj(S.src);
+  const isNumTok = t => proj ? isFinite(parseNum(t)) : isFinite(parseAngle(t));
+  txt.split(/\r?\n/).forEach((line, li) => {
+    if (!line.trim()) return;
+    let toks;
+    if (line.includes('\t')) toks = line.split('\t');
+    else if (line.includes(';')) toks = line.split(';');
+    else {
+      toks = line.trim().match(/(?:"[^"]*"|[^\s"])+/g) || [];
+      // DMS with spaces inside quotes-less: keep tokens that contain °'" together
+      toks = toks.map(t => t.replace(/^,+|,+$/g, '')).filter(Boolean);
+      if (toks.length < 2 && line.includes(',')) toks = line.split(',');
+    }
+    toks = toks.map(t => t.trim()).filter(t => t !== '');
+    if (!toks.length) return;
+    let name = '';
+    if (!isNumTok(toks[0])) name = toks.shift();
+    else if (toks.length >= 3 && /^\d+$/.test(toks[0]) && /[.,°]/.test(toks[1]) && /[.,°]/.test(toks[2])) name = toks.shift();
+    else if (proj && toks.length >= 3 && /^\d+$/.test(toks[0]) && +toks[0] < 100000 && parseNum(toks[1]) > 100000 && parseNum(toks[2]) > 100000) name = toks.shift();
+    if (toks.length < 2) { if (li === 0 && name) return; out.push(Object.assign(makeRow(name || `Dòng ${li + 1}`, toks[0] || '', '', '', 'paste'))); return; }
+    if (li === 0 && !isNumTok(toks[0]) && !isNumTok(toks[1])) return; // header line
+    out.push(makeRow(name || ('P' + (out.length + 1)), toks[0], toks[1], toks[2] ?? '', 'paste'));
+  });
+  return out;
+}
+$('manyGo').addEventListener('click', () => {
+  $('manyErr').classList.remove('on');
+  const list = parseLines($('manyTxt').value);
+  if (!list.length) { $('manyErr').textContent = 'Chưa có dòng tọa độ nào.'; $('manyErr').classList.add('on'); return; }
+  addRows(list, true);
+});
+
+/* ===== INPUT: EXCEL ===== */
+const xlsState = { wb: null, rows: null, header: null, start: 0, name: '' };
+const drop = $('drop');
+drop.addEventListener('click', () => $('fileIn').click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileIn').click(); } });
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+$('fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) readFile(f); e.target.value = ''; });
+function readFile(f) {
+  $('xlsErr').classList.remove('on');
+  if (typeof XLSX === 'undefined') { $('xlsErr').textContent = 'Chưa tải được thư viện Excel (cần Internet).'; $('xlsErr').classList.add('on'); return; }
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      xlsState.wb = XLSX.read(new Uint8Array(fr.result), { type: 'array', cellDates: false });
+      xlsState.name = f.name;
+      $('sheetSel').innerHTML = xlsState.wb.SheetNames.map((s, i) => `<option value="${i}">${esc(s)}</option>`).join('');
+      const guess = xlsState.wb.SheetNames.findIndex(s => sheetMatchesSrc(s));
+      $('sheetSel').value = guess >= 0 ? guess : 0;
+      loadSheet();
+    } catch (err) { $('xlsErr').textContent = 'Không đọc được file: ' + err.message; $('xlsErr').classList.add('on'); }
+  };
+  fr.readAsArrayBuffer(f);
+}
+function sheetMatchesSrc(s) {
+  s = s.toLowerCase();
+  if (S.src.kind === 'vn2000tm') return /vn.?2000/.test(s) && !/độ|do|geo/.test(s);
+  if (S.src.kind === 'utm') return /utm/.test(s);
+  if (S.src.kind === 'wgs84') return /wgs/.test(s);
+  return false;
+}
+$('sheetSel').addEventListener('change', loadSheet);
+function loadSheet() {
+  const ws = xlsState.wb.Sheets[xlsState.wb.SheetNames[+$('sheetSel').value]];
+  const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '', blankrows: false });
+  let hi = -1;
+  for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+    const r = aoa[i]; const txt = r.filter(v => typeof v === 'string' && v.trim() && !isFinite(parseNum(v))).length;
+    const nums = r.filter(v => isFinite(parseNum(v))).length;
+    if (txt >= 2 && aoa[i + 1] && aoa[i + 1].filter(v => isFinite(parseNum(v)) || isFinite(parseAngle(v))).length >= 2) { hi = i; break; }
+    if (nums >= 2) break;
+  }
+  const width = Math.max(0, ...aoa.map(r => r.length));
+  const colL = i => { let s = '', n = i + 1; while (n) { s = String.fromCharCode(65 + (n - 1) % 26) + s; n = Math.floor((n - 1) / 26); } return s; };
+  xlsState.header = Array.from({ length: width }, (_, i) => (hi >= 0 && String(aoa[hi][i] ?? '').trim()) ? String(aoa[hi][i]).trim() : 'Cột ' + colL(i));
+  xlsState.rows = aoa.slice(hi + 1).filter(r => r.some(v => String(v).trim() !== ''));
+  $('fName').textContent = xlsState.name;
+  $('fRows').textContent = `· ${xlsState.rows.length} dòng`;
+  $('fileInfo').classList.add('on');
+  fillColSelects(true);
+}
+function guessCols() {
+  const H = xlsState.header.map(h => h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd'));
+  const find = (re, not) => H.findIndex((h, i) => re.test(h) && !(not && not.includes(i)));
+  let name = find(/ten|name|so hieu|ma diem|ma moc|ten moc/);
+  if (name < 0) name = find(/diem|point|moc/);
+  if (name < 0) name = find(/stt|^id$|^tt$|^so$/);
+  const used = [name];
+  let a, b;
+  if (S.src.kind === 'vn2000tm' || S.src.kind === 'utm') {
+    a = find(/^x\b|^x[\s(_]|^x$|toa do x|northing|^n\b|^n$|^n[\s(]|bac/, used); used.push(a);
+    b = find(/^y\b|^y[\s(_]|^y$|toa do y|easting|^e\b|^e$|^e[\s(]|dong/, used);
+  } else {
+    a = find(/vi do|^lat|latitude|^b\b|^b$|^phi/, used); used.push(a);
+    b = find(/kinh do|^lon|^lng|longitude|^l\b|^l$|lambda/, used);
+  }
+  used.push(b);
+  const hcol = find(/^h\b|^h$|^h[\s(]|do cao|cao do|elev|^z$|height/, used);
+  // fallback: first two numeric columns
+  if (a < 0 || b < 0) {
+    const sample = xlsState.rows.slice(0, 5);
+    const numCols = xlsState.header.map((_, i) => i).filter(i => i !== name && sample.length && sample.every(r => isFinite(parseNum(r[i])) || isFinite(parseAngle(r[i]))));
+    const big = numCols.filter(i => !(sample.every(r => /^\d{1,4}$/.test(String(r[i]))) && numCols.length > 2));
+    if (a < 0) a = big[0] ?? -1; if (b < 0) b = big.find(i => i !== a) ?? -1;
+  }
+  return { name, a, b, h: hcol };
+}
+function fillColSelects(reguess) {
+  const opts = (none) => (none ? `<option value="-1">— không dùng —</option>` : '') + xlsState.header.map((h, i) => `<option value="${i}">${esc(h)}</option>`).join('');
+  const prev = { name: $('colName').value, a: $('colA').value, b: $('colB').value, h: $('colH').value };
+  $('colName').innerHTML = opts(true); $('colH').innerHTML = opts(true); $('colA').innerHTML = opts(true); $('colB').innerHTML = opts(true);
+  const g = reguess ? guessCols() : prev;
+  $('colName').value = g.name ?? -1; $('colA').value = g.a ?? -1; $('colB').value = g.b ?? -1; $('colH').value = g.h ?? -1;
+  if (reguess) { const g2 = guessCols(); $('colA').value = g2.a; $('colB').value = g2.b; }
+  ['colName', 'colA', 'colB', 'colH'].forEach(id => { if ($(id).selectedIndex < 0) $(id).value = -1; });
+  checkXlsHint(); renderPreview();
+}
+['colName', 'colA', 'colB', 'colH'].forEach(id => $(id).addEventListener('change', () => { checkXlsHint(); renderPreview(); }));
+function checkXlsHint() {
+  const hint = $('xlsHint'); hint.classList.remove('on');
+  const H = xlsState.header.join(' ').toLowerCase();
+  const geoHdr = /kinh|vĩ|lat|lon/.test(H), projHdr = /\bx\b|\by\b|northing|easting/.test(H.replace(/[()]/g, ' '));
+  if (isProj(S.src) && geoHdr && !projHdr) {
+    hint.innerHTML = 'File có cột Kinh/Vĩ độ nhưng hệ nguồn đang là tọa độ phẳng. <br><button class="btn" type="button" id="hintFix">Đổi hệ nguồn sang WGS84</button>';
+    hint.classList.add('on'); $('hintFix').onclick = () => { S.src.kind = 'wgs84'; renderCRS('src'); onCRSChange('src'); fillColSelects(true); };
+  } else if (!isProj(S.src) && projHdr && !geoHdr) {
+    hint.innerHTML = 'File có cột X/Y nhưng hệ nguồn đang là Kinh/Vĩ độ. <br><button class="btn" type="button" id="hintFix">Đổi hệ nguồn sang VN2000 phẳng</button>';
+    hint.classList.add('on'); $('hintFix').onclick = () => { S.src.kind = 'vn2000tm'; renderCRS('src'); onCRSChange('src'); fillColSelects(true); };
+  }
+}
+function renderPreview() {
+  const sel = [+$('colName').value, +$('colA').value, +$('colB').value, +$('colH').value];
+  const hd = xlsState.header.map((h, i) => `<th>${esc(h)}</th>`).join('');
+  const body = xlsState.rows.slice(0, 4).map(r => '<tr>' + xlsState.header.map((_, i) => `<td class="${sel.includes(i) ? 'm' : ''}">${esc(r[i])}</td>`).join('') + '</tr>').join('');
+  $('preview').innerHTML = `<table><thead><tr>${hd}</tr></thead><tbody>${body}</tbody></table>`;
+}
+$('xlsGo').addEventListener('click', () => {
+  $('xlsErr').classList.remove('on');
+  const ci = +$('colName').value, ca = +$('colA').value, cb = +$('colB').value, chh = +$('colH').value;
+  if (ca < 0 || cb < 0) { $('xlsErr').textContent = 'Chọn đủ 2 cột tọa độ.'; $('xlsErr').classList.add('on'); return; }
+  const used = new Set([ci, ca, cb, chh]);
+  const list = xlsState.rows.map((r, i) => {
+    const attrs = {}; xlsState.header.forEach((h, j) => { if (!used.has(j)) attrs[h] = r[j]; });
+    return makeRow(ci >= 0 ? r[ci] : 'P' + (i + 1), r[ca], r[cb], chh >= 0 ? r[chh] : '', 'excel', attrs);
+  });
+  xlsState.attrCols = xlsState.header.filter((h, j) => !used.has(j));
+  xlsState.nameHdr = ci >= 0 ? xlsState.header[ci] : 'Tên điểm';
+  addRows(list, true);
+});
+
+/* ===== TEMPLATE ===== */
+$('tplBtn').addEventListener('click', () => {
+  if (typeof XLSX === 'undefined') return toast('Chưa tải được thư viện Excel (cần Internet)');
+  const pts = [['M1', 'Tháp Rùa – Hồ Gươm', 21.027872, 105.852323], ['M2', 'Nhà hát Lớn', 21.024278, 105.857611], ['M3', 'Ga Hà Nội', 21.024528, 105.841194], ['M4', 'Lăng Bác', 21.036769, 105.834683]];
+  const vnC = { kind: 'vn2000tm', lon0: 105, k0: 0.9999 };
+  const wb = XLSX.utils.book_new();
+  const vn = [['STT', 'Tên điểm', 'X (m)', 'Y (m)', 'H (m)', 'Ghi chú']];
+  pts.forEach(([n, g, lat, lon], i) => { const p = Geo.fromWGS(vnC, { lat, lon, h: 0 }); vn.push([i + 1, n, +p.X.toFixed(3), +p.Y.toFixed(3), '', g]); });
+  const wg = [['STT', 'Tên điểm', 'Vĩ độ', 'Kinh độ', 'H (m)', 'Ghi chú']];
+  pts.forEach(([n, g, lat, lon], i) => wg.push([i + 1, n, lat, lon, '', g]));
+  const ut = [['STT', 'Tên điểm', 'N (Northing)', 'E (Easting)', 'H (m)', 'Ghi chú']];
+  pts.forEach(([n, g, lat, lon], i) => { const p = Geo.fromWGS({ kind: 'utm', zone: 48 }, { lat, lon, h: 0 }); ut.push([i + 1, n, +p.X.toFixed(3), +p.Y.toFixed(3), '', g]); });
+  const guide = [['HƯỚNG DẪN NHẬP TỌA ĐỘ'], [''],
+    ['1. Chọn sheet phù hợp: VN2000 (X, Y phẳng), WGS84 (Vĩ độ, Kinh độ) hoặc UTM (N, E). Có thể xóa các sheet không dùng.'],
+    ['2. Giữ dòng tiêu đề. Các cột khác (Ghi chú, Loại đất…) được giữ nguyên khi xuất kết quả.'],
+    ['3. VN2000: X là tọa độ Bắc (7 chữ số), Y là tọa độ Đông (6 chữ số). Mẫu tính theo KTT 105°00\' (TP. Hà Nội), múi 3°.'],
+    ['4. Kinh/Vĩ độ nhập dạng thập phân (21.027872) hoặc độ-phút-giây (21°01\'40.3").'],
+    ['5. Trên web: chọn hệ nguồn đúng tỉnh/KTT, tải file lên, kiểm tra cột được tự nhận, bấm "Chuyển đổi file".']];
+  const sh = (aoa, w) => { const s = XLSX.utils.aoa_to_sheet(aoa); s['!cols'] = w.map(x => ({ wch: x })); return s; };
+  XLSX.utils.book_append_sheet(wb, sh(vn, [6, 12, 16, 14, 9, 24]), 'VN2000');
+  XLSX.utils.book_append_sheet(wb, sh(wg, [6, 12, 14, 14, 9, 24]), 'WGS84');
+  XLSX.utils.book_append_sheet(wb, sh(ut, [6, 12, 16, 14, 9, 24]), 'UTM');
+  XLSX.utils.book_append_sheet(wb, sh(guide, [110]), 'Huong dan');
+  XLSX.writeFile(wb, 'Mau_nhap_toa_do.xlsx');
+});
+
+/* ===== EXPORT ===== */
+function stamp() { const d = new Date(); return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`; }
+$('xlsxOut').addEventListener('click', () => {
+  if (typeof XLSX === 'undefined') return toast('Chưa tải được thư viện Excel (cần Internet)');
+  const dec = +$('decSel').value;
+  const [sa, sb] = axisNames(S.src), [da, db] = axisNames(S.dst);
+  const sl = crsLabel(S.src, true), dl = crsLabel(S.dst, true);
+  const attrCols = [...new Set(rows.flatMap(r => r.attrs ? Object.keys(r.attrs) : []))];
+  const anyH = rows.some(r => r.src && r.src.h);
+  const hdr = ['STT', 'Tên điểm', ...attrCols, `${sa} – ${sl}`, `${sb} – ${sl}`, ...(anyH ? ['H nguồn (m)'] : []), `${da} – ${dl}`, `${db} – ${dl}`, ...(S.dst.kind === 'utm' ? ['Múi UTM'] : []), ...(anyH ? ['H đích (m)'] : []), 'Vĩ độ WGS84', 'Kinh độ WGS84', 'Ghi chú'];
+  const aoa = [hdr];
+  const v = (c, p, k) => { if (!p) return ''; if (isProj(c)) return +p[k].toFixed(dec); if (c.fmt === 'dms' && c === S.dst) return fmtDMS(p[k]); return +p[k].toFixed(dec + 6); };
+  rows.forEach((r, i) => {
+    const s1 = r.src ? v(S.src, r.src, isProj(S.src) ? 'X' : 'lat') : r.rawA, s2 = r.src ? v(S.src, r.src, isProj(S.src) ? 'Y' : 'lon') : r.rawB;
+    aoa.push([i + 1, r.name, ...attrCols.map(c => r.attrs?.[c] ?? ''), s1, s2, ...(anyH ? [r.src ? +(r.src.h || 0).toFixed(3) : ''] : []),
+      v(S.dst, r.dst, isProj(S.dst) ? 'X' : 'lat'), v(S.dst, r.dst, isProj(S.dst) ? 'Y' : 'lon'), ...(S.dst.kind === 'utm' ? [r.dst ? r.dst.zone + 'N' : ''] : []),
+      ...(anyH ? [r.dst ? +(r.dst.h || 0).toFixed(3) : ''] : []),
+      r.wgs ? +r.wgs.lat.toFixed(9) : '', r.wgs ? +r.wgs.lon.toFixed(9) : '', [r.err, r.warn, r.origin === 'map' ? 'Lấy từ bản đồ' : r.origin === 'gps' ? 'GPS' : ''].filter(Boolean).join(' · ')]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = hdr.map((h, i) => ({ wch: i === 0 ? 6 : Math.max(12, Math.min(34, h.length + 2)) }));
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = 1; R <= range.e.r; R++) for (let C = 0; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+    if (cell && cell.t === 'n' && C > 0) { const h = hdr[C]; cell.z = /Vĩ độ|Kinh độ/.test(h) ? '0.000000000' : (h.startsWith('H ') ? '0.000' : '0.' + '0'.repeat(dec)); if (/Vĩ độ|Kinh độ/.test(h) && !/WGS84$/.test(h)) cell.z = '0.' + '0'.repeat(dec + 6); }
+  }
+  const meta = [['THÔNG SỐ CHUYỂN ĐỔI'], ['Hệ nguồn', crsLabel(S.src)], ['Hệ đích', crsLabel(S.dst)], ['Số điểm', rows.length], ['Số điểm lỗi', rows.filter(r => r.err).length],
+    ['Tham số 7 phép (VN2000→WGS84)', 'ΔX=-191.90441429 ΔY=-39.30318279 ΔZ=-111.45032835 m; ωX=-0.00928836" ωY=0.01975479" ωZ=-0.00427372"; k=0.252906278 ppm (TT 973/2001/TT-TCĐC)'],
+    ['Phép chiếu', 'TM (Gauss-Krüger/UTM), ellipsoid WGS84, E0=500000 m, N0=0'], ['Độ cao', 'H chuyển theo ellipsoid (không hiệu chỉnh geoid)'], ['Thời gian', new Date().toLocaleString('vi-VN')]];
+  if (polyOn && polyStats) meta.push(['Diện tích vùng (m²)', +polyStats.area.toFixed(2)], ['Chu vi vùng (m)', +polyStats.per.toFixed(3)], ['Tính trên hệ', polyStats.on]);
+  const ms = XLSX.utils.aoa_to_sheet(meta); ms['!cols'] = [{ wch: 30 }, { wch: 100 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Ket qua');
+  XLSX.utils.book_append_sheet(wb, ms, 'Thong so');
+  XLSX.writeFile(wb, `Chuyen_doi_toa_do_${stamp()}.xlsx`);
+  toast('Đã xuất file Excel');
+});
+$('kmlOut').addEventListener('click', () => {
+  const ok = rows.filter(r => r.wgs);
+  const pm = ok.map(r => `<Placemark><name>${esc(r.name)}</name><description>${esc(crsLabel(S.dst, true) + ': ' + fmtVals(S.dst, r.dst).join(', '))}</description><Point><coordinates>${r.wgs.lon.toFixed(9)},${r.wgs.lat.toFixed(9)},0</coordinates></Point></Placemark>`).join('\n');
+  const poly = polyOn && ok.length >= 3 ? `<Placemark><name>Vùng</name><Style><LineStyle><color>ff2a7af2</color><width>2</width></LineStyle><PolyStyle><color>402a7af2</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>${[...ok, ok[0]].map(r => `${r.wgs.lon.toFixed(9)},${r.wgs.lat.toFixed(9)},0`).join(' ')}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>` : '';
+  const kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Chuyen doi toa do</name>\n${pm}\n${poly}</Document></kml>`;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' }));
+  a.download = `Diem_${stamp()}.kml`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+
+/* ===== MAP ===== */
+let map = null, layer = null, polyLayer = null, markers = {}, polyOn = false, polyStats = null, picking = false;
+function initMap() {
+  if (typeof L === 'undefined') { $('nomap').style.display = 'grid'; return; }
+  map = L.map('map', { zoomControl: true, maxZoom: 22 }).setView([16.2, 106.3], 6);
+  const g = (lyr) => L.tileLayer(`https://mt{s}.google.com/vt/lyrs=${lyr}&x={x}&y={y}&z={z}&hl=vi`, { subdomains: '0123', maxZoom: 22, maxNativeZoom: 21, attribution: '© Google' });
+  const bases = {
+    'Google vệ tinh + nhãn': g('y'), 'Google vệ tinh': g('s'), 'Google bản đồ': g('m'), 'Google địa hình': g('p'),
+    'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22, maxNativeZoom: 19, attribution: '© OpenStreetMap' })
+  };
+  bases['Google vệ tinh + nhãn'].addTo(map);
+  L.control.layers(bases, null, { position: 'topright' }).addTo(map);
+  L.control.scale({ imperial: false, position: 'bottomright' }).addTo(map);
+  layer = L.layerGroup().addTo(map); polyLayer = L.layerGroup().addTo(map);
+  map.on('mousemove', e => readout(e.latlng));
+  map.on('mouseout', () => { $('readout').innerHTML = '<span class="idle">Di chuột trên bản đồ để đọc tọa độ</span>'; });
+  map.on('click', e => {
+    if (!picking) { readout(e.latlng); return; }
+    const n = rows.filter(r => r.origin === 'map').length + 1;
+    const r = makeRow('BĐ' + n, '', '', '', 'map'); r.wgsFix = { lat: e.latlng.lat, lon: e.latlng.lng, h: 0 };
+    rows.push(interpret(r)); render(); setDrawer(true);
+    toast(`${r.name}: ${fmtVals(S.dst, r.dst).join('  ·  ')}`);
+  });
+  map.on('locationfound', e => {
+    const r = makeRow('GPS ±' + Math.round(e.accuracy) + 'm', '', '', '', 'gps'); r.wgsFix = { lat: e.latlng.lat, lon: e.latlng.lng, h: 0 };
+    rows.push(interpret(r)); render(); setDrawer(true); focusRow(r.id);
+  });
+  map.on('locationerror', () => toast('Không lấy được vị trí (cần cho phép định vị, chạy trên https)'));
+}
+function readout(ll) {
+  const w = { lat: ll.lat, lon: ll.lng, h: 0 };
+  const line = (c, k) => { const p = Geo.fromWGS(resolve(c), w); const [a, b] = fmtVals(c, p); const [na, nb] = axisNames(c); return `<div><span class="k">${k}</span>${na.split(' ')[0]} ${a} &nbsp;${nb.split(' ')[0]} ${b}${c.kind === 'utm' ? ' · ' + p.zone + 'N' : ''}</div>`; };
+  $('readout').innerHTML = line(S.src, crsLabel(S.src, true).replace('UTM WGS84 (tự chọn múi)', 'UTM')) + line(S.dst, crsLabel(S.dst, true).replace('UTM WGS84 (tự chọn múi)', 'UTM')) +
+    (S.src.kind !== 'wgs84' && S.dst.kind !== 'wgs84' ? `<div><span class="k">WGS84</span>${ll.lat.toFixed(7)}, ${ll.lng.toFixed(7)}</div>` : '');
+}
+function popupHtml(r) {
+  const [sa, sb] = axisNames(S.src), [da, db] = axisNames(S.dst);
+  const [s1, s2] = fmtVals(S.src, r.src), [d1, d2] = fmtVals(S.dst, r.dst);
+  return `<div class="pop"><h4>${esc(r.name)}</h4><table>
+    <tr><td colspan="2" style="padding-top:2px">${esc(crsLabel(S.src, true))}</td></tr><tr><td>${sa}</td><td>${s1}</td></tr><tr><td>${sb}</td><td>${s2}</td></tr>
+    <tr><td colspan="2" style="padding-top:6px;color:var(--stake-deep)">${esc(crsLabel(S.dst, true))}</td></tr><tr><td>${da}</td><td>${d1}</td></tr><tr><td>${db}</td><td>${d2}</td></tr>
+    </table><div style="margin-top:6px"><a href="https://www.google.com/maps?q=${r.wgs.lat.toFixed(7)},${r.wgs.lon.toFixed(7)}" target="_blank" rel="noopener">Mở Google Maps ↗</a></div></div>`;
+}
+function drawMap() {
+  if (!map) return;
+  layer.clearLayers(); polyLayer.clearLayers(); markers = {};
+  const ok = rows.filter(r => r.wgs);
+  ok.forEach(r => {
+    const icon = L.divIcon({ className: '', html: `<div class="pt ${r.origin === 'map' || r.origin === 'gps' ? 'map' : ''} ${selId === r.id ? 'sel' : ''}"><i></i><span>${esc(r.name)}</span></div>`, iconSize: [0, 0] });
+    const m = L.marker([r.wgs.lat, r.wgs.lon], { icon, title: r.name }).bindPopup(popupHtml(r), { maxWidth: 320 }).addTo(layer);
+    m.on('click', () => { selId = r.id; document.querySelectorAll('table.res tr').forEach(t => t.classList.toggle('sel', +t.dataset.id === r.id)); document.querySelector(`table.res tr[data-id="${r.id}"]`)?.scrollIntoView({ block: 'nearest' }); });
+    markers[r.id] = m;
+  });
+  polyStats = null; $('area').classList.remove('on');
+  if (polyOn && ok.length >= 2) {
+    const ll = ok.map(r => [r.wgs.lat, r.wgs.lon]);
+    const style = { color: 'oklch(0.72 0.19 45)', weight: 2.5, fillColor: 'oklch(0.72 0.19 45)', fillOpacity: .16 };
+    (ok.length >= 3 ? L.polygon(ll, style) : L.polyline(ll, style)).addTo(polyLayer);
+    // area & perimeter in a projected CRS
+    let c = isProj(S.dst) ? S.dst : isProj(S.src) ? S.src : null, on;
+    let P;
+    if (c) { P = ok.map(r => Geo.fromWGS(resolve(c), r.wgs)); on = crsLabel(c, true); }
+    else { const z = Geo.utmZone(ok[0].wgs.lon); P = ok.map(r => Geo.fromWGS({ kind: 'utm', zone: z }, r.wgs)); on = `UTM ${z}N`; }
+    let area = 0, per = 0;
+    for (let i = 0; i < P.length; i++) {
+      const p = P[i], q = P[(i + 1) % P.length];
+      if (ok.length >= 3) area += p.Y * q.X - q.Y * p.X;
+      if (i < P.length - 1 || ok.length >= 3) per += Math.hypot(q.X - p.X, q.Y - p.Y);
+    }
+    area = Math.abs(area) / 2;
+    polyStats = { area, per, on };
+    const fmt = (x, d) => x.toLocaleString('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d });
+    $('area').innerHTML = ok.length >= 3 ? `S = ${fmt(area, 1)} m² (${fmt(area / 10000, 4)} ha) · P = ${fmt(per, 2)} m` : `L = ${fmt(per, 3)} m`;
+    $('area').title = 'Tính trên ' + on; $('area').classList.add('on');
+  }
+}
+function fitAll() {
+  if (!map) return;
+  const ok = rows.filter(r => r.wgs);
+  if (!ok.length) return;
+  if (ok.length === 1) map.setView([ok[0].wgs.lat, ok[0].wgs.lon], 18);
+  else map.fitBounds(L.latLngBounds(ok.map(r => [r.wgs.lat, r.wgs.lon])), { padding: [50, 50], maxZoom: 19 });
+}
+$('fitBtn').addEventListener('click', fitAll);
+$('polyBtn').addEventListener('click', () => { polyOn = !polyOn; $('polyBtn').classList.toggle('on', polyOn); drawMap(); });
+function setPick(on) { picking = on; $('pickBtn').classList.toggle('on', on); $('stage').classList.toggle('picking', on); }
+$('pickBtn').addEventListener('click', () => setPick(!picking));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setPick(false); });
+$('gpsBtn').addEventListener('click', () => { if (!map) return; map.locate({ setView: true, maxZoom: 18, enableHighAccuracy: true }); });
+
+/* ===== SWAP & TABS ===== */
+$('swapBtn').addEventListener('click', () => {
+  const b = $('swapBtn'); b.classList.toggle('spin');
+  rows.forEach(r => {
+    if (r.dst && r.origin !== 'map' && r.origin !== 'gps') {
+      if (isProj(S.dst)) { r.rawA = r.dst.X; r.rawB = r.dst.Y; } else { r.rawA = r.dst.lat; r.rawB = r.dst.lon; }
+      r.rawH = r.dst.h;
+    }
+  });
+  [S.src, S.dst] = [S.dst, S.src];
+  if (S.src.kind === 'utm' && S.src.zone === 'auto') { const z = rows.find(r => r.dst)?.dst.zone; S.src.zone = String(z || 48); }
+  renderCRS('src'); renderCRS('dst'); save(); updateInputLabels(); reinterpretAll(); render();
+});
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + b.dataset.tab));
+}));
+$('autoSwap').addEventListener('change', () => { reinterpretAll(); render(); });
+window.addEventListener('resize', () => map?.invalidateSize());
+
+/* ===== BOOT ===== */
+renderCRS('src'); renderCRS('dst'); updateInputLabels(); initMap(); render();
+document.documentElement.style.setProperty('--drawer-h', '52px');
+
+</script>
+</body>
+</html>
