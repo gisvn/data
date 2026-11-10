@@ -1,14 +1,14 @@
 {
   "packageName": "com.rsgis.fieldmap.survey",
-  "versionCode": 18,
-  "versionName": "1.2.3",
-  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=18",
+  "versionCode": 19,
+  "versionName": "1.2.4",
+  "apkUrl": "https://gisvn.github.io/data/datdai/Hdatdai.apk?v=19",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-11-03",
+  "releaseDate": "2026-11-10",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/datdai/",
   "changelog": [
-    "Cập nhập tính năng tính diện tích và cắt thửa cho dữ liệu *DGN, *CAD và *SHP"
+    "Cập nhập tính năng update dữ liệu từ Excel vào trong thuộc tính lớp bản đồ"
 	]
 }
