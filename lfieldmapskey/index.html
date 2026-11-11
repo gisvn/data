@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Quản lý key · LField Maps / Quản lý dữ liệu đất đai</title>
+<title>Quản lý key · LField Maps / Quản lý dữ liệu đất đai / UMField Maps</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -65,6 +65,10 @@ header.top{position:sticky;top:0;z-index:20;background:oklch(0.975 0.008 165 / 0
 .app-switch select{border:0;background:var(--surface,#fff);border-radius:999px;padding:5px 10px;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}
 body.app-qldd .mark{background:oklch(0.45 0.13 150);color:#fff}
 body.app-qldd .app-switch{background:oklch(0.93 0.05 150);color:oklch(0.35 0.1 150)}
+/* UMField Maps (CTY TNHH MTV Lâm nghiệp U Minh Hạ) - tông xanh nước rừng tràm */
+body.app-umh .mark{background:oklch(0.42 0.1 220);color:#fff}
+body.app-umh .app-switch{background:oklch(0.93 0.04 220);color:oklch(0.33 0.09 220)}
+body.app-umh .app-banner{background:oklch(0.95 0.03 220);color:oklch(0.32 0.08 220);border-color:oklch(0.85 0.06 220)}
 .app-banner{max-width:1180px;margin:10px auto 0;padding:9px 16px;border-radius:12px;background:oklch(0.95 0.04 150);color:oklch(0.33 0.09 150);font-size:13px;border:1px solid oklch(0.85 0.07 150)}
 .app-banner b{font-weight:700}
 
@@ -357,6 +361,7 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
         <select id="appSwitch">
           <option value="lfield">LField Maps / RSGIS Field Map</option>
           <option value="qldd">Quản lý dữ liệu đất đai</option>
+          <option value="umh">UMField Maps (U Minh Hạ)</option>
         </select>
       </label>
       <span id="envChip" class="chip hidden"><span class="dot"></span><span id="envText"></span></span>
@@ -714,7 +719,8 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1p
 // CẤU HÌNH GÓI - khớp PlanCatalog.java
 // =====================================================================
 // =====================================================================
-// HAI APP DÙNG CHUNG TRANG NÀY (chọn ở ô "App" góc trên). Mỗi app RIÊNG:
+// BA APP DÙNG CHUNG TRANG NÀY (chọn ở ô "App" góc trên): LField Maps, Quản lý dữ liệu
+// đất đai, UMField Maps (11/11/2026). Mỗi app RIÊNG:
 //   khoá ký (localStorage), collection Firestore, tiền tố key, chuỗi ký, bảng giá.
 //   -> key cấp cho app này dán vào app kia đều bị từ chối.
 // Cấu hình Firebase + đăng nhập quản trị dùng chung (cùng project Firebase).
@@ -745,7 +751,7 @@ const APPS = {
     lsKey: 'qldd_admin_signing_jwk', file: 'qldd', team: false,
     // Sau khi "Tạo cặp khoá mới" ở chế độ này: dán khoá công khai vào ĐÂY và vào
     // LicenseConfig.PUBLIC_KEY của app Quản lý dữ liệu đất đai (để trang kiểm tra khớp khoá). '' = bỏ kiểm tra.
-    pub: 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkkyFk+3/fQepDnIQ5wmOc2L5S+YW9qGNtX9ACMbPSzCnKOll2bcpT2iG2VuXQYack7M9sRkSxlPqLmcstOCCUQ==',
+    pub: '',
     // Khớp PlanCatalog.java của app Quản lý dữ liệu đất đai.
     plans: [
       { code: 'STARTER',  name: 'DÙNG THỬ', label: '3 ngày',    days: 3,  price: 0,      orig: 0,       color: 'var(--p-starter)' },
@@ -753,6 +759,19 @@ const APPS = {
       { code: 'ULTIMATE', name: 'TRỌN ĐỜI', label: 'Vĩnh viễn', days: 0,  price: 500000, orig: 1500000, color: 'var(--p-ultimate)' },
     ]
   }
+};
+// UMField Maps: app tách từ LField Maps cho CTY TNHH MTV Lâm nghiệp U Minh Hạ (com.rsgis.fieldmap.umh).
+// DÙNG CHUNG khoá ký với LField Maps (sharedKey: cùng ô localStorage + cùng khoá công khai) nên
+// KHÔNG phải tạo / chuyển khoá mới; key vẫn không dùng lẫn được vì chuỗi ký 'UMH1' ≠ 'RSGIS1',
+// tiền tố UMH- ≠ RSG- và collection umh_* riêng. Có làm việc nhóm (team: true, chung collection teams).
+APPS.umh = {
+  id: 'umh', name: 'UMField Maps', title: 'UMField Maps · Lâm nghiệp U Minh Hạ', mark: 'UM',
+  pkg: 'com.rsgis.fieldmap.umh', canon: 'UMH1', keyPrefix: 'UMH', trialDays: 7,
+  col: { licenses: 'umh_licenses', customers: 'umh_customers', trials: 'umh_trials', broadcasts: 'umh_broadcasts' },
+  lsKey: APPS.lfield.lsKey, sharedKey: 'lfield', file: 'umh', team: true,
+  pub: APPS.lfield.pub,
+  // Khớp PlanCatalog.java của UMField Maps (giống hệt LField Maps).
+  plans: APPS.lfield.plans.map(p => ({ ...p })),
 };
 const APP = (() => {
   const q = new URLSearchParams(location.search).get('app');
@@ -798,7 +817,7 @@ const $ = (s, r = document) => r.querySelector(s);
   const bn = document.getElementById('appBanner');
   if (APP.id !== 'lfield' && bn) {
     bn.classList.remove('hidden');
-    bn.innerHTML = `Đang quản lý key của <b>${APP.title}</b> (<code>${APP.pkg}</code>) · key <b>${APP.keyPrefix}-…</b> · Firestore <code>${APP.col.licenses}</code> · khoá ký riêng. Đổi app ở ô <b>App</b> góc trên.`;
+    bn.innerHTML = `Đang quản lý key của <b>${APP.title}</b> (<code>${APP.pkg}</code>) · key <b>${APP.keyPrefix}-…</b> · Firestore <code>${APP.col.licenses}</code> · ${APP.sharedKey ? 'khoá ký DÙNG CHUNG với ' + APPS[APP.sharedKey].name + ' (không cần tạo khoá mới)' : 'khoá ký riêng'}. Đổi app ở ô <b>App</b> góc trên.`;
   }
   if (!APP.team) document.querySelectorAll('[data-tab="deletions"]').forEach(t => t.classList.add('hidden'));
 })();
@@ -835,6 +854,7 @@ function normalizeCode(s) {
   if (c.startsWith(kp)) { prefix = kp; c = c.slice(kp.length); }
   else if (c.startsWith('RSG')) { prefix = 'RSG'; c = c.slice(3); }
   else if (c.startsWith('QLD')) { prefix = 'QLD'; c = c.slice(3); }
+  else if (c.startsWith('UMH')) { prefix = 'UMH'; c = c.slice(3); }
   c = c.replace(/O/g, '0').replace(/[IL]/g, '1').split('').filter(ch => CROCK.includes(ch)).join('');
   let out = prefix;
   for (let i = 0; i < c.length; i++) { if (out.length && i % 4 === 0) out += '-'; out += c[i]; }
@@ -2270,6 +2290,13 @@ function wire2() {
 
   // ----- khoá ký -----
   $('#btnGen').onclick = async () => {
+    // App dùng chung khoá ký (UMField Maps dùng khoá của LField Maps): tạo khoá mới ở đây sẽ
+    // GHI ĐÈ khoá của app kia -> MỌI key đã bán của CẢ 2 app bị từ chối. Chặn hẳn.
+    if (APP.sharedKey && !S.demo) {
+      const other = APPS[APP.sharedKey];
+      alert(`${APP.name} dùng CHUNG khoá ký với ${other ? other.name : APP.sharedKey}.\n\nKhông tạo khoá mới ở đây (sẽ làm hỏng key của cả 2 app).\nNếu trình duyệt này chưa có khoá: chọn App = ${other ? other.name : APP.sharedKey}, nhập file sao lưu khoá / chuyển khoá như bình thường - ${APP.name} tự dùng theo.`);
+      return;
+    }
     if (S.demo) { toast('Đang xem dữ liệu mẫu: khoá ký chỉ tạm thời', true); }
     if (!S.demo && APP_PUBLIC_KEY) {
       const ans = prompt(`App đang phát hành dùng khoá công khai ${APP_PUBLIC_KEY.slice(-12)}...\n\nTạo khoá mới = MỌI key đã bán bị app từ chối, phải sửa LicenseConfig.PUBLIC_KEY và build lại app.\nNếu bạn chỉ vừa chuyển trang sang địa chỉ mới (GitHub), hãy BẤM HUỶ và chuyển khoá cũ sang.\n\nVẫn tạo? Gõ TAO KHOA MOI để xác nhận:`);
