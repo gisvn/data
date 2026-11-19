@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.4.0" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.4.1" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.4.0</version>
+    <version>1.1.4.1</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.4.0.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.4.1.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.4.0.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.4.1.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-11-19T09:30:22Z</create_date>
-    <update_date>2026-11-19T09:30:22Z</update_date>
+    <create_date>2026-11-19T14:34:21Z</create_date>
+    <update_date>2026-11-19T14:34:21Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Tích hợp tính năng xuất hồ sơ điều tra và kiểm kê rừng theo TT16-2025 cảu Bộ NN&MT]]></changelog>
-    <sha256>3cb6d8ad100abf8ee9aa42a745de8d5bbd1ee68af7f35b34b7c54ee605a06de1</sha256>
+    <changelog><![CDATA[Tích hợp tính năng xuất hồ sơ kiểm kê và điều tra rừng theo TT16-2025 của Bộ NN&MT]]></changelog>
+    <sha256>aa41396b8c678a1d79720edaf6e27ed303b0eb44b01176ff247c200d9ea3f700</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
