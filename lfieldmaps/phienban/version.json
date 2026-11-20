@@ -1,14 +1,14 @@
 {
-  "versionCode": 85,
-  "versionName": "1.8.8",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=85",
+  "versionCode": 86,
+  "versionName": "1.8.9",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=86",
   "apkSize": 0,
   "sha256": "",
   "releaseDate": "2026-11-20",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
-    " Cập nhập tiện ích nhập OTC cho rừng trồng"
+    "Bổ sung tính năng xuất dữ liệu Ô điều tra rừng trồng "
 	
   ]
 }
