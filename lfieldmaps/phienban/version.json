@@ -1,10 +1,10 @@
 {
-  "versionCode": 82,
-  "versionName": "1.8.5",
-  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=82",
+  "versionCode": 84,
+  "versionName": "1.8.7",
+  "apkUrl": "https://gisvn.github.io/data/lfieldmaps/phienban/LFieldMaps.apk?v=84",
   "apkSize": 0,
   "sha256": "",
-  "releaseDate": "2026-11-19",
+  "releaseDate": "2026-11-20",
   "minVersionCode": 0,
   "pageUrl": "https://gisvn.github.io/data/lfieldmaps/",
   "changelog": [
