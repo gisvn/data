@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-  <pyqgis_plugin name="RS GIS Forest" version="1.1.6.5" plugin_id="2664306">
+  <pyqgis_plugin name="RS GIS Forest" version="1.1.6.6" plugin_id="2664306">
     <description><![CDATA[Bộ công cụ GIS lâm nghiệp: số hóa kiểu MapInfo, node, Combine, Enclose, Buffer, chuyển đổi TAB/SHP, font TCVN3/VNI, CRS VN-2000, Excel, nhãn, ký hiệu LDLR, EUDR, Atlas...]]></description>
     <about><![CDATA[RS GIS Forest - bộ công cụ hỗ trợ thành lập bản đồ chuyên ngành lâm nghiệp trên QGIS. Thanh công cụ "Công cụ Bản đồ", "RS - Hỗ trợ số hóa bản đồ" và menu RS FOREST.]]></about>
-    <version>1.1.6.5</version>
+    <version>1.1.6.6</version>
     <trusted>False</trusted>
     <qgis_minimum_version>3.22</qgis_minimum_version>
     <qgis_maximum_version>3.99</qgis_maximum_version>
     <homepage>https://gisvn.github.io/data/layout</homepage>
-    <file_name>RS_GIS_Forest.1.1.6.5.zip</file_name>
+    <file_name>RS_GIS_Forest.1.1.6.6.zip</file_name>
     <icon>https://gisvn.github.io/data/layout/icon.png</icon>
     <author_name><![CDATA[RS GIS]]></author_name>
-    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.6.5.zip</download_url>
+    <download_url>https://gisvn.github.io/data/layout/RS_GIS_Forest.1.1.6.6.zip</download_url>
     <uploaded_by><![CDATA[RS GIS]]></uploaded_by>
-    <create_date>2026-11-26T01:53:36Z</create_date>
-    <update_date>2026-11-26T01:53:36Z</update_date>
+    <create_date>2026-11-26T02:25:57Z</create_date>
+    <update_date>2026-11-26T02:25:57Z</update_date>
     <experimental>False</experimental>
     <deprecated>False</deprecated>
     <tracker>https://gisvn.github.io/data/layout</tracker>
@@ -25,8 +25,8 @@
     <rating_votes>0</rating_votes>
     <external_dependencies></external_dependencies>
     <server>False</server>
-    <changelog><![CDATA[Cập nhập hướng dẫn sử dụng chi tiết sử dụng biểu kiểm kê và điều tra rừng theo TT16-2025]]></changelog>
-    <sha256>c3488f17c3931beb84161797d6a2df908c877b014980a735ba08df70ccb2b1e1</sha256>
+    <changelog><![CDATA[Cập nhập tính năng xử lý ảnh viễn thám và xác định vị trí mất rừng]]></changelog>
+    <sha256>1882fb596e7bd31a3a9f4d78bb6b6625958a8ab9c403b75c2b6e78cf43d0598b</sha256>
     <python_tags>cp311,cp312</python_tags>
   </pyqgis_plugin>
 </plugins>
